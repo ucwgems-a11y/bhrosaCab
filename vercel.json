@@ -1,7 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
+  "buildCommand": "cd client && npm install && npm run build && node -e \"const fs=require('fs'); if(fs.existsSync('../backend/uploads')) fs.cpSync('../backend/uploads', 'dist/uploads', {recursive:true});\"",
   "outputDirectory": "client/dist",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "backend/uploads/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -9,10 +14,6 @@
     },
     {
       "source": "/api",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/uploads/(.*)",
       "destination": "/api/index.js"
     },
     {

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd client && npm install && npm run build",
+    "build": "cd client && npm install && npm run build && node -e \"const fs=require('fs'); if(fs.existsSync('../backend/uploads')) fs.cpSync('../backend/uploads', 'dist/uploads', {recursive:true});\"",
     "dev:backend": "npm run dev --prefix backend",
     "dev:client": "npm run dev --prefix client"
   },
