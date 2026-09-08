@@ -341,7 +341,7 @@
 
 .slider-controls {
     position: absolute;
-    left: max(0px, calc((100% - 1400px) / 2));
+    left: max(0px, calc((100% - 1320px) / 2));
     bottom: 0;
     z-index: 20;
 

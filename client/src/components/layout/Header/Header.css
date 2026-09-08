@@ -8,8 +8,8 @@
 }
 
 .header-container {
-    width: 92%;
-    max-width: 1400px;
+    width: 100%;
+    max-width: 1320px;
     margin: 0 auto;
     padding: 20px 15px;
 }
