@@ -103,11 +103,13 @@ export default function AdminLogin() {
           Login
         </button>
 
+        {/* Production: Register Admin / Reset Password is disabled
         <div style={{ marginTop: "14px", fontSize: "12px", textAlign: "center" }}>
           <Link to="/admin/register" style={{ color: "#79c5e8", textDecoration: "none" }}>
             Register Admin / Reset Password
           </Link>
         </div>
+        */}
 
         <div className="admin-login-footer-links">
           <a href="https://bhrosacab.com/policy">

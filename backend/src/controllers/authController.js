@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 
-// ⚠️ ONE-TIME USE ONLY — pehla admin account banane ke baad
-// is function ko routes/authRoutes.js se hata/comment kar dena.
+// ⚠️ PRODUCTION SECURITY: Admin self-registration & password reset endpoint is disabled.
+/*
 const registerAdmin = async (req, res) => {
   try {
     const { name, nickName, email, password, dob, country, gender } = req.body;
@@ -44,6 +44,7 @@ const registerAdmin = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+*/
 
 const loginAdmin = async (req, res) => {
   try {
@@ -175,4 +176,4 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerAdmin, loginAdmin, getAdminProfile, changePassword, updateProfile };
+module.exports = { /* registerAdmin, */ loginAdmin, getAdminProfile, changePassword, updateProfile };

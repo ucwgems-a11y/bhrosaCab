@@ -51,7 +51,7 @@ import RefundPolicyPage from "../components/pages/legal/RefundPolicyPage";
 ========================================================= */
 import AdminLayout from "../components/admin/layout/AdminLayout/AdminLayout";
 import AdminLogin from "../components/adminpage/Login";
-import AdminRegister from "../components/adminpage/Register";
+// import AdminRegister from "../components/adminpage/Register"; // Disabled in production
 import AdminDashboard from "../components/adminpage/Dashboard";
 import AdminProfile from "../components/adminpage/Profile";
 import ChangePassword from "../components/adminpage/ChangePassword";
@@ -218,7 +218,7 @@ function AppRoutes() {
                  SECTION 2: ADMIN & CRM AUTHENTICATION
               ========================================================= */}
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/register" element={<AdminRegister />} />
+              {/* <Route path="/admin/register" element={<AdminRegister />} /> Disabled in production */}
               <Route path="/crm-login" element={<CrmLogin />} />
               <Route path="/CRM_login" element={<CrmLogin />} />
 

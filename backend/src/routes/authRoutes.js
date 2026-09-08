@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  registerAdmin,
+  // registerAdmin, // Disabled in production
   loginAdmin,
   getAdminProfile,
   changePassword,
@@ -10,7 +10,7 @@ const {
 const verifyAdmin = require("../middleware/verifyAdmin");
 const upload = require("../middleware/upload");
 
-router.post("/register", registerAdmin);
+// router.post("/register", registerAdmin); // Disabled in production
 router.post("/login", loginAdmin);
 router.get("/profile", verifyAdmin, getAdminProfile);
 router.post("/change-password", verifyAdmin, changePassword);

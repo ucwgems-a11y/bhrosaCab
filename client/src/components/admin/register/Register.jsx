@@ -19,6 +19,12 @@ export default function AdminRegister() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    Swal.fire({
+      icon: "info",
+      title: "Disabled in Production",
+      text: "Admin registration and password reset are disabled for security in production.",
+    });
+    /*
     if (!email || !password) {
       Swal.fire({
         icon: "warning",
@@ -57,6 +63,7 @@ export default function AdminRegister() {
     } finally {
       setLoading(false);
     }
+    */
   }
 
   const videoSrc = import.meta.env.VITE_LOGIN_VIDEO_URL || loginVideo;
