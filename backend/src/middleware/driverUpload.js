@@ -9,9 +9,19 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const driverDir = path.join(__dirname, "../../uploads/drivers");
-if (!fs.existsSync(driverDir)) {
-  fs.mkdirSync(driverDir, { recursive: true });
+const os = require("os");
+
+const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const driverDir = isServerless
+  ? path.join(os.tmpdir(), "uploads/drivers")
+  : path.join(__dirname, "../../uploads/drivers");
+
+try {
+  if (!fs.existsSync(driverDir)) {
+    fs.mkdirSync(driverDir, { recursive: true });
+  }
+} catch (e) {
+  // Gracefully ignore on read-only file systems
 }
 
 const storage = multer.diskStorage({

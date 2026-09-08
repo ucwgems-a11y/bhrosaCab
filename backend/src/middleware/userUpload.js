@@ -2,9 +2,19 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const userUploadDir = path.join(__dirname, "../../uploads/userImages");
-if (!fs.existsSync(userUploadDir)) {
-  fs.mkdirSync(userUploadDir, { recursive: true });
+const os = require("os");
+
+const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const userUploadDir = isServerless
+  ? path.join(os.tmpdir(), "uploads/userImages")
+  : path.join(__dirname, "../../uploads/userImages");
+
+try {
+  if (!fs.existsSync(userUploadDir)) {
+    fs.mkdirSync(userUploadDir, { recursive: true });
+  }
+} catch (e) {
+  // Gracefully ignore on read-only file systems
 }
 
 const storage = multer.diskStorage({
