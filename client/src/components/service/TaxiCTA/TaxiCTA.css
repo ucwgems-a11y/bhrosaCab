@@ -138,3 +138,87 @@ Taxi CTA
     clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
     font-size: 13px;
 }
+
+/* =====================================
+   Tablet & Mobile Responsive
+===================================== */
+@media (max-width: 992px) {
+    .taxi-cta {
+        padding: 60px 0;
+    }
+
+    .taxi-bg-cta {
+        width: 100%;
+    }
+
+    .taxi-container {
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .taxi-content {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .taxi-list {
+        width: 100%;
+        padding-left: 0;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .taxi-cta {
+        padding: 50px 0;
+    }
+
+    .taxi-bg-cta {
+        width: 100%;
+        height: 100%;
+    }
+
+    .taxi-container {
+        width: 90%;
+        padding: 0;
+    }
+
+    .taxi-content h4 {
+        font-size: 15px;
+        margin-bottom: 12px;
+    }
+
+    .taxi-content h2 {
+        font-size: 26px;
+        line-height: 1.25;
+        margin-bottom: 22px;
+    }
+
+    .taxi-btn {
+        margin-bottom: 25px;
+    }
+
+    .taxi-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .taxi-item {
+        font-size: 15px;
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .taxi-cta {
+        padding: 40px 0;
+    }
+
+    .taxi-content h2 {
+        font-size: 22px;
+        line-height: 1.3;
+    }
+}

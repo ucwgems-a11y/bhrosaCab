@@ -672,7 +672,7 @@
 
     .hero-left {
         width: 100%;
-        text-align: center;
+        text-align: left;
     }
 
     .hero-right,
@@ -683,21 +683,31 @@
 
     .slider-content {
         max-width: 100%;
-        margin: auto;
+        margin: 0;
+        transform: none;
+        text-align: left;
     }
 
     .slider-caption.medium {
-        font-size: 16px;
+        font-size: 15px;
+        margin-bottom: 12px;
     }
 
     .slider-caption.big h1 {
-        font-size: 34px;
-        line-height: 1.3;
+        font-size: 28px;
+        line-height: 1.25;
+        margin-bottom: 16px;
     }
 
     .slider-caption.small p {
-        font-size: 16px;
-        line-height: 28px;
+        font-size: 14px;
+        line-height: 22px;
+        margin-bottom: 22px;
+    }
+
+    .slider-btn {
+        display: flex;
+        justify-content: flex-start;
     }
 
     .default-btn {
