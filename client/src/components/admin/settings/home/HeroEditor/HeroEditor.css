@@ -1,0 +1,227 @@
+.hero-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.hero-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.hero-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.hero-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hero-editor-loading {
+  color: var(--text-muted);
+}
+
+.hero-slide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-slide-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.hero-slide-thumb {
+  width: 80px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+
+.hero-slide-info {
+  flex: 1;
+}
+
+.hero-slide-type {
+  color: #7fc4e8;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.hero-slide-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.hero-slide-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hero-slide-actions button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-slide-actions button:hover {
+  color: var(--text-primary);
+  border-color: #7fc4e8;
+}
+
+.hero-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.hero-modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px;
+  width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.hero-modal-header h2 {
+  color: var(--text-primary);
+  font-size: 17px;
+}
+
+.hero-modal-header button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.hero-modal label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 12px 0 6px;
+}
+
+.hero-modal input,
+.hero-modal textarea,
+.hero-modal select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.hero-save-btn {
+  margin-top: 20px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hero-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hero-type-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.hero-type-tab {
+  flex: 1;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.hero-type-tab span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.hero-type-tab.active {
+  border-color: var(--accent);
+  background: rgba(232, 135, 58, 0.08);
+  color: var(--accent);
+}
+
+.hero-type-tab.active span {
+  color: #c9793a;
+}
+
+.hero-required-tag {
+  background: rgba(229, 72, 77, 0.15);
+  color: #e5484d;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+.hero-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}

@@ -1,0 +1,164 @@
+/* ============================================
+   Shared styles — Promo Add, Promo Manage, Icons
+   ============================================ */
+
+.form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 100%;
+  margin-bottom: 24px;
+}
+
+.form-card-heading {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.form-card label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+  margin-top: 18px;
+}
+
+.form-card label:first-of-type {
+  margin-top: 0;
+}
+
+.form-card input[type="text"],
+.form-card input[type="number"],
+.form-card input[type="date"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.form-card input[type="file"] {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.form-submit-btn {
+  margin-top: 24px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 26px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============ Table page heading + search ============ */
+.data-page-title {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.data-search-row {
+  margin-bottom: 18px;
+  max-width: 320px;
+}
+
+.data-search-row input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+}
+
+/* ============ Table ============ */
+.data-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.data-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--bg-panel);
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.status-expired {
+  color: #e5484d;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.data-icon-cell img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.data-action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.data-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+}
+
+.data-icon-btn.edit {
+  background: var(--accent);
+}
+
+.data-icon-btn.delete {
+  background: #e5484d;
+}
+
+.data-no-data {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+}

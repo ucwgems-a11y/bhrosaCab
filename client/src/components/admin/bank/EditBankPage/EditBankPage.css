@@ -1,0 +1,128 @@
+.edit-bank-topbar {
+  margin-bottom: 16px;
+}
+
+.fc-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fc-back-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.edit-bank-header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-bank-icon {
+  color: var(--accent);
+}
+
+.edit-bank-subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 2px 0 0;
+}
+
+.edit-bank-req {
+  color: #e5484d;
+}
+
+.edit-bank-alert-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(46, 158, 91, 0.15);
+  border: 1px solid rgba(46, 158, 91, 0.35);
+  color: #2e9e5b;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.edit-bank-image-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.edit-bank-preview-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-bank-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.edit-bank-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel);
+  border: 1px dashed var(--input-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-bank-upload-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.edit-bank-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.edit-bank-cancel-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-bank-cancel-btn:hover {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+

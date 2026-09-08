@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+*,
+*::before,
+*::after{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    font-size:17px;
+    line-height:27px;
+    font-weight:400;
+    letter-spacing:-0.2px;
+    color:#666666;
+    background:#fff;
+    overflow-x:hidden;
+}
+
+/* =========================================================
+   CUSTOM GLOBAL SCROLLBAR (#fd683e)
+   ========================================================= */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #fd683e;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e05328;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #fd683e transparent;
+}
+
+/* SweetAlert2 Custom Styling */
+.swal2-actions {
+    display: flex !important;
+    gap: 12px !important;
+}
+
+/* Global Spin Animation for Reload buttons */
+.spin,
+.animate-spin {
+    animation: globalSpin 0.65s linear infinite;
+}
+.spin-fast {
+    animation: globalSpin 0.45s linear infinite;
+}
+@keyframes globalSpin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+.swal2-actions .btn {
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: filter 0.2s ease !important;
+}
+
+.swal2-actions .btn-success {
+    background-color: #2e9e5b !important;
+    color: #ffffff !important;
+}
+
+.swal2-actions .btn-danger {
+    background-color: #e5484d !important;
+    color: #ffffff !important;
+}
+
+.swal2-actions .btn:hover {
+    filter: brightness(0.92) !important;
+}

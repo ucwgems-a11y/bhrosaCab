@@ -1,0 +1,155 @@
+.franchise-form-section {
+    background: #f4f5fa;
+    padding: 80px 0;
+    font-family: "Poppins", sans-serif;
+}
+
+.franchise-form-wrapper {
+    width: 100%;
+}
+
+.franchise-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d7d7d7;
+    border-radius: 2px;
+    background: #fff;
+    padding: 6px 12px;
+    font-size: 18px;
+    color: #666;
+    outline: none;
+    transition: .3s;
+    font-family: "Poppins", sans-serif;
+}
+
+.form-group input::placeholder {
+    color: #9a9a9a;
+}
+
+.form-group input:focus {
+    border-color: #87CEEB;
+}
+
+.form-icon {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 23px;
+    color: #87CEEB;
+}
+
+.submit-wrapper {
+    grid-column: 1/-1;
+    margin-top: 4px;
+}
+
+.submit-wrapper button {
+    position: relative;
+    overflow: hidden;
+    width: 115px;
+    height: 45px;
+    border: none;
+    background: #87CEEB;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    z-index: 1;
+    transition: color .3s ease;
+    border-radius: 2px;
+}
+
+.submit-wrapper button::before,
+.submit-wrapper button::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    background: #222;
+    z-index: -1;
+    transition: transform .4s ease;
+}
+
+/* Top Half : Left → Right */
+.submit-wrapper button::before {
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+}
+
+/* Bottom Half : Right → Left */
+.submit-wrapper button::after {
+    bottom: 0;
+    left: 0;
+    transform: translateX(100%);
+}
+
+.submit-wrapper button:hover::before {
+    transform: translateX(0);
+}
+
+.submit-wrapper button:hover::after {
+    transform: translateX(0);
+}
+
+.submit-wrapper button:hover {
+    color: #fff;
+}
+.form-status {
+  font-size: 13px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.form-status.success {
+  color: #2e9e5b;
+}
+
+.form-status.error {
+  color: #e5484d;
+}
+
+@media(max-width:991px) {
+
+    .franchise-form {
+        grid-template-columns: 1fr;
+    }
+
+    .submit-wrapper {
+        text-align: left;
+    }
+
+}
+
+@media(max-width:576px) {
+
+    .franchise-form-section {
+        padding: 70px 0;
+    }
+
+    .form-group input {
+        height: 58px;
+        font-size: 16px;
+    }
+
+    .submit-wrapper button {
+        width: 130px;
+        height: 54px;
+        font-size: 18px;
+    }
+
+}

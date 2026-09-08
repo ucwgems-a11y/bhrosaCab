@@ -1,0 +1,209 @@
+.cars-page-wrap {
+  padding: 4px;
+}
+
+.cars-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.cars-card-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cars-card-title {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.cars-card-body {
+  padding: 20px 22px;
+}
+
+/* Add form */
+.cars-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.cars-form-group {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cars-form-group label {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.cars-form-group input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  outline: none;
+}
+
+.cars-form-group input:focus {
+  border-color: var(--accent);
+}
+
+.cars-save-btn {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cars-save-btn:hover {
+  filter: brightness(0.95);
+}
+
+/* Table toolbar (search) */
+.cars-table-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.cars-table-search {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 13px;
+  width: 220px;
+  outline: none;
+}
+
+.cars-table-search:focus {
+  border-color: var(--accent);
+}
+
+/* Table */
+.cars-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.cars-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cars-table th,
+.cars-table td {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.cars-table th {
+  background: var(--bg-card);
+  font-weight: 700;
+}
+
+.cars-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cars-action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.cars-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+}
+
+.cars-icon-btn.edit {
+  background: #4338ca;
+}
+
+.cars-icon-btn.delete {
+  background: #e5484d;
+}
+
+.cars-no-data {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+
+.cars-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.cars-form-group select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  outline: none;
+}
+
+.cars-form-group select:focus {
+  border-color: var(--accent);
+}
+
+.cars-form-group input[type="file"] {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.cars-form-group-btn {
+  justify-content: flex-end;
+}
+
+.cars-save-btn-margin {
+  margin-top: 20px;
+}
+
+.cars-table-thumb {
+  width: 50px;
+  height: 36px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .cars-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

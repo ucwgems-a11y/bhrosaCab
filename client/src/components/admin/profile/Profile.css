@@ -1,0 +1,272 @@
+/* ============================================
+   PROFILE PAGE — LAYOUT WRAPPER
+   ============================================ */
+.profile-page {
+  max-width: 100%;
+}
+
+/* ============================================
+   PROFILE TITLE BAR — top "Profile" label card
+   ============================================ */
+.profile-title-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+/* ============================================
+   COVER SECTION — banner image + avatar + name/email
+   ============================================ */
+.profile-cover {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 0 16px 16px;
+  
+}
+
+.profile-cover img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  margin-top: 12px;
+  border-radius: 14px;
+}
+
+.profile-cover-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 4px 0;
+}
+
+.profile-avatar {
+  width: 82px;
+  height:88px;
+  border-radius: 50%;
+ 
+
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: -60px;
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Name + Email — label on top, value below */
+.profile-cover-text {
+  display: flex;
+  flex-direction: row;
+  gap: 23px;
+}
+
+.profile-cover-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-cover-label {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.profile-cover-value {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ============================================
+   TABS — About Me / Settings switch
+   ============================================ */
+.profile-tabs {
+  display: flex;
+  gap: 24px;
+  margin: 22px 0 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profile-tabs button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 10px 0;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.profile-tabs button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* ============================================
+   TAB CONTENT — shared heading style
+   ============================================ */
+.profile-tab-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px 24px;
+}
+
+.profile-tab-content h3 {
+  color: var(--accent);
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+.profile-tab-content h3:not(:first-child) {
+  margin-top: 22px;
+}
+
+/* ============================================
+   ABOUT ME TAB — bio text + language tags
+   ============================================ */
+.profile-bio-text {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.profile-language-tags {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.profile-language-tags span {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+/* ============================================
+   ABOUT ME TAB — personal information list
+   ============================================ */
+.profile-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-info-row {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.profile-info-label {
+  color: var(--text-primary);
+  font-weight: 700;
+  min-width: 130px;
+}
+
+.profile-info-value {
+  color: var(--text-muted);
+}
+
+/* ============================================
+   SETTINGS TAB — edit profile form
+   ============================================ */
+.profile-settings-hint {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.profile-settings-form {
+  max-width: 100%;
+ 
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.profile-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-form-field-full {
+  grid-column: span 2;
+}
+
+.profile-form-field label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.profile-form-field input,
+.profile-form-field select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.profile-form-avatar-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 8px;
+}
+
+.profile-form-checkbox-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-form-checkbox-row input {
+  width: auto;
+}
+
+.profile-form-checkbox-row label {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.profile-update-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-update-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

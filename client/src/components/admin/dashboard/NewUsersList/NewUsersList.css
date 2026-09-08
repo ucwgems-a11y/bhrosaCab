@@ -1,0 +1,60 @@
+.new-users-card {
+  background: var(--bg-card);
+  /* border: 1px solid var(--border-color); */
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.new-users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.new-users-header h3 {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.new-users-all-btn {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.new-users-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 24px;
+}
+
+.new-user-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.new-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.new-user-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

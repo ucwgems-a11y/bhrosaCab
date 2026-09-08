@@ -1,0 +1,147 @@
+.settings-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 700px;
+  margin-bottom: 28px;
+}
+
+.settings-form-heading {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.settings-form-card label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.settings-form-card label:first-of-type {
+  margin-top: 0;
+}
+
+.settings-form-card input,
+.settings-form-card select,
+.settings-form-card textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.settings-form-card textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.settings-form-card input[type="file"] {
+  color: var(--text-primary);
+}
+
+.settings-submit-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 26px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-page-title {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.settings-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.settings-table th,
+.settings-table td {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.settings-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--bg-panel);
+}
+
+.settings-table tr:last-child td {
+  border-bottom: none;
+}
+
+.settings-table td.description-cell {
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+.settings-logo-cell img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--bg-panel);
+  padding: 6px;
+}
+
+.settings-action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.settings-icon-btn.edit {
+  background: var(--accent);
+}
+
+.settings-icon-btn.delete {
+  background: #e5484d;
+}
+
+.settings-icon-btn.view {
+  background: #8b5cf6;
+}

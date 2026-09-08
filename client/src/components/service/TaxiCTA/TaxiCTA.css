@@ -1,0 +1,140 @@
+/*=========================
+Taxi CTA
+=========================*/
+
+.taxi-cta {
+    position: relative;
+    padding: 80px 0;
+    overflow: hidden;
+}
+
+.taxi-bg-cta {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 92%;
+    height: 100%;
+    background: #87CEEB url("../../../assets/img/map.png") center/cover no-repeat;
+    z-index: -1;
+}
+
+.taxi-container {
+    width: 90%;
+    max-width: 1320px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+}
+
+.taxi-content {
+    width: 38%;
+}
+
+.taxi-content h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 18px;
+}
+
+.taxi-content h2 {
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 35px;
+}
+
+
+.taxi-btn {
+    position: relative;
+    overflow: hidden;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 45px;
+    padding: 0 30px;
+
+    background: #222;
+    color: #fff;
+
+    border: none;
+    border-radius: 2px;
+
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 400;
+
+    cursor: pointer;
+
+    z-index: 1;
+    transition: color .3s ease;
+}
+
+.taxi-btn::before,
+.taxi-btn::after {
+    content: "";
+    position: absolute;
+    left: 0;
+
+    width: 100%;
+    height: 50%;
+
+    background: #fff;
+
+    z-index: -1;
+    transition: transform .4s ease;
+}
+
+/* Top Half */
+.taxi-btn::before {
+    top: 0;
+    transform: translateX(-100%);
+}
+
+/* Bottom Half */
+.taxi-btn::after {
+    bottom: 0;
+    transform: translateX(100%);
+}
+
+/* Hover */
+.taxi-btn:hover::before {
+    transform: translateX(0);
+}
+
+.taxi-btn:hover::after {
+    transform: translateX(0);
+}
+
+.taxi-btn:hover {
+    color: #222;
+}
+
+.taxi-list {
+    width: 62%;
+    padding-left: 80px;
+    margin-left: -80px;
+}
+
+.taxi-item {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 17px;
+    margin-bottom: 22px;
+}
+
+.taxi-item span {
+    width: 40px;
+    height: 26px;
+    background: #222;
+    color: #f8a11a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+    font-size: 13px;
+}

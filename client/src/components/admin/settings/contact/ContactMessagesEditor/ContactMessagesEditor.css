@@ -1,0 +1,75 @@
+.contact-messages-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.contact-messages-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.contact-messages-loading {
+  color: var(--text-muted);
+}
+
+.contact-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 560px;
+}
+
+.contact-message-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.contact-message-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.contact-message-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.contact-message-meta {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.contact-message-top button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.contact-message-top button:hover {
+  color: #e5484d;
+  border-color: #e5484d;
+}
+
+.contact-message-body {
+  color: var(--text-primary);
+  font-size: 13px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.contact-message-date {
+  color: var(--text-muted);
+  font-size: 11px;
+}

@@ -1,0 +1,810 @@
+.hero-slide {
+    width: 100%;
+    height: 630px;
+    position: relative;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+
+    overflow: hidden;
+}
+
+.hero-section {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.heroSwiper {
+    width: 100%;
+    height: 630px;
+}
+
+.heroSwiper .swiper-wrapper,
+.heroSwiper .swiper-slide {
+    height: 100%;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+}
+
+.hero-container {
+
+    width: 92%;
+    max-width: 1200px;
+    margin: auto;
+    height: 100%;
+
+    margin: auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: relative;
+    z-index: 5;
+
+}
+
+.hero-left {
+
+    width: 48%;
+
+}
+
+.hero-right {
+
+    width: 52%;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+
+}
+
+/* =========================
+   Shape
+========================= */
+
+.shape {
+    position: absolute;
+    right: 120px;
+    top: 0;
+
+    width: 450px;
+    height: 100%;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+
+    transform: skewX(-20deg);
+
+    overflow: hidden;
+    z-index: 1;
+}
+
+.shape div {
+    background: #222;
+    width: 100px;
+    height: 80%;
+}
+
+.shape-center {
+    width: 200px !important;
+    height: 100% !important;
+    background: #87CEEB !important;
+}
+
+.shape-right {
+    margin-bottom: 30%;
+}
+
+/* =========================
+   Car
+========================= */
+
+.car-img {
+    position: absolute;
+    right: -30px;
+    bottom: 0;
+
+    width: 720px;
+    z-index: 5;
+}
+
+/* =========================
+   Animation
+========================= */
+
+.shape-left,
+.shape-center,
+.shape-right {
+    opacity: 0;
+}
+
+@keyframes slideBottom {
+
+    from {
+        transform: translateY(300px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+}
+
+@keyframes fadeCenter {
+
+    from {
+        opacity: 0;
+        transform: translateY(250px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+@keyframes slideTop {
+
+    from {
+        transform: translateY(-300px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+}
+
+.swiper-slide-active .shape-left {
+    animation: slideBottom .8s ease forwards;
+}
+
+.swiper-slide-active .shape-center {
+    animation: fadeCenter 1s ease forwards;
+    animation-delay: .15s;
+}
+
+.swiper-slide-active .shape-right {
+    animation: slideTop 1s ease forwards;
+    animation-delay: .3s;
+}
+
+.car-holder {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 52%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    z-index: 3;
+    overflow: visible;
+}
+
+.car-img {
+    width: 720px;
+    /* Fixed width */
+    max-width: none;
+    height: auto;
+    /* Aspect ratio maintain */
+    object-fit: contain;
+
+    position: absolute;
+    right: -30px;
+    bottom: 0;
+
+    z-index: 5;
+}
+
+/* banner */
+.banner-slide {
+
+    width: 100%;
+    height: 630px;
+
+}
+
+.banner-slide img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+}
+
+
+/* content */
+.slider-content {
+    max-width: 560px;
+    font-family: 'Poppins', sans-serif;
+    transform: translateX(-50px);
+}
+
+/* Subtitle */
+.slider-caption.medium {
+    font-size: 22px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 22px;
+}
+
+/* Main Heading */
+.slider-caption.big h1 {
+    font-size: 56px;
+    line-height: 1.08;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 28px;
+}
+
+.slider-caption.big span {
+    color: #87CEEB;
+}
+
+/* Description */
+.slider-caption.small p {
+    font-size: 22px;
+    color: #fff;
+    opacity: .9;
+    margin-bottom: 35px;
+    line-height: 34px;
+}
+
+/* Button */
+.default-btn {
+    position: relative;
+    overflow: hidden;
+
+    width: 115px;
+    height: 45px;
+    margin-bottom: 30px;
+
+    border: none;
+    border-radius: 2px;
+
+    background: #87CEEB;
+    color: #fff;
+
+    font-size: 17px;
+    font-weight: 400;
+    font-family: "Poppins", sans-serif;
+
+    cursor: pointer;
+
+    z-index: 1;
+    transition: color .3s ease;
+}
+
+.default-btn::before,
+.default-btn::after {
+    content: "";
+    position: absolute;
+    left: 0;
+
+    width: 100%;
+    height: 50%;
+
+    background: #222;
+
+    z-index: -1;
+    transition: transform .4s ease;
+}
+
+/* Top */
+.default-btn::before {
+    top: 0;
+    transform: translateX(-100%);
+}
+
+/* Bottom */
+.default-btn::after {
+    bottom: 0;
+    transform: translateX(100%);
+}
+
+.default-btn:hover::before {
+    transform: translateX(0);
+}
+
+.default-btn:hover::after {
+    transform: translateX(0);
+}
+
+.default-btn:hover {
+    color: #fff;
+}
+
+.slider-controls {
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 420px;
+    height: 95px;
+
+    background: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-evenly;
+
+    z-index: 20;
+
+}
+
+
+
+/* ===========================
+   Slider Controls
+=========================== */
+
+.slider-controls {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 20;
+
+    width: 450px;
+    height: 80px;
+
+    background: #fff;
+    border-radius: 2px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    column-gap: 60px;
+
+    padding: 0 20px;
+}
+
+/* Prev & Next */
+
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: #444;
+
+    cursor: pointer;
+    transition: .3s;
+}
+
+.slider-control:hover {
+    color: #87CEEB;
+}
+
+/* Pagination */
+
+.slider-pagination {
+    position: relative !important;
+
+    width: auto !important;
+
+    color: #333;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.slider-pagination .swiper-pagination-current {
+    color: #87CEEB;
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.slider-pagination .swiper-pagination-total {
+    color: #444;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+/* Remove Swiper default */
+
+.heroSwiper .swiper-pagination {
+    position: relative;
+    bottom: auto;
+    left: auto;
+}
+
+/* Fix button */
+
+.slider-button-prev,
+.slider-button-next {
+    user-select: none;
+}
+
+
+
+/* text Animation */
+@keyframes fadeBottom {
+
+    from {
+        opacity: 0;
+        transform: translateY(80px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+.swiper-slide-active .slider-caption.medium {
+    animation: fadeBottom .6s ease forwards;
+}
+
+.swiper-slide-active .slider-caption.big {
+    opacity: 0;
+    animation: fadeBottom .8s ease forwards;
+    animation-delay: .2s;
+}
+
+.swiper-slide-active .slider-caption.small {
+    opacity: 0;
+    animation: fadeBottom 1s ease forwards;
+    animation-delay: .4s;
+}
+
+.swiper-slide-active .slider-btn {
+    opacity: 0;
+    animation: fadeBottom 1.2s ease forwards;
+    animation-delay: .6s;
+}
+
+
+
+/* car animation */
+@keyframes carAnimation {
+
+    from {
+        opacity: 0;
+        transform: translateX(250px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+}
+
+.swiper-slide-active .car-img {
+    opacity: 0;
+    animation: carAnimation 1.4s ease forwards;
+    animation-delay: .3s;
+}
+
+/* background zoom */
+@keyframes kenburns {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.12);
+    }
+
+}
+
+.animate-slide .hero-bg {
+    animation: kenburns 12s linear forwards;
+}
+
+/* spase annimation */
+
+@keyframes floatShape {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+}
+
+.animate-slide .shape1 {
+    animation: floatShape 3s infinite;
+}
+
+.animate-slide .shape2 {
+    animation: floatShape 4s infinite;
+}
+
+.animate-slide .shape3 {
+    animation: floatShape 5s infinite;
+}
+
+
+.hero-slide {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+}
+
+.hero-container {
+    position: relative;
+    z-index: 2;
+}
+
+.animate-slide .hero-bg {
+    animation: kenburns 12s linear forwards;
+}
+
+
+
+/* ===================================
+   Hero Responsive
+=================================== */
+/* ===================================
+   Tablet Responsive
+=================================== */
+
+@media (min-width:769px) and (max-width:1024px) {
+
+    .heroSwiper,
+    .heroSwiper .swiper-wrapper,
+    .heroSwiper .swiper-slide {
+        height: 500px;
+    }
+
+    .hero-slide {
+        height: 500px;
+        min-height: 500px;
+    }
+
+    .banner-slide {
+        height: 500px;
+    }
+
+    .banner-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        display: block;
+    }
+
+    .hero-container {
+        width: 100%;
+        padding: 50px 40px 90px;
+    }
+
+    /* Car & Shape hide */
+    .hero-right,
+    .shape,
+    .car-img {
+        display: none;
+    }
+
+    .hero-left {
+        width: 100%;
+        max-width: 700px;
+
+    }
+
+    .slider-content {
+        max-width: 100%;
+
+
+    }
+
+    .slider-caption.medium {
+        font-size: 18px;
+    }
+
+    .slider-caption.big h1 {
+        font-size: 46px;
+        line-height: 1.2;
+    }
+
+    .slider-caption.small p {
+        font-size: 18px;
+        line-height: 30px;
+    }
+
+    .default-btn {
+        margin-bottom: 0;
+    }
+
+    .slider-controls {
+        width: 380px;
+        height: 70px;
+    }
+
+    .slider-pagination .swiper-pagination-current {
+        font-size: 36px;
+    }
+
+}
+
+/* mobile */
+
+@media (max-width:768px) {
+
+    .heroSwiper,
+    .heroSwiper .swiper,
+    .heroSwiper .swiper-wrapper,
+    .heroSwiper .swiper-slide {
+        height: 520px !important;
+    }
+
+    .banner-slide {
+        width: 100%;
+        height: 100%;
+    }
+
+    .banner-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        display: block;
+    }
+
+}
+
+@media (max-width:768px) {
+
+    .hero-slide {
+        min-height: 520px;
+        height: auto;
+        background-position: center;
+        background-size: cover;
+    }
+
+    .hero-container {
+        width: 100%;
+        padding: 50px 20px 90px;
+        display: block;
+    }
+
+    .hero-left {
+        width: 100%;
+        text-align: center;
+    }
+
+    .hero-right,
+    .shape,
+    .car-img {
+        display: none;
+    }
+
+    .slider-content {
+        max-width: 100%;
+        margin: auto;
+    }
+
+    .slider-caption.medium {
+        font-size: 16px;
+    }
+
+    .slider-caption.big h1 {
+        font-size: 34px;
+        line-height: 1.3;
+    }
+
+    .slider-caption.small p {
+        font-size: 16px;
+        line-height: 28px;
+    }
+
+    .default-btn {
+        margin-bottom: 0;
+    }
+
+}
+
+@media (max-width:768px) {
+
+    .heroSwiper {
+        height: 520px !important;
+    }
+
+    .heroSwiper .swiper-wrapper {
+        height: 100% !important;
+    }
+
+    .heroSwiper .swiper-slide {
+        height: 100% !important;
+    }
+
+    .banner-slide,
+    .hero-slide {
+        height: 100%;
+    }
+
+    .banner-slide img {
+        width: 100%;
+        height: 100%;
+
+        object-fit: fill;
+        display: block;
+    }
+}
+
+
+/* ==========================
+   Slider Controls - Small Mobile
+========================== */
+
+@media (max-width:480px) {
+
+    .slider-controls {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+
+        width: 80%;
+        height: 55px;
+
+        background: #fff;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 12px;
+        column-gap: 10px;
+
+        z-index: 20;
+    }
+
+    .slider-control {
+        font-size: 13px;
+        gap: 5px;
+    }
+
+    .slider-pagination {
+        font-size: 14px;
+    }
+
+    .slider-pagination .swiper-pagination-current {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .slider-pagination .swiper-pagination-total {
+        font-size: 14px;
+    }
+
+    .slider-button-prev,
+    .slider-button-next {
+        white-space: nowrap;
+    }
+
+}

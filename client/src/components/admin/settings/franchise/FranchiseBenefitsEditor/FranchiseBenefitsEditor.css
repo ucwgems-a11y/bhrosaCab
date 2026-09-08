@@ -1,0 +1,127 @@
+.franchise-benefits-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.franchise-benefits-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.franchise-benefits-editor-loading {
+  color: var(--text-muted);
+}
+
+.franchise-benefits-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 520px;
+}
+
+.franchise-benefits-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.franchise-benefits-editor-form input,
+.franchise-benefits-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.franchise-benefits-editor-preview {
+  width: 140px;
+  height: 90px;
+  object-fit: cover;
+  background: var(--bg-panel);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.franchise-benefits-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}
+
+.franchise-benefits-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.franchise-benefits-add-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #7fc4e8;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.franchise-benefits-item-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.franchise-benefits-item-number {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.franchise-benefits-item-row textarea {
+  flex: 1;
+  margin: 0;
+  resize: vertical;
+  min-height: 44px;
+}
+
+.franchise-benefits-item-row button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.franchise-benefits-item-row button:hover {
+  color: #e5484d;
+  border-color: #e5484d;
+}
+
+.franchise-benefits-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.franchise-benefits-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

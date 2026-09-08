@@ -1,0 +1,61 @@
+.feedback-page-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.feedback-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-form-heading {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.feedback-form-card label {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.feedback-form-card input[type="text"] {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+}
+
+.feedback-form-card input[type="file"] {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.feedback-submit-btn {
+  margin-top: 24px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 24px;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.feedback-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

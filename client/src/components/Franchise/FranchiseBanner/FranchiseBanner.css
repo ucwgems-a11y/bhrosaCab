@@ -1,0 +1,234 @@
+/* ===============================
+   Franchise Banner
+================================ */
+
+.franchise-page-header {
+    background: url("../../../assets/img/bg-1.jpg") no-repeat center center;
+    background-size: cover;
+    width: 100%;
+    height: 350px;
+
+    display: flex;
+    align-items: center;
+
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Dark Overlay */
+
+.franchise-page-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(34, 34, 34, 0.8);
+    z-index: -1;
+}
+
+/* Container */
+
+.franchise-container {
+    width: 90%;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* Content */
+
+.franchise-page-info {
+    position: relative;
+    z-index: 5;
+}
+
+.franchise-page-info h2 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #87ceeb;
+    margin: 0;
+}
+
+/* ===================================
+        Bottom Right Shape
+=================================== */
+
+.franchise-page-shape {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+
+    width: 52%;
+    height: 100px;
+}
+
+/* Blue Shape */
+
+.franchise-page-shape::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: #87ceeb;
+    background-image: repeating-linear-gradient(45deg,
+            #87ceeb 0,
+            #87ceeb 2px,
+            transparent 2px,
+            transparent 10px);
+
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+}
+
+/* Black Cut */
+
+.franchise-page-shape::after {
+    content: "";
+    position: absolute;
+
+    left: -150px;
+    bottom: 0;
+
+    width: 100%;
+    height: 80px;
+
+    background: #222 url("../../../assets/img/texture.png") repeat;
+
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+
+    z-index: -1;
+}
+
+.franchise-page-info h4 {
+    display: inline-block;
+    padding: 0 15px;
+    height: 25px;
+    line-height: 25px;
+
+    background: #87CEEB;
+
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    clip-path: polygon(93% 0%, 100% 30%, 100% 100%, 0 100%, 0 0);
+    position: relative;
+    top: -30px;
+}
+
+/* ===================================
+   TABLET (769px - 992px)
+=================================== */
+
+@media (max-width:992px) {
+
+    .franchise-page-header {
+        height: 320px;
+    }
+
+    .franchise-container {
+        width: 92%;
+    }
+
+    .franchise-page-info h4 {
+        font-size: 11px;
+        padding: 0 14px;
+        height: 24px;
+        line-height: 24px;
+        top: -35px;
+    }
+
+    .franchise-page-info h2 {
+        font-size: 36px;
+        line-height: 44px;
+    }
+
+    .franchise-page-shape {
+        width: 55%;
+        height: 80px;
+    }
+
+    .franchise-page-shape::after {
+        height: 65px;
+        left: -110px;
+    }
+
+}
+
+/* ===================================
+   MOBILE (481px - 768px)
+=================================== */
+
+@media (max-width:768px) {
+
+    .franchise-page-header {
+        height: 300px;
+    }
+
+    .franchise-container {
+        width: 92%;
+    }
+
+    .franchise-page-info h4 {
+        font-size: 11px;
+        padding: 0 12px;
+        height: 22px;
+        line-height: 22px;
+        top: -30px;
+    }
+
+    .franchise-page-info h2 {
+        font-size: 30px;
+        line-height: 38px;
+    }
+
+    .franchise-page-shape {
+        width: 60%;
+        height: 70px;
+    }
+
+    .franchise-page-shape::after {
+        height: 55px;
+        left: -90px;
+    }
+
+}
+
+/* ===================================
+   SMALL MOBILE (480px)
+=================================== */
+
+@media (max-width:480px) {
+
+    .franchise-page-header {
+        height: 270px;
+    }
+
+    .franchise-container {
+        width: 90%;
+    }
+
+    .franchise-page-info h4 {
+        font-size: 10px;
+        padding: 0 10px;
+        height: 20px;
+        line-height: 20px;
+        top: -25px;
+    }
+
+    .franchise-page-info h2 {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .franchise-page-shape {
+        width: 65%;
+        height: 60px;
+    }
+
+    .franchise-page-shape::after {
+        height: 45px;
+        left: -70px;
+    }
+
+}

@@ -1,0 +1,111 @@
+.cancel-reason-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 600px;
+  margin-bottom: 28px;
+}
+
+.cancel-reason-form-heading {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.cancel-reason-form-card label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.cancel-reason-form-card input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+}
+
+.cancel-reason-submit-btn {
+  margin-top: 18px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 26px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-reason-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-reason-page-title {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.cancel-reason-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+.cancel-reason-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cancel-reason-table th,
+.cancel-reason-table td {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.cancel-reason-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--bg-panel);
+}
+
+.cancel-reason-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cancel-reason-action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.cancel-reason-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+}
+
+.cancel-reason-icon-btn.edit {
+  background: var(--accent);
+}
+
+.cancel-reason-icon-btn.delete {
+  background: #e5484d;
+}

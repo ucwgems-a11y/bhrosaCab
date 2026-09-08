@@ -1,0 +1,125 @@
+.footer-middle-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.footer-middle-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.footer-middle-editor-loading {
+  color: var(--text-muted);
+}
+
+.footer-middle-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.footer-middle-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.footer-middle-editor-form input,
+.footer-middle-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.footer-middle-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}
+
+.footer-middle-links-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.footer-middle-add-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #7fc4e8;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.footer-middle-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.footer-middle-link-row input {
+  flex: 1;
+  margin: 0;
+}
+
+.footer-middle-link-row button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.footer-middle-link-row button:hover {
+  color: #e5484d;
+  border-color: #e5484d;
+}
+
+.footer-middle-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.footer-middle-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.footer-middle-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  padding: 0;
+}
+
+.footer-middle-back-btn:hover {
+  color: var(--text-primary);
+}

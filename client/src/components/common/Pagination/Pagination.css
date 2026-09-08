@@ -1,0 +1,156 @@
+/* =========================================================
+   GLOBAL REUSABLE PAGINATION STYLES
+========================================================= */
+
+.app-pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 4px 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Left side: Results Count Info */
+.app-pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.app-pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.app-pagination-highlight {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Page Size Dropdown */
+.app-pagination-pagesize-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.app-pagination-pagesize-select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.app-pagination-pagesize-select:focus {
+  border-color: var(--accent);
+}
+
+/* Right side: Page Navigation Controls */
+.app-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.app-pagination-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.app-pagination-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #14161a;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(232, 135, 58, 0.25);
+}
+
+.app-pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: var(--bg-panel);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+.app-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 32px;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  user-select: none;
+}
+
+/* Nav specific buttons */
+.app-pagination-btn.nav-btn {
+  padding: 0 6px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 640px) {
+  .app-pagination-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .app-pagination-left {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .app-pagination-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .app-pagination-btn {
+    min-width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+}
+

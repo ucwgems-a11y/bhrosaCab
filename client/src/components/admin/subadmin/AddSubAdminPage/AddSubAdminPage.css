@@ -1,0 +1,166 @@
+.subadmin-form-panel {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 28px 32px;
+  max-width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.subadmin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 28px;
+  margin-bottom: 16px;
+}
+
+.subadmin-form-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.subadmin-form-panel .fc-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  max-width: 100%;
+}
+
+.subadmin-form-panel .fc-form-group label {
+  color: #212529;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.subadmin-form-panel .fc-form-group input[type="text"],
+.subadmin-form-panel .fc-form-group input[type="email"],
+.subadmin-form-panel .fc-form-group input[type="password"],
+.subadmin-form-panel .fc-form-group input[type="number"],
+.subadmin-form-panel .fc-form-group select {
+  background: #21252d !important;
+  border: 1px solid #21252d !important;
+  color: #ffffff !important;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  width: 100%;
+  height: 42px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.subadmin-form-panel .fc-form-group textarea {
+  background: #21252d !important;
+  border: 1px solid #21252d !important;
+  color: #ffffff !important;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.subadmin-form-panel .fc-form-group select option {
+  background: #21252d;
+  color: #ffffff;
+}
+
+.subadmin-form-panel .fc-form-group input:focus,
+.subadmin-form-panel .fc-form-group select:focus,
+.subadmin-form-panel .fc-form-group textarea:focus {
+  border-color: #3b4252 !important;
+  box-shadow: 0 0 0 2px rgba(33, 37, 45, 0.2);
+}
+
+.subadmin-form-panel .fc-form-group textarea {
+  min-height: 44px;
+  resize: vertical;
+}
+
+.subadmin-form-panel .fc-form-group input[type="file"] {
+  background: #21252d;
+  border: 1px solid #21252d;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  line-height: normal;
+  cursor: pointer;
+}
+
+.subadmin-form-panel .fc-form-group input[type="file"]::file-selector-button,
+.subadmin-form-panel .fc-form-group input[type="file"]::-webkit-file-upload-button {
+  background: #e2e8f0;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 5px 12px;
+  margin: 0 12px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+
+.subadmin-form-panel .fc-form-group input[type="file"]::file-selector-button:hover,
+.subadmin-form-panel .fc-form-group input[type="file"]::-webkit-file-upload-button:hover {
+  background: #cbd5e1;
+}
+
+.subadmin-full-width {
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+
+.subadmin-submit-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 13px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.subadmin-submit-btn:hover {
+  background: #1a1a1a;
+}
+
+.subadmin-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .subadmin-form-panel {
+    padding: 20px 16px;
+  }
+  .subadmin-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

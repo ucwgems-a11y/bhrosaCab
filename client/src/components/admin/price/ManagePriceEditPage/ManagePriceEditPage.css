@@ -1,0 +1,302 @@
+/* =========================================================
+   EDIT DISTANCE PRICE
+========================================================= */
+
+.price-edit-page {
+  padding: 4px;
+}
+
+.price-edit-topbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.price-edit-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.price-edit-back-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.price-edit-alert-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(46, 158, 91, 0.15);
+  border: 1px solid rgba(46, 158, 91, 0.35);
+  color: #2e9e5b;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.price-edit-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 760px;
+}
+
+.price-edit-card.not-found {
+  padding: 30px;
+  text-align: center;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.price-edit-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.price-edit-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.price-edit-card-title {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.price-edit-card-subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.price-edit-body {
+  padding: 24px;
+}
+
+.price-edit-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.price-edit-notice strong {
+  color: var(--text-primary);
+}
+
+/* =========================================================
+   SECTIONS & GRIDS
+========================================================= */
+
+.price-edit-section {
+  margin-bottom: 20px;
+}
+
+.price-edit-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.price-edit-section-header .lock-icon {
+  opacity: 0.7;
+}
+
+.price-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.price-edit-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-edit-form-group label {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.price-edit-form-group input,
+.price-edit-form-group select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Readonly fields styling */
+.price-edit-form-group .price-readonly {
+  background: var(--bg-panel);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Highlight Active Price Section */
+.price-highlight-section {
+  background: var(--accent-soft);
+  border: 1px solid rgba(232, 135, 58, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 10px;
+}
+
+.price-active-label {
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.price-req {
+  color: #e5484d;
+}
+
+.price-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.price-currency-prefix {
+  position: absolute;
+  left: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.price-active-input {
+  background: var(--input-bg) !important;
+  border: 2px solid var(--accent) !important;
+  color: var(--input-text) !important;
+  padding-left: 32px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+
+.price-active-input:focus {
+  box-shadow: 0 0 0 3px rgba(232, 135, 58, 0.2);
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.price-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.price-btn-submit {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 28px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.price-btn-submit:hover {
+  filter: brightness(0.95);
+}
+
+.price-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.price-btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.price-btn-cancel:hover {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 640px) {
+  .price-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}

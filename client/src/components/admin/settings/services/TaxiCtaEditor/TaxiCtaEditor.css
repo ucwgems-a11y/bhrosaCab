@@ -1,0 +1,108 @@
+.taxi-cta-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.taxi-cta-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.taxi-cta-editor-loading {
+  color: var(--text-muted);
+}
+
+.taxi-cta-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.taxi-cta-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.taxi-cta-editor-form input,
+.taxi-cta-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.taxi-cta-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}
+
+.taxi-cta-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.taxi-cta-add-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #7fc4e8;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.taxi-cta-item-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.taxi-cta-item-row input {
+  flex: 1;
+  margin: 0;
+}
+
+.taxi-cta-item-row button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.taxi-cta-item-row button:hover {
+  color: #e5484d;
+  border-color: #e5484d;
+}
+
+.taxi-cta-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.taxi-cta-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

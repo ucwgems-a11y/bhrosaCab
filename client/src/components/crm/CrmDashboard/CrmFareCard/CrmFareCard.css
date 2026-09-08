@@ -1,0 +1,49 @@
+.crm-fare-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.crm-fare-card:hover {
+  transform: translateY(-2px);
+  /* border-color: var(--accent); */
+}
+
+.crm-fare-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crm-fare-card-header {
+  font-size: 14.5px;
+  font-weight: 500;
+  
+  color: var(--text-primary);
+  opacity: 0.7;
+}
+
+.crm-fare-card-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crm-fare-card-icon {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm-fare-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}

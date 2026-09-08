@@ -1,0 +1,59 @@
+.subadmin-drivers-topbar {
+  margin-bottom: 16px;
+}
+
+.subadmin-drivers-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.subadmin-drivers-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subadmin-drivers-subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 3px 0 0;
+}
+
+.subadmin-drivers-toolbar {
+  margin-bottom: 16px;
+}
+
+.subadmin-drivers-search-box {
+  position: relative;
+  max-width: 360px;
+}
+
+.subadmin-drivers-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.subadmin-drivers-search-box input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 10px 14px 10px 38px;
+  font-size: 13px;
+  outline: none;
+}
+
+.subadmin-drivers-search-box input:focus {
+  border-color: var(--accent);
+}
+

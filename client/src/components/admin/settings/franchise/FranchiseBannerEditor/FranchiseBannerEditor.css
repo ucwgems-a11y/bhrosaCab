@@ -1,0 +1,53 @@
+.franchise-banner-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.franchise-banner-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.franchise-banner-editor-loading {
+  color: var(--text-muted);
+}
+
+.franchise-banner-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.franchise-banner-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.franchise-banner-editor-form input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.franchise-banner-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.franchise-banner-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

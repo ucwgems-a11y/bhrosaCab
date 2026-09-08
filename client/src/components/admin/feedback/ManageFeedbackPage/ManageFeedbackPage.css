@@ -1,0 +1,278 @@
+/* =========================================================
+   USER MOOD EMOJI MANAGE
+========================================================= */
+
+.feedback-page {
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.feedback-card {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.feedback-card-header {
+  padding: 24px 34px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.feedback-card-header h4 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.feedback-card-body {
+  width: 100%;
+  padding: 25px 40px 30px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.feedback-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.feedback-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+}
+
+/* =========================================================
+   TABLE HEADER
+========================================================= */
+
+.feedback-table thead th {
+  padding: 15px 20px 18px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.feedback-table tbody tr {
+  border: none;
+}
+
+.feedback-table tbody td {
+  height: 60px;
+  padding: 8px 17px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  vertical-align: middle;
+}
+
+/* REMOVE ALL LINES */
+
+.feedback-table th,
+.feedback-table td {
+  border: none !important;
+}
+
+/* =========================================================
+   COLUMN ALIGNMENT
+========================================================= */
+
+/* Sr No */
+.feedback-table th:first-child,
+.feedback-table td:first-child {
+  width: 15%;
+  text-align: center;
+}
+
+/* Image */
+.feedback-table th:nth-child(2),
+.feedback-table td:nth-child(2) {
+  width: 25%;
+  text-align: center;
+}
+
+/* Title */
+.feedback-table th:nth-child(3),
+.feedback-table td:nth-child(3) {
+  width: 30%;
+  text-align: center;
+}
+
+/* Action */
+.feedback-table th:nth-child(4),
+.feedback-table td:nth-child(4) {
+  width: 30%;
+  text-align: center;
+}
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.feedback-image-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.feedback-emoji-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.feedback-table tbody td:nth-child(3) {
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.feedback-edit-btn,
+.feedback-delete-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  color: #ffffff;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+/* EDIT */
+
+.feedback-edit-btn {
+  background: #fca103;
+}
+
+.feedback-edit-btn:hover {
+  background: #e89100;
+  transform: scale(1.08);
+}
+
+/* DELETE */
+
+.feedback-delete-btn {
+  background: #ff3154;
+}
+
+.feedback-delete-btn:hover {
+  background: #e92346;
+  transform: scale(1.08);
+}
+
+/* =========================================================
+   ROW HOVER
+========================================================= */
+
+.feedback-table tbody tr:hover td {
+  background: transparent;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+[data-theme="dark"] .feedback-card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .feedback-card-header {
+  border-bottom-color: var(--border-color);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .feedback-card {
+    border-radius: 12px;
+  }
+
+  .feedback-card-header {
+    padding: 18px 20px;
+  }
+
+  .feedback-card-header h4 {
+    font-size: 18px;
+  }
+
+  .feedback-card-body {
+    padding: 20px 15px;
+  }
+
+  .feedback-table {
+    min-width: 650px;
+  }
+
+  .feedback-table tbody td {
+    height: 65px;
+    padding: 10px 15px;
+  }
+
+  .feedback-emoji-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .feedback-actions {
+    gap: 12px;
+  }
+}

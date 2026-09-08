@@ -1,0 +1,60 @@
+.about-banner-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.about-banner-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.about-banner-editor-loading {
+  color: var(--text-muted);
+}
+
+.about-banner-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.about-banner-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.about-banner-editor-form input,
+.about-banner-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.about-banner-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}
+
+.about-banner-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.about-banner-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

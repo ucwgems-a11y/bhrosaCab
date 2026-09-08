@@ -1,0 +1,101 @@
+.walletlog-page-wrap {
+  padding: 4px;
+}
+
+.walletlog-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.walletlog-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.walletlog-card-header h4 {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.walletlog-back-btn {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.walletlog-back-btn:hover {
+  filter: brightness(0.95);
+}
+
+.walletlog-card-body {
+  padding: 20px 22px;
+}
+
+.walletlog-table-wrap {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.walletlog-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.walletlog-table th,
+.walletlog-table td {
+  text-align: left;
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.walletlog-table th {
+  background: var(--bg-card);
+  font-weight: 700;
+}
+
+.walletlog-table td:last-child {
+  white-space: normal;
+}
+
+.walletlog-table tr:last-child td {
+  border-bottom: none;
+}
+
+.walletlog-row-even {
+  background: var(--bg-card);
+}
+
+.walletlog-positive {
+  color: #2e9e5b;
+  font-weight: 700;
+}
+
+.walletlog-negative {
+  color: #e5484d;
+  font-weight: 700;
+}
+
+.walletlog-no-data {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  white-space: normal;
+}

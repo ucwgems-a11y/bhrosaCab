@@ -1,0 +1,250 @@
+.booking-section {
+    position: relative;
+    padding: 120px 0 0;
+    background: #F4F5F8;
+    overflow: visible;
+}
+
+/* Left Blue */
+.booking-section::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 90px;
+    width: 300px;
+    height: 320px;
+    background: #8ccbe7;
+    z-index: 0;
+}
+
+/* Black Box */
+.booking-bg {
+    position: absolute;
+    top: 90px;
+    left: 20%;
+    right: 0;
+    height: 320px;
+    background: #202020;
+    z-index: 0;
+
+    clip-path: polygon(0 0,
+            67% 0,
+            76% 30%,
+            100% 30%,
+            100% 100%,
+            0 100%);
+}
+
+.booking-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.booking-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 280px;
+}
+
+.booking-left {
+    width: 45%;
+    position: relative;
+}
+
+.booking-car {
+    width: 670px;
+    /* Pehle 720px ya 780px tha */
+    max-width: none;
+    position: absolute;
+    left: -350px;
+    top: -148px;
+}
+
+.booking-right {
+    width: 50%;
+    position: relative;
+    left: -210px;
+    top: -40px;
+
+}
+
+.booking-right h4 {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #8ccbe7;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+
+
+.booking-right h4::before {
+    content: "///";
+    color: #87CEEB;
+    font-size: 14px;
+
+
+    font-weight: 700;
+}
+
+.booking-right h2 {
+    color: #fff;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 0.6;
+}
+
+/* ===================================
+   Tablet
+=================================== */
+
+@media (max-width:992px) {
+
+    .booking-section {
+        padding: 70px 0;
+    }
+
+    /* Hide only blue shape & car */
+    .booking-section::before,
+    .booking-car {
+        display: none;
+    }
+
+    /* Black background should remain */
+    .booking-bg {
+        display: block;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 280px;
+
+        clip-path: polygon(0 0,
+                70% 0,
+                78% 28%,
+                100% 28%,
+                100% 100%,
+                0 100%);
+    }
+
+    .booking-wrapper {
+        min-height: auto;
+        height: auto;
+        padding-top: 65px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .booking-left {
+        display: none;
+    }
+
+    .booking-right {
+        width: 100%;
+        left: -210px;
+        top: -60px;
+        text-align: center;
+    }
+
+    .booking-right h4 {
+        justify-content: center;
+        text-align: center;
+        margin-left: -30px !important;
+    }
+
+    .booking-right h2 {
+        font-size: 34px;
+        text-align: center;
+
+    }
+
+}
+
+
+/* ===================================
+   Mobile
+=================================== */
+
+@media (max-width:768px) {
+
+    .booking-section {
+        padding: 50px 0 0;
+    }
+
+    .booking-bg {
+        height: 240px;
+
+        clip-path: polygon(0 0,
+                62% 0,
+                74% 22%,
+                100% 22%,
+                100% 100%,
+                0 100%);
+    }
+
+    .booking-right {
+        width: 100%;
+        padding: 0 20px;
+    }
+
+    .booking-right h4 {
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .booking-right h2 {
+        font-size: 24px;
+        line-height: 1.4;
+    }
+
+}
+
+/* ===================================
+   Small Mobile (480px)
+=================================== */
+
+@media (max-width:480px) {
+
+    .booking-section {
+        padding: 40px 0 0;
+    }
+
+    .booking-bg {
+        height: 220px;
+
+        clip-path: polygon(0 0,
+                60% 0,
+                72% 20%,
+                100% 20%,
+                100% 100%,
+                0 100%);
+    }
+
+    .booking-wrapper {
+        min-height: 220px;
+    }
+
+    .booking-right {
+        width: 100%;
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    .booking-right h4 {
+        justify-content: center;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .booking-right h2 {
+        font-size: 20px;
+        line-height: 1.4;
+    }
+}

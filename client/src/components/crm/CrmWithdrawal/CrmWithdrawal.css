@@ -1,0 +1,350 @@
+/* =========================================================
+   CRM WITHDRAWAL REQUEST PAGE (THEME ALIGNED WITH BANK DETAILS)
+========================================================= */
+
+.crm-withdraw-page-wrap {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Page Header */
+.crm-withdraw-page-header {
+  margin-bottom: 4px;
+}
+
+.crm-withdraw-page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.crm-withdraw-header-icon {
+  color: var(--accent);
+}
+
+.crm-withdraw-page-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Main Card */
+.crm-withdraw-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.crm-withdraw-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-panel);
+}
+
+.crm-withdraw-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--accent-soft, rgba(253, 104, 62, 0.15));
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm-withdraw-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.crm-withdraw-card-subtitle {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.crm-withdraw-card-body {
+  padding: 28px;
+}
+
+/* Grid Layout */
+.crm-withdraw-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .crm-withdraw-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Left Column: Form */
+.crm-withdraw-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Info Box (Aligned with CrmBankDetails info box) */
+.crm-withdraw-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: #6366f1;
+}
+
+.crm-withdraw-info-icon {
+  color: #6366f1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.crm-withdraw-info-box p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.crm-withdraw-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.crm-withdraw-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crm-withdraw-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.crm-withdraw-label .text-danger {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* Bank Select Wrapper */
+.crm-withdraw-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.crm-withdraw-select-icon-left {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.crm-withdraw-white-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 36px 0 42px;
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.crm-withdraw-white-select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft, rgba(253, 104, 62, 0.15));
+}
+
+/* Withdrawal Amount Input */
+.crm-withdraw-input-wrapper {
+  width: 100%;
+}
+
+.crm-withdraw-dark-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--input-text);
+  font-size: 13.5px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.crm-withdraw-dark-input::placeholder {
+  color: var(--text-muted);
+}
+
+.crm-withdraw-dark-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft, rgba(253, 104, 62, 0.15));
+}
+
+.crm-withdraw-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 6px 0 2px 0;
+}
+
+/* Submit Area */
+.crm-withdraw-submit-area {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.crm-withdraw-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px var(--accent-soft, rgba(253, 104, 62, 0.3));
+  margin-top: 36px;
+}
+
+.crm-withdraw-submit-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.crm-withdraw-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Right Column: Commission Summary */
+.crm-commission-summary-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.crm-commission-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.crm-commission-card:hover {
+  transform: translateY(-2px);
+}
+
+.crm-commission-badge-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.crm-commission-badge-icon.badge-green {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.crm-commission-badge-icon.badge-pink {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.crm-commission-badge-icon.badge-yellow {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.crm-commission-badge-icon.badge-blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.crm-commission-card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.crm-commission-card-title {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.crm-commission-card-amount {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* =========================================================
+   LIGHT THEME OVERRIDES
+========================================================= */
+
+[data-theme="light"] .crm-withdraw-card-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .crm-withdraw-white-select {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .crm-commission-card {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .crm-commission-card-amount {
+  color: #0f172a !important;
+}

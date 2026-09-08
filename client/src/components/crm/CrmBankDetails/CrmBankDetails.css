@@ -1,0 +1,351 @@
+.crm-bank-page-wrap {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.crm-bank-page-header {
+  margin-bottom: 4px;
+}
+
+.crm-bank-page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.crm-bank-header-icon {
+  color: var(--accent);
+}
+
+.crm-bank-page-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.crm-bank-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crm-bank-back-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Card */
+.crm-bank-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.crm-bank-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-panel);
+}
+
+.crm-bank-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(232, 135, 58, 0.15);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm-bank-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.crm-bank-card-subtitle {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.crm-bank-card-body {
+  padding: 28px;
+}
+
+/* Info Box */
+.crm-bank-info-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  color: #6366f1;
+}
+
+.crm-bank-info-box p {
+  font-size: 13px;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Grid form */
+.crm-bank-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .crm-bank-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.crm-bank-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crm-bank-form-group label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.crm-bank-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.crm-bank-input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.crm-bank-input-wrapper input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 10px 14px 10px 40px;
+  font-size: 13.5px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.crm-bank-input-wrapper input:focus {
+  border-color: var(--accent);
+}
+
+.crm-bank-submit-area {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.crm-bank-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.crm-bank-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.crm-bank-cancel-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Table */
+.crm-bank-table-body {
+  padding: 0;
+}
+
+.crm-bank-table-wrap {
+  overflow-x: auto;
+  background: #1c202a;
+}
+
+.crm-bank-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 900px;
+}
+
+.crm-bank-table th {
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px 16px;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.crm-bank-table th:last-child {
+  border-right: none;
+}
+
+.crm-bank-table td {
+  padding: 14px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  color: #f1f5f9;
+  font-size: 13.5px;
+  vertical-align: middle;
+}
+
+.crm-bank-table td:last-child {
+  border-right: none;
+}
+
+.crm-bank-table tbody tr {
+  background: #1c202a;
+  transition: background-color 0.2s ease;
+}
+
+.crm-bank-table tbody tr:hover {
+  background: #242935;
+}
+
+.crm-bank-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.crm-bank-cell-icon {
+  color: var(--accent);
+}
+
+.crm-bank-ifsc {
+  font-family: monospace;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.crm-bank-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.crm-bank-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.crm-bank-action-btn.edit {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.crm-bank-action-btn.delete {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.crm-bank-action-btn:hover {
+  opacity: 0.8;
+}
+
+.crm-bank-no-data {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--text-muted);
+}
+
+/* Light mode overrides */
+[data-theme="light"] .crm-bank-table th {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-right: 1px solid #cbd5e1 !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .crm-bank-table td {
+  background: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .crm-bank-table-wrap {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .crm-bank-table tbody tr {
+  background: #ffffff !important;
+}
+
+[data-theme="light"] .crm-bank-table tbody tr:hover {
+  background: #f8fafc !important;
+}
+
+[data-theme="light"] .crm-bank-ifsc {
+  color: #475569 !important;
+}

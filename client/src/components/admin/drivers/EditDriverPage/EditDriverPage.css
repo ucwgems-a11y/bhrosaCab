@@ -1,0 +1,231 @@
+.edit-driver-page {
+  padding: 4px;
+}
+
+.edit-driver-topbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.edit-driver-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-driver-back-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.edit-driver-alert-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(46, 158, 91, 0.15);
+  border: 1px solid rgba(46, 158, 91, 0.35);
+  color: #2e9e5b;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.edit-driver-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+}
+
+.edit-driver-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.edit-driver-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-driver-card-title {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.edit-driver-card-subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.edit-driver-card-body {
+  padding: 24px;
+}
+
+.edit-driver-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.edit-driver-full-width {
+  grid-column: span 2;
+}
+
+.edit-driver-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-driver-form-group label {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.edit-driver-req {
+  color: #e5484d;
+}
+
+.edit-driver-form-group input,
+.edit-driver-form-group select,
+.edit-driver-form-group textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.edit-driver-form-group input:focus,
+.edit-driver-form-group select:focus,
+.edit-driver-form-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.edit-driver-image-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.edit-driver-preview-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+
+.edit-driver-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.edit-driver-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel);
+  border: 1px dashed var(--input-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-driver-upload-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.edit-driver-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.edit-driver-btn-submit {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 28px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.edit-driver-btn-submit:hover {
+  filter: brightness(0.95);
+}
+
+.edit-driver-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.edit-driver-btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-driver-btn-cancel:hover {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .edit-driver-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .edit-driver-full-width {
+    grid-column: span 1;
+  }
+}

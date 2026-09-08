@@ -1,0 +1,558 @@
+/* =========================================================
+   SUB ADMIN TRANSACTION LIST PAGE & MODAL
+========================================================= */
+
+.transaction-page {
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transaction-header {
+  margin-bottom: 20px;
+}
+
+.transaction-page-title {
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+
+  
+}
+.transaction-page-title span{
+  margin-left: 10px;
+}
+
+
+.transaction-page-icon {
+  color: var(--accent);
+  
+ 
+}
+
+.transaction-page-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Transaction Card */
+.transaction-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.transaction-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-panel);
+}
+
+.transaction-card-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.transaction-card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: rgba(94, 162, 163, 0.15);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.transaction-card-title h5 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.transaction-card-title span {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* Search input */
+.transaction-search-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.transaction-search-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.transaction-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.transaction-search-input {
+  height: 38px;
+  width: 260px;
+  padding: 0 12px 0 36px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--input-text);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.transaction-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(94, 162, 163, 0.15);
+}
+
+.transaction-reload-btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: rgba(94, 162, 163, 0.12);
+  color: var(--accent, #5ea2a3);
+  border: 1px solid rgba(94, 162, 163, 0.35);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.transaction-reload-btn:hover {
+  background: var(--accent, #5ea2a3);
+  color: #ffffff;
+  border-color: var(--accent, #5ea2a3);
+  box-shadow: 0 2px 8px rgba(94, 162, 163, 0.3);
+}
+
+.transaction-reload-btn:active {
+  transform: scale(0.97);
+}
+
+/* Table */
+.transaction-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.transaction-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.transaction-table th {
+  background: var(--table-header-bg, var(--bg-panel));
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.transaction-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.transaction-table tbody tr:hover td {
+  background: rgba(94, 162, 163, 0.04);
+}
+
+.subadmin-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.subadmin-state {
+  color: var(--text-muted);
+}
+
+.withdraw-amount {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.transaction-date-text {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.transaction-empty-cell {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--text-muted);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.status-badge.status-pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-badge.status-approved {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.status-rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* View Button */
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(94, 162, 163, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(94, 162, 163, 0.25);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* =========================================================
+   MODAL POPUP STYLING (SCREENSHOT MATCHING)
+========================================================= */
+
+.transaction-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.transaction-modal-container {
+  width: 100%;
+  max-width: 680px;
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 14px;
+}
+
+.transaction-custom-modal {
+  background: #181c26;
+  border: 1px solid #282e3e;
+  border-radius: 14px;
+  padding: 24px 28px;
+  color: #ffffff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Modal Header */
+.transaction-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.transaction-modal-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.transaction-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.transaction-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Dividers */
+.transaction-modal-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 16px 0;
+}
+
+/* Modal Body */
+.transaction-modal-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section Title */
+.detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 12px;
+}
+
+.detail-section-icon {
+  color: #3b82f6;
+}
+
+/* Grid Row */
+.detail-grid-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 576px) {
+  .detail-grid-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Two-column section for Withdrawal Details & Status (Matching Screenshot) */
+.detail-two-col-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 576px) {
+  .detail-two-col-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-section-header-line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 4px 0 12px 0;
+}
+
+/* Pure White Cards */
+.detail-white-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.update-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-select-wrap {
+  width: 100%;
+}
+
+.modal-status-select {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.modal-status-select:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+}
+
+.reject-reason-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.modal-reject-reason-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  border-radius: 8px;
+  color: #1e293b;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.modal-reject-reason-input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.modal-update-status-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ff5722;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(255, 87, 34, 0.3);
+}
+
+.modal-update-status-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.modal-update-status-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.detail-rejected-reason-box {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.detail-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.detail-card-value {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.detail-amount-blue {
+  color: #2563eb !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+/* Modal Status Badges */
+.modal-status-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 14px;
+  border-radius: 20px;
+}
+
+.modal-status-pending {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
+.modal-status-approved {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.modal-status-rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}

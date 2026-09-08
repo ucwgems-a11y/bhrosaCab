@@ -1,0 +1,62 @@
+.company-info-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.company-info-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.company-info-editor-loading {
+  color: var(--text-muted);
+}
+
+.company-info-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.company-info-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.company-info-editor-form input,
+.company-info-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.company-info-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}
+
+.company-info-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.company-info-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

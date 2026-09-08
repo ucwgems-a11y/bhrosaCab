@@ -1,0 +1,2 @@
+import ActiveDriversByStatePage from "../../../components/admin/drivers/ActiveDriversByStatePage/ActiveDriversByStatePage";
+export default function ActiveDriversByState() { return <ActiveDriversByStatePage />; }

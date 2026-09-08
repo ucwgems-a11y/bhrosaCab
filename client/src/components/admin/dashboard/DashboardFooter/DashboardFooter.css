@@ -1,0 +1,23 @@
+.dashboard-footer {
+  margin-top: auto;
+  padding-top: 24px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.dashboard-footer p {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.dashboard-footer a {
+  color: #7fc4e8;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.dashboard-footer a:hover {
+  text-decoration: underline;
+}

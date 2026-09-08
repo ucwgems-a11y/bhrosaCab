@@ -1,0 +1,2 @@
+import DriverReferralListPage from "../../../components/admin/drivers/DriverReferralListPage/DriverReferralListPage";
+export default function DriverReferralList() { return <DriverReferralListPage />; }

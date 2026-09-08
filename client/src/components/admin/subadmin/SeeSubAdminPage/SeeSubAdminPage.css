@@ -1,0 +1,95 @@
+.subadmin-search-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.subadmin-search-input {
+  flex: 1;
+  min-width: 260px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  outline: none;
+}
+
+.subadmin-search-input:focus {
+  border-color: var(--accent);
+}
+
+.subadmin-search-btn {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.subadmin-search-btn:hover {
+  filter: brightness(0.95);
+}
+
+.subadmin-reset-btn {
+  background: #4338ca;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.subadmin-reset-btn:hover {
+  filter: brightness(0.92);
+}
+
+.subadmin-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.subadmin-status-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.subadmin-status-badge.inactive {
+  background: #e5484d;
+}
+
+.subadmin-status-badge.active {
+  background: #2e9e5b;
+}
+
+.subadmin-agreement-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #2e9e5b;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.subadmin-agreement-badge:hover {
+  opacity: 0.9;
+  color: #fff;
+}

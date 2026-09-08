@@ -1,0 +1,86 @@
+.mediasource-page-wrap {
+  padding: 4px;
+}
+
+.mediasource-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mediasource-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mediasource-card-header h4 {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.mediasource-back-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mediasource-back-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mediasource-card-body {
+  padding: 20px 22px;
+}
+
+.mediasource-table-wrap {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.mediasource-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1600px;
+}
+
+.mediasource-table th,
+.mediasource-table td {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.mediasource-table th {
+  background: var(--bg-card);
+  font-weight: 700;
+}
+
+.mediasource-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mediasource-no-data {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  white-space: normal;
+}

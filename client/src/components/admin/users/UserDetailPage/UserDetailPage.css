@@ -1,0 +1,159 @@
+.userdetail-page-wrap {
+  padding: 4px;
+}
+
+.userdetail-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Left profile card */
+.userdetail-profile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.userdetail-banner img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+
+.userdetail-header {
+  padding: 24px;
+  text-align: center;
+}
+
+.userdetail-name {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.userdetail-email {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Right column */
+.userdetail-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.userdetail-info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.userdetail-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.userdetail-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 20px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+}
+
+.userdetail-btn.location {
+  background: var(--accent);
+}
+
+.userdetail-btn.location:hover {
+  filter: brightness(0.95);
+}
+
+.userdetail-btn.back {
+  background: #4338ca;
+}
+
+.userdetail-btn.back:hover {
+  filter: brightness(0.92);
+}
+
+.userdetail-section-title {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 700;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.userdetail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.userdetail-info-label {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.userdetail-info-value {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.userdetail-muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.userdetail-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.userdetail-badge.verified {
+  background: rgba(46, 158, 91, 0.15);
+  color: #2e9e5b;
+}
+
+.userdetail-badge.pending {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.userdetail-doc-thumb {
+  width: 80px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+@media (max-width: 900px) {
+  .userdetail-grid {
+    grid-template-columns: 1fr;
+  }
+  .userdetail-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

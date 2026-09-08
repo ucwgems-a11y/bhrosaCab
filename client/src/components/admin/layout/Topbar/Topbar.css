@@ -1,0 +1,230 @@
+.topbar { 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 20px;
+  min-height: 68px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.topbar-menu-btn {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.topbar-menu-btn:hover {
+  background: transparent;
+  color: var(--text-primary);
+  opacity: 0.8;
+  transform: scale(1.08);
+}
+
+.topbar-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.topbar-vertical-divider {
+  width: 2px;
+  height: 54px;
+  background: var(--border-color);
+  opacity: 1;
+  color: var(--text-primary);
+  /* margin: 0 4px; */
+}
+
+.topbar-avatar-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #ffb703;
+  padding: 2.5px;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-left: -8px;
+}
+
+.topbar-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.topbar-admin-name {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* Dropdown menu */
+.topbar-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  padding: 8px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topbar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.topbar-dropdown-item:hover {
+  background: rgba(127, 196, 232, 0.08);
+  color: var(--text-primary);
+}
+
+.topbar-dropdown-icon {
+  color: var(--text-muted);
+}
+
+.topbar-dropdown-icon-accent {
+  color: #ff9d1f;
+}
+
+/* =========================================================
+   ANIMATED LIGHT / DARK MODE CAPSULE TOGGLE
+   ========================================================= */
+.theme-switch-capsule {
+  position: relative;
+  width: 72px;
+  height: 34px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 9px;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark mode track */
+.theme-switch-capsule.dark {
+  background: #141a24;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Light mode track */
+.theme-switch-capsule.light {
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Icons inside track */
+.theme-switch-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.theme-switch-icon.sun {
+  color: rgba(255, 255, 255, 0.35);
+}
+.theme-switch-capsule.light .theme-switch-icon.sun {
+  color: #d97706;
+}
+
+.theme-switch-icon.moon {
+  color: rgba(255, 255, 255, 0.85);
+}
+.theme-switch-capsule.light .theme-switch-icon.moon {
+  color: #94a3b8;
+}
+
+/* Sliding Glowing Thumb */
+.theme-switch-thumb {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  z-index: 2;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.3s ease,
+              box-shadow 0.35s ease;
+}
+
+/* Dark mode: Knob slides to right, glowing warm golden amber */
+.theme-switch-capsule.dark .theme-switch-thumb {
+  transform: translateX(36px);
+  background: linear-gradient(135deg, #ffc107 0%, #f59e0b 100%);
+  box-shadow: 0 0 14px 4px rgba(245, 158, 11, 0.6),
+              0 0 26px 8px rgba(245, 158, 11, 0.25),
+              inset 0 -1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* Light mode: Knob slides to left, sunny yellow glow */
+.theme-switch-capsule.light .theme-switch-thumb {
+  transform: translateX(0px);
+  background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+  box-shadow: 0 0 12px 3px rgba(250, 204, 21, 0.7),
+              inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.theme-switch-capsule:hover .theme-switch-thumb {
+  filter: brightness(1.1);
+}

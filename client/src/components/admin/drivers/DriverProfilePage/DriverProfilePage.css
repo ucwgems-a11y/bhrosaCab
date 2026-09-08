@@ -1,0 +1,136 @@
+.driverprofile-page-wrap {
+  padding: 4px;
+}
+
+.driverprofile-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  text-align: center;
+}
+
+.driverprofile-title-row h2 {
+  color: #1a1a2e;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.driverprofile-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.driverprofile-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+}
+
+.driverprofile-btn.orange {
+  background: var(--accent);
+}
+
+.driverprofile-btn.orange:hover {
+  filter: brightness(0.95);
+}
+
+.driverprofile-btn.purple {
+  background: #8b5cf6;
+}
+
+.driverprofile-btn.purple:hover {
+  filter: brightness(0.95);
+}
+
+.driverprofile-body {
+  text-align: left;
+
+}
+
+
+
+.driverprofile-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.driverprofile-table th,
+.driverprofile-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.driverprofile-table th {
+  color: #6b7280;
+  font-weight: 600;
+  width: 460px;
+  min-width: 410px;
+  text-align: left;
+}
+
+.driverprofile-table td {
+  color: #1a1a2e;
+  
+  
+}
+
+.driverprofile-avatar {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  /* transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease; */
+  transform-origin: center center;
+}
+
+.driverprofile-avatar:hover {
+  /* transform: scale(2.8); */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 100;
+}
+
+.driverprofile-doc-thumb {
+  width: 140px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 2px;
+  cursor: pointer;
+ transition: transform 1.15s ease;
+  transform-origin: center center;
+}
+
+.driverprofile-doc-thumb:hover {
+  transform: scale(3.6);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  border: none !important;
+  position: relative;
+  z-index: 100;
+}
+
+.driverprofile-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+}
+
+.driverprofile-zoom-img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}

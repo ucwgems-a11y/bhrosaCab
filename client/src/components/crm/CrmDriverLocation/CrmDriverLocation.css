@@ -1,0 +1,119 @@
+.crm-location-page-wrap {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.crm-location-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.crm-location-card-body {
+  padding: 24px;
+}
+
+.crm-location-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.crm-location-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.crm-location-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fca103;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.crm-location-back-btn:hover {
+  opacity: 0.9;
+}
+
+.crm-location-info-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.crm-location-info-col strong {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.crm-location-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.crm-location-badge.online {
+  background: #22c55e;
+}
+
+.crm-location-badge.offline {
+  background: #ef4444;
+}
+
+.crm-location-map-box {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.crm-location-map-popup {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  min-width: 240px;
+  z-index: 10;
+}
+
+.crm-location-popup-header {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.crm-location-popup-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+}

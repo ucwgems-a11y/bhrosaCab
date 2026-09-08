@@ -1,0 +1,177 @@
+/* =========================
+   Header
+========================= */
+
+.mid-header {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.header-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 20px 15px;
+}
+
+.mid-header-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* =========================
+   Logo
+========================= */
+
+.site-logo {
+    width: 220px;
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+
+.site-logo img {
+    width: 180px;
+    display: block;
+}
+
+/* =========================
+   Header Info
+========================= */
+
+.header-info {
+    margin-left: auto;
+}
+
+.header-info ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 40px;
+}
+
+.header-info li {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+
+/* Fixed widths */
+
+.header-info li:nth-child(1) {
+    width: 180px;
+}
+
+.header-info li:nth-child(2) {
+    width: 205px;
+    position: relative;
+    left: -30px;
+}
+
+.header-info li:nth-child(3) {
+
+    position: relative;
+    right: -20px;
+
+}
+
+/* =========================
+   Icon
+========================= */
+
+.header-info-icon {
+    font-size: 28px;
+    color: #87CEEB;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* =========================
+   Text
+========================= */
+
+.header-info-text {
+    line-height: 1.2;
+}
+
+.header-info-text span {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.header-info-text h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 550;
+    color: #222;
+    line-height: 1.25;
+}
+
+.header-info-text h3 a {
+    color: #222;
+    text-decoration: none;
+}
+
+.header-info-text br {
+    display: block;
+}
+
+/* =========================
+   Responsive (Tablet + Mobile)
+========================= */
+
+.mobile-menu-btn {
+    display: none;
+}
+
+@media (max-width:992px) {
+
+    .header-container {
+        padding: 15px;
+    }
+
+    .mid-header-wrap {
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .site-logo {
+        margin: 0;
+        width: auto;
+    }
+
+    .site-logo img {
+        width: 150px;
+    }
+
+    /* Hide Desktop Header Info */
+    .header-info {
+        display: none;
+    }
+
+    /* Hide Desktop Navigation */
+    .nav-menu-wrapper {
+        display: none !important;
+    }
+
+    /* Show Mobile Menu Button */
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 45px;
+        height: 45px;
+
+        border: none;
+        background: #87CEEB;
+        color: #fff;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+}

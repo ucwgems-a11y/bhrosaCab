@@ -1,0 +1,318 @@
+.about-section {
+    padding: 100px 0;
+    background: #fff;
+}
+
+.about-wrapper {
+    width: 1200px;
+    height: 370px;
+    /* 370 + 100 + 100 = 570px total */
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* LEFT */
+
+.about-img {
+    width: 42%;
+    height: 100%;
+    position: relative;
+    left: -40px;
+}
+
+.about-img::before {
+    content: "";
+    position: absolute;
+
+    width: 220px;
+    height: 380px;
+
+    background: #8ED7F7;
+
+    left: 175px;
+    top: 10px;
+
+    transform: skew(-18deg);
+    z-index: 0;
+}
+
+.about-img1 {
+    width: 300px;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    z-index: 2;
+}
+
+.about-img2 {
+    width: 210px;
+
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 320px;
+
+    z-index: 3;
+}
+
+/* RIGHT */
+
+.about-content {
+    width: 52%;
+}
+
+.about-content h4 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    color: #87CEEB;
+    font-size: 16px;
+    font-weight: 700;
+
+    margin-bottom: 15px;
+}
+
+.about-content h4::before {
+     content: "///";
+    color: #87CEEB;
+    font-size: 14px;
+    margin-right: -6px;
+
+    font-weight: 700;
+}
+
+.about-content h2 {
+    font-size: 36px; 
+    line-height: 1.18;
+    font-weight: 700;
+    ;
+
+    color: #222;
+
+    margin-bottom: 22px;
+}
+
+.about-content p {
+    font-size: 18px;
+    line-height: 31px;
+    color: #666;
+
+    margin-bottom: 14px;
+}
+
+/* 
+@keyframes shapeZoom{
+    from{
+        opacity:0;
+        transform:scale(.6);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.about-img::before{
+    animation: shapeZoom .6s ease forwards;
+} */
+
+
+img {
+    border-radius: 4px;
+
+}
+
+/* ===================================
+   Tablet Responsive
+=================================== */
+
+@media (max-width:992px) {
+
+    .about-section {
+        padding: 50px 0;
+    }
+
+    .about-wrapper {
+        width: 95%;
+        height: auto;
+        margin: auto;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+    }
+
+    /* Left */
+
+    .about-img {
+        width: 45%;
+        height: 420px;
+        left: 0;
+    }
+
+    .about-img::before {
+        width: 180px;
+        height: 320px;
+        left: 120px;
+        top: 20px;
+    }
+
+    .about-img1 {
+        width: 240px;
+    }
+
+    .about-img2 {
+        width: 180px;
+        left: 180px;
+        bottom: 20px;
+    }
+
+    /* Right */
+
+    .about-content {
+        width: 50%;
+    }
+
+    .about-content h4 {
+        font-size: 15px;
+    }
+
+    .about-content h2 {
+        font-size: 26px;
+        line-height: 42px;
+        margin-bottom: 20px;
+    }
+
+    .about-content p {
+        font-size: 17px;
+        line-height: 30px;
+    }
+
+    .about-content {
+        margin-right: -30px;
+    }
+
+
+
+
+}
+
+
+/* ===================================
+   Mobile Responsive
+=================================== */
+
+@media (max-width:768px) {
+
+    .about-section {
+        padding: 50px 0;
+    }
+
+    .about-wrapper {
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        gap: 40px;
+    }
+
+    /* Images Top */
+
+    .about-img {
+        width: 100%;
+        height: 360px;
+        left: 0;
+        margin-bottom: 20px;
+    }
+
+    .about-img::before {
+        width: 170px;
+        height: 300px;
+        left: 50%;
+        top: 10px;
+        transform: translateX(-50%) skew(-18deg);
+    }
+
+    .about-img1 {
+        width: 240px;
+        left: 50px;
+        top: 100PX;
+    }
+
+    .about-img2 {
+        width: 190px;
+        left: auto;
+        right: 90px;
+        bottom: 150px;
+    }
+
+    /* Content Bottom */
+
+    .about-content {
+        width: 100%;
+        text-align: left;
+    }
+
+    .about-content h4 {
+        justify-content: flex-start;
+        font-size: 15px;
+        margin-bottom: 12px;
+    }
+
+    .about-content h2 {
+        font-size: 24px;
+        line-height: 34px;
+        margin-bottom: 18px;
+    }
+
+    .about-content p {
+        font-size: 16px;
+        line-height: 28px;
+        margin-bottom: 12px;
+    }
+
+}
+
+
+/* ===================================
+   Small Mobile
+=================================== */
+
+@media (max-width:580px) {
+
+    .about-img {
+        height: 320px;
+    }
+
+    .about-img::before {
+        width: 150px;
+        height: 260px;
+    }
+
+    .about-img1 {
+        width: 180px;
+    }
+
+    .about-img2 {
+        width: 145px;
+        right: 10px;
+    }
+
+    .about-content h2 {
+        font-size: 22px;
+        line-height: 32px;
+    }
+
+    .about-content p {
+        font-size: 15px;
+        line-height: 26px;
+    }
+
+}

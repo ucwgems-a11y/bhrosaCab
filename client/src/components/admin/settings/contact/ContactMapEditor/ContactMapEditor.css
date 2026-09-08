@@ -1,0 +1,68 @@
+.contact-map-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.contact-map-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.contact-map-editor-loading {
+  color: var(--text-muted);
+}
+
+.contact-map-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 520px;
+}
+
+.contact-map-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.contact-map-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.contact-map-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+  line-height: 1.5;
+}
+
+.contact-map-field-hint code {
+  background: var(--bg-panel);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.contact-map-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.contact-map-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

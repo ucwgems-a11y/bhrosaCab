@@ -1,0 +1,244 @@
+/* =========================================================
+   DRIVER RIDES PAGE - MODERN PREMIUM STYLING
+   ========================================================= */
+
+.driverrides-page-wrap {
+  padding: 16px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.driverrides-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel, #1a202c);
+  color: var(--text-primary, #ffffff);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.driverrides-back-btn:hover {
+  background: var(--accent, #fd683e);
+  color: #ffffff;
+  border-color: var(--accent, #fd683e);
+}
+
+.driverrides-card {
+  background: var(--bg-card, #161b26);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.driverrides-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.driverrides-card-header h4 {
+  color: var(--text-primary, #ffffff);
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.driverrides-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.driverrides-filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary, #ffffff);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-panel, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  transition: all 0.15s ease;
+}
+
+.driverrides-filter-group label:hover {
+  border-color: var(--accent, #fd683e);
+}
+
+.driverrides-card-body {
+  padding: 20px 24px;
+}
+
+.driverrides-table-wrap {
+  background: var(--bg-card, #141824);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.driverrides-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+.driverrides-table th {
+  background: var(--bg-panel, #1a202c);
+  color: var(--text-muted, #94a3b8);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.driverrides-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-primary, #ffffff);
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+  vertical-align: middle;
+}
+
+.driverrides-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.driverrides-table tr:last-child td {
+  border-bottom: none;
+}
+
+.driverrides-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.driverrides-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.driverrides-status.completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.driverrides-status.cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.driverrides-status.booked {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.driverrides-status.in_progress {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.driverrides-no-data {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted, #94a3b8);
+  padding: 36px !important;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .driverrides-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .driverrides-card-header {
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .driverrides-card-header h4 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .driverrides-filter-group label {
+  color: #0f172a;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .driverrides-table-wrap {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .driverrides-table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .driverrides-table td {
+  color: #1e293b;
+  border-bottom-color: #f1f5f9;
+}
+
+[data-theme="light"] .driverrides-table tr:hover td {
+  background: #f8fafc;
+}
+
+[data-theme="light"] .driverrides-back-btn {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .driverrides-status.completed {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+
+[data-theme="light"] .driverrides-status.cancelled {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+[data-theme="light"] .driverrides-status.booked {
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+[data-theme="light"] .driverrides-status.in_progress {
+  background: #ecfeff;
+  color: #0891b2;
+  border-color: #a5f3fc;
+}

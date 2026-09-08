@@ -1,0 +1,135 @@
+.download-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.download-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.download-editor-loading {
+  color: var(--text-muted);
+}
+
+.download-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.download-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.download-editor-form input,
+.download-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.download-editor-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  background: var(--bg-panel);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.download-features-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.download-add-feature-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #7fc4e8;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.download-feature-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.download-feature-card input {
+  margin: 0;
+}
+
+.download-feature-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download-feature-icon-preview {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  background: var(--bg-card);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.download-feature-icon-row input[type="file"] {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+.download-feature-icon-row button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.download-feature-icon-row button:hover {
+  color: #e5484d;
+  border-color: #e5484d;
+}
+
+.download-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.download-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

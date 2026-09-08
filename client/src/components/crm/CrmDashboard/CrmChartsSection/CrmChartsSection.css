@@ -1,0 +1,91 @@
+.crm-charts-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  width: 100%;
+  margin-top: 18px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .crm-charts-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.crm-chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.crm-chart-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.crm-chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.crm-chart-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.crm-chart-summary-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.crm-chart-summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.crm-chart-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.crm-chart-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.crm-chart-tab {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crm-chart-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.crm-chart-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}

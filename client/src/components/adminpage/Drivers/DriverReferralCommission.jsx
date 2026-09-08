@@ -1,0 +1,2 @@
+import DriverReferralCommissionPage from "../../../components/admin/drivers/DriverReferralCommissionPage/DriverReferralCommissionPage";
+export default function DriverReferralCommission() { return <DriverReferralCommissionPage />; }

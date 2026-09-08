@@ -1,0 +1,2 @@
+import DriverWalletHistoryPage from "../../../components/admin/drivers/DriverWalletHistoryPage/DriverWalletHistoryPage";
+export default function DriverWalletHistory() { return <DriverWalletHistoryPage />; }

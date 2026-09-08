@@ -1,0 +1,121 @@
+.refcomm-page-wrap {
+  padding: 4px;
+}
+
+.refcomm-subheading {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.refcomm-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.refcomm-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.refcomm-summary-card h6 {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.refcomm-summary-card h4 {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.refcomm-summary-card .refcomm-amount {
+  color: #2e9e5b;
+}
+
+.refcomm-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.refcomm-card-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.refcomm-card-header h4 {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.refcomm-card-body {
+  padding: 20px 22px;
+}
+
+.refcomm-table-wrap {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.refcomm-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.refcomm-table th,
+.refcomm-table td {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.refcomm-table th {
+  background: var(--bg-card);
+  font-weight: 700;
+}
+
+.refcomm-table tr:last-child td {
+  border-bottom: none;
+}
+
+.refcomm-no-data {
+  text-align: center;
+  font-style: italic;
+  color: #e5484d;
+  white-space: normal;
+}
+
+@media (max-width: 900px) {
+  .refcomm-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.refcomm-auto-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -1,0 +1,81 @@
+.why-editor-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.why-editor-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.why-editor-loading {
+  color: var(--text-muted);
+}
+
+.why-editor-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.why-editor-form label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 14px 0 6px;
+}
+
+.why-editor-form input,
+.why-editor-form textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.why-checkbox-label {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+}
+
+.why-checkbox-label input {
+  width: auto;
+}
+
+.why-editor-preview {
+  width: 140px;
+  height: 90px;
+  object-fit: cover;
+  background: var(--bg-panel);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.why-field-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: -4px;
+}
+
+.why-save-btn {
+  margin-top: 22px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.why-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

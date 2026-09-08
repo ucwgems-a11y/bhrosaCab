@@ -1,0 +1,137 @@
+.price-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 700px;
+  margin-bottom: 28px;
+}
+
+.price-form-heading {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.price-form-card label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+  margin-top: 18px;
+}
+
+.price-form-card label:first-of-type {
+  margin-top: 0;
+}
+
+.price-form-sublabel {
+  margin-top: 0 !important;
+  color: #7fc4e8 !important;
+}
+
+.price-form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.price-form-col {
+  flex: 1;
+}
+
+.price-form-card input,
+.price-form-card select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.price-submit-btn {
+  margin-top: 24px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 26px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.price-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.price-page-title {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.price-search-row {
+  margin-bottom: 18px;
+  max-width: 420px;
+}
+
+.price-search-row input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--input-text);
+  font-size: 13px;
+}
+
+.price-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.price-table th,
+.price-table td {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.price-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--bg-panel);
+}
+
+.price-table tr:last-child td {
+  border-bottom: none;
+}
+
+.price-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  background: var(--accent);
+}

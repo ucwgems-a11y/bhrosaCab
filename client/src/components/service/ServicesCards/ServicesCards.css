@@ -1,0 +1,97 @@
+.services-cards {
+    padding: 80px 0 100px;
+    background: #F4F5F8;
+}
+
+.services-container {
+    width: 90%;
+    max-width: 1320px;
+    margin: auto;
+
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.service-card {
+    background: #fff;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, .08);
+    transition: .35s;
+}
+
+
+
+.service-thumb {
+    position: relative;
+    overflow: visible;
+    height: 300px;
+}
+
+.service-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.service-scooter {
+    position: absolute;
+    right: -30px;
+    bottom: -30px;
+
+    z-index: 5;
+    width: 220px;
+
+    transition: .25s;
+}
+
+.service-scooter img {
+    width: 100%;
+
+
+    display: block;
+}
+
+.service-card:hover .service-scooter {
+    right: 0;
+    bottom: -35px;
+}
+
+.service-content {
+    padding: 28px;
+}
+
+.service-content h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.service-content p {
+    color: #666;
+    font-size: 17px;
+    line-height: 1.4;
+    margin: 0 0 20px;
+    letter-spacing: -.7px;
+}
+
+@media(max-width:991px) {
+
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media(max-width:767px) {
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
