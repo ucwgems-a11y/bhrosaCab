@@ -25,7 +25,7 @@ function Header() {
   return (
     <>
       <header className="mid-header">
-        <div className="container header-container">
+        <div className="header-container">
           <div className="mid-header-wrap">
             <div className="site-logo">
               <img src={logoUrl} alt="" />

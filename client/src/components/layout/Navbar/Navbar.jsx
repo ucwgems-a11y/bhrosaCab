@@ -5,21 +5,19 @@ import "./navbar.css";
 function Navbar() {
   return (
     <nav className="nav-menu-wrapper">
-      <div className="container">
-        <div className="nav-menu-inner">
-          <ul className="menu">
-            {navLinks.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) => (isActive ? "active-link" : "")}
-                >
-                  {item.name}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="nav-menu-inner">
+        <ul className="menu">
+          {navLinks.map((item) => (
+            <li key={item.path}>
+              <NavLink
+                to={item.path}
+                className={({ isActive }) => (isActive ? "active-link" : "")}
+              >
+                {item.name}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
       </div>
     </nav>
   );

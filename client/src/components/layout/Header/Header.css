@@ -8,10 +8,10 @@
 }
 
 .header-container {
-    width: 100%;
-    max-width: 1320px;
+    width: 95%;
+    max-width: 1700px;
     margin: 0 auto;
-    padding: 20px 15px;
+    padding: 16px 20px;
 }
 
 .mid-header-wrap {

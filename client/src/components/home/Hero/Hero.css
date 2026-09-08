@@ -338,22 +338,22 @@
 
 .slider-controls {
     position: absolute;
-    left: max(0px, calc((100% - 1320px) / 2));
+    left: 0 !important;
     bottom: 0;
     z-index: 20;
 
-    width: clamp(280px, 25vw, 420px);
+    width: 420px;
     height: 75px;
 
     background: #fff;
-    border-radius: 2px 2px 0 0;
+    border-radius: 0;
 
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     column-gap: 20px;
 
-    padding: 0 15px;
+    padding: 0 20px;
 }
 
 /* Prev & Next */
