@@ -102,8 +102,8 @@ export default function CrmLogin() {
       const errorMsg =
         err.response?.data?.message ||
         (err.message === "Network Error"
-          ? "Backend server is offline or IP mismatch."
-          : "Invalid email, password, or IP not authorized.");
+          ? "Unable to connect to the server. Please verify your connection."
+          : "Invalid email or password, or IP address is not authorized.");
 
       Swal.fire({
         icon: "error",

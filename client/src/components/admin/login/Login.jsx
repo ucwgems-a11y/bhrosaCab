@@ -42,21 +42,19 @@ export default function AdminLogin() {
 
 
   } catch (err) {
-
+    const errorMsg =
+      err.response?.data?.message ||
+      (err.message === "Network Error"
+        ? "Unable to connect to the server. Please verify your connection."
+        : "Invalid email or password. Please try again.");
 
     Swal.fire({
       title: "Login Failed",
-      text: err.response?.data?.message || "Email/password check karo",
+      text: errorMsg,
       icon: "error"
     });
 
-
-    setError(
-      err.response?.data?.message || 
-      "Login failed, email/password check karo"
-    );
-
-
+    setError(errorMsg);
   } finally {
 
     setLoading(false);
