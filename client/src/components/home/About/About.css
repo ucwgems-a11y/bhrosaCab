@@ -4,9 +4,10 @@
 }
 
 .about-wrapper {
-    width: 1200px;
-    height: 370px;
-    /* 370 + 100 + 100 = 570px total */
+    width: 92%;
+    max-width: 1200px;
+    min-height: 370px;
+    height: auto;
     margin: 0 auto;
 
     display: flex;

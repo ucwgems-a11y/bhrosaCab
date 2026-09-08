@@ -31,7 +31,8 @@
 }
 
 .service-container {
-    width: 1200px;
+    width: 92%;
+    max-width: 1280px;
     margin: 0 auto;
     position: relative;
     z-index: 2;
