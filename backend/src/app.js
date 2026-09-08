@@ -18,4 +18,10 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/api", (req, res) => {
+  res.json({
+    message: "Bhrosa Cab Backend Running"
+  });
+});
+
 module.exports = app;
