@@ -1,25 +1,21 @@
 .nav-menu-wrapper {
     position: relative;
-    left: 140px;
     z-index: 99;
     margin-bottom: -30px;
-
-
 }
 
 .nav-menu-inner {
-    width: 80%;
-    max-width: 90%;
+    width: 85%;
+    max-width: 1050px;
     height: 60px;
     background: #87CEEB;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     margin-left: auto;
     margin-right: 0;
-    padding: 0 40px;
+    padding: 0 45px;
     position: relative;
-    right: 10%;
+    right: 5%;
 }
 
 /* Left Cut */
@@ -34,25 +30,33 @@
     transform: skewx(16deg);
 }
 
-
-
-
 .menu {
     display: flex;
     align-items: center;
-    gap: 42px;
+    gap: 34px;
     list-style: none;
     margin: 0;
     padding: 0;
-    margin-right: 310px;
+    flex-wrap: nowrap;
 }
 
-.menu a {
+.menu li {
+    list-style: none;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.menu a,
+.menu li a {
+    font-family: "Space Grotesk", sans-serif;
     text-decoration: none;
     color: #fff;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
+    white-space: nowrap;
+    display: inline-block;
     transition: .3s;
+    line-height: 1;
 }
 
 .menu a:hover,
@@ -65,30 +69,50 @@
     display: none;
 }
 
+/* Medium Desktop / Laptops (993px - 1280px) */
+@media (max-width: 1280px) {
+    .nav-menu-inner {
+        width: 90%;
+        padding: 0 28px;
+        right: 2%;
+    }
 
-.menu li a {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: #fff;
-    text-decoration: none;
+    .menu {
+        gap: 22px;
+    }
+
+    .menu a,
+    .menu li a {
+        font-size: 15px;
+    }
 }
 
-/* navbar hide  */
+@media (max-width: 1100px) {
+    .nav-menu-inner {
+        width: 95%;
+        padding: 0 20px;
+        right: 0;
+    }
+
+    .menu {
+        gap: 16px;
+    }
+
+    .menu a,
+    .menu li a {
+        font-size: 14px;
+    }
+}
 
 /* Tablet + Mobile */
 @media (max-width: 992px) {
-
     .nav-menu-wrapper {
         display: none !important;
     }
-
 }
 
-@media (max-width:768px) {
-
+@media (max-width: 768px) {
     .nav-menu-wrapper {
         display: none !important;
     }
-
 }

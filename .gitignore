@@ -5,8 +5,9 @@ backend/.env
 backend/.env.*
 client/.env
 client/.env.*
-backend/uploads/
 client/dist/
+# backend/uploads/ (included so Vercel can serve existing uploaded images)
+
 logs/
 *.log
 .DS_Store

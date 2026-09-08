@@ -1,7 +1,7 @@
 node_modules/
 .env
 .env.*
-uploads/
+# uploads/ (tracked so Vercel can serve existing images)
 logs/
 *.log
 .DS_Store
