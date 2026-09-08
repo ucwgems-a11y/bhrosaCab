@@ -6,7 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-import "./OfferSection.css";
+import "./offerSection.css";
 import OfferCard from "./OfferCard";
 import api from "../../../api/axios";
 
