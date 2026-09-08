@@ -15,37 +15,35 @@
 }
 
 .nav-menu-inner {
-    width: fit-content;
-    max-width: 85%;
-    height: 60px;
-    background: #87CEEB;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    width: fit-content;
+    max-width: 80%;
+    height: 60px;
     margin-left: auto;
     margin-right: 0;
-    padding: 0 45px;
     position: relative;
     z-index: 1;
+    padding: 0 35px;
 }
 
-/* Left Cut */
+/* Original polygon cut */
 .nav-menu-inner::before {
+    background-color: #87CEEB;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 1% 100%);
     content: "";
     position: absolute;
-    left: -22px;
+    left: 0;
     top: 0;
-    width: 50px;
+    width: 100%;
     height: 100%;
-    background: #87CEEB;
-    transform: skewx(16deg);
     z-index: -1;
 }
 
 .menu {
     display: flex;
     align-items: center;
-    gap: 34px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -56,25 +54,31 @@
     list-style: none;
     flex-shrink: 0;
     white-space: nowrap;
+    margin: 0 15px;
 }
 
 .menu a,
 .menu li a {
+    display: block;
     font-family: "Space Grotesk", sans-serif;
-    text-decoration: none;
-    color: #fff;
     font-size: 16px;
-    font-weight: 700;
+    letter-spacing: -0.2px;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #fff;
+    text-decoration: none;
     white-space: nowrap;
-    display: inline-block;
-    transition: .3s;
+    transition: color .3s;
     line-height: 1;
 }
 
 .menu a:hover,
-.menu .active-link {
-    border-bottom: 3px solid #fff;
-    padding-bottom: 6px;
+.menu li a:hover,
+.menu a.active-link,
+.menu li a.active-link {
+    color: #222;
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .mobile-btn {
