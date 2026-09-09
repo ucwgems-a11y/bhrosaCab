@@ -1,6 +1,6 @@
  /**
  * =========================================================================
- * BHROSA CAB - UNIFIED CMS & WEBSITE CONTENT CONTROLLER (cmswebController.js)
+ * BHROSA CAB - UNIFIED WEBSITE CONTENT CONTROLLER (bhrosawebController.js)
  * =========================================================================
  * Ye controller public website ke sabhi dynamic sections aur pages ko manage
  * karta hai. Har section ke liye GET (Public website) aur PUT/POST/DELETE (Admin
