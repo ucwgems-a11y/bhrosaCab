@@ -1,11 +1,6 @@
 /**
- * =========================================================================
- * BHROSA CAB - FCM NOTIFICATION SERVICE (fcmService.js)
- * =========================================================================
- * Equivalent to PHP ApiController::generateAccessToken()
- * Generates and manages short-lived OAuth2 Bearer Access Tokens for
- * Firebase Cloud Messaging (FCM) HTTP v1 API.
- * =========================================================================
+ * FCM Notification Service
+ * Handles OAuth2 Bearer token generation and push notifications via FCM HTTP v1 API.
  */
 
 const fs = require("fs");
@@ -128,9 +123,88 @@ function getFcmEndpoint() {
   return `https://fcm.googleapis.com/v1/projects/${detectedProjectId}/messages:send`;
 }
 
+/**
+ * Sends a push notification via Firebase Cloud Messaging HTTP v1 API.
+ * Equivalent to PHP: ApiController::sendNotification($deviceToken, $title, $body)
+ *
+ * @param {string} deviceToken - Target FCM registration token
+ * @param {string} title - Notification title
+ * @param {string} body - Notification body text
+ * @returns {Promise<object>} FCM API response
+ */
+async function sendNotification(deviceToken, title, body) {
+  if (!deviceToken) {
+    throw new Error("Device token is required to send notification.");
+  }
+
+  const accessToken = await getAccessToken();
+  if (!accessToken) {
+    throw new Error("Access Token is not available. Please generate it first.");
+  }
+
+  const url = getFcmEndpoint();
+
+  const payload = {
+    message: {
+      token: deviceToken,
+      notification: {
+        title: title || "",
+        body: body || "",
+      },
+    },
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const responseData = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const errorText = responseData ? JSON.stringify(responseData) : await response.text().catch(() => "");
+    throw new Error(`FCM API returned HTTP status code ${response.status}. Response: ${errorText}`);
+  }
+
+  return responseData;
+}
+
+/**
+ * Controller handler for testing FCM notification.
+ * Equivalent to PHP: ApiController::testNotification(Request $request)
+ */
+async function testNotification(req, res) {
+  try {
+    const deviceToken = req.body?.reg_id || req.query?.reg_id;
+    if (!deviceToken) {
+      return res.status(400).json({ error: "Device token is required" });
+    }
+
+    const title = "Test Notification";
+    const body = "This is a test message from Firebase Cloud Messaging.";
+
+    await sendNotification(deviceToken, title, body);
+
+    return res.status(200).json({
+      message: "Notification sent successfully",
+    });
+  } catch (e) {
+    return res.status(500).json({
+      error: e.message,
+    });
+  }
+}
+
 module.exports = {
   generateAccessToken,
   getAccessToken,
   getFcmEndpoint,
+  sendNotification,
+  testNotification,
   getProjectId: () => detectedProjectId,
 };
+

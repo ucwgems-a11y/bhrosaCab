@@ -1,10 +1,6 @@
 /**
- * =========================================================================
- * BHROSA CAB - UNIFIED CMS & WEBSITE CONTENT ROUTES (cmswebRoutes.js)
- * =========================================================================
- * Ye route file website ke sabhi public sections aur unke corresponding admin
- * CMS content editors ke endpoints ko single clean interface me mount karti hai.
- * =========================================================================
+ * CMS & Website Content Routes
+ * Endpoints for public website sections and admin CMS management.
  */
 
 const express = require("express");

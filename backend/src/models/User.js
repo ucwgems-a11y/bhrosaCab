@@ -132,6 +132,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "0",
     },
+    welcomeCoupon: {
+      type: String,
+      default: null,
+      trim: true,
+      index: true,
+      sparse: true,
+    },
+    couponAmount: {
+      type: Number,
+      default: 200,
+    },
+    coupon_status: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

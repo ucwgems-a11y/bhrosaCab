@@ -1,7 +1,6 @@
 /**
- * =========================================================================
- * RIDE & BOOKING CONTROLLER (PHP SOURCE OF TRUTH MIGRATION)
- * =========================================================================
+ * Ride & Booking Controller
+ * Handles vehicle types, price calculation, booking creation, ride management, and cancellations.
  */
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -30,8 +29,15 @@ function formatImageUrl(image, req) {
 }
 
 // 1. GET VEHICLE TYPES & FARES
+// Equivalent to PHP: Route::any('get-vehicle-types', 'get_vehicle_types')
 const getVehicleTypes = async (req, res) => {
   try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
     const fares = await PriceFare.find().populate("carType");
 
     const data = fares.map((item) => ({
@@ -52,17 +58,26 @@ const getVehicleTypes = async (req, res) => {
       data,
     });
   } catch (error) {
-    console.error("Error in getVehicleTypes:", error);
+    console.error("Error in get_price_fares:", error);
     return res.status(500).json({
       message: "An error occurred while fetching price fares",
-      error: error.message,
     });
   }
 };
 
 // 2. GET VEHICLE TYPE FARE (Estimated Fare Calculation)
+// Equivalent to PHP: Route::any('get-vehicle-type-fare', 'get_vehicle_type_fare')
 const getVehicleTypeFare = async (req, res) => {
   try {
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Invalid Method" });
+    }
+
+    const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(400).json({ message: "Token not provided" });
+    }
+
     const body = req.body || {};
     const fromLat = body.fromLat || req?.query?.fromLat;
     const fromLng = body.fromLng || req?.query?.fromLng;
@@ -83,13 +98,13 @@ const getVehicleTypeFare = async (req, res) => {
 
       // Minimum fare for first 2 KM
       if (numDistance <= 2) {
-        const typeName = carType?.typeName || "";
-        if (typeName.toLowerCase().includes("hatchback")) {
-          total_price = 30;
-        } else if (typeName.toLowerCase().includes("sedan")) {
-          total_price = 40;
+        const typeId = carType?.mysqlId || carType?.vehicle_type;
+        if (typeId === 1) {
+          total_price = 30; // Bike
+        } else if (typeId === 2) {
+          total_price = 40; // Auto
         } else {
-          total_price = 90;
+          total_price = 90; // Cars / SUVs
         }
         farePerKm = Math.round((total_price / Math.max(numDistance, 1)) * 100) / 100;
       }
@@ -121,7 +136,9 @@ const getVehicleTypeFare = async (req, res) => {
       }
 
       result.push({
-        vehicle_id: carType?._id || fare.vehicleType,
+        id: carType?.mysqlId || carType?._id,
+        vehicle_id: carType?.mysqlId || carType?._id,
+        vehicle_mongo_id: carType?._id,
         vehicle_name: carType?.typeName || "Car",
         vehicle_image: image,
         fare_per_km: farePerKm,
@@ -143,8 +160,29 @@ const getVehicleTypeFare = async (req, res) => {
 };
 
 // 3. GET AVAILABLE NEARBY DRIVERS (Haversine 20 KM Radius)
+// Equivalent to PHP: Route::any('get-available-drivers', 'get_available_drivers')
 const getAvailableDrivers = async (req, res) => {
   try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({ $or: [{ appToken: token }, { token: token }] });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
     const body = req.body || {};
     const fromLat = body.fromLat || req?.query?.fromLat;
     const fromLng = body.fromLng || req?.query?.fromLng;
@@ -161,19 +199,43 @@ const getAvailableDrivers = async (req, res) => {
     };
 
     if (vehicle_id) {
-      query.$or = [
-        { cateogory: vehicle_id },
-        { cateogory: String(vehicle_id) },
-      ];
+      // Resolve CarType if vehicle_id is numeric or ObjectId or typeName
+      const carTypeConditions = [];
+      if (!isNaN(vehicle_id)) carTypeConditions.push({ mysqlId: Number(vehicle_id) });
+      if (mongoose.Types.ObjectId.isValid(vehicle_id)) carTypeConditions.push({ _id: vehicle_id });
+      carTypeConditions.push({ typeName: new RegExp(`^${vehicle_id}$`, "i") });
+
+      const carType = await CarType.findOne({ $or: carTypeConditions });
+
+      const categoryMatches = [vehicle_id, String(vehicle_id)];
+      if (carType) {
+        if (carType.mysqlId) categoryMatches.push(carType.mysqlId, String(carType.mysqlId));
+        if (carType._id) categoryMatches.push(carType._id, String(carType._id));
+        if (carType.typeName) categoryMatches.push(carType.typeName);
+      }
+
+      query.cateogory = { $in: [...new Set(categoryMatches)] };
     }
 
     const drivers = await Driver.find(query);
 
-    // Get topup requirements
+    // Get topup requirements mapping
     const topups = await DriverTopup.find();
     const topupMap = {};
     topups.forEach((t) => {
-      topupMap[String(t.car_type_id)] = t.topup_amount || 0;
+      const topupAmt = t.topupAmount ?? t.topup_amount ?? 0;
+      if (t.carTypeId) topupMap[String(t.carTypeId)] = topupAmt;
+      if (t.car_type_id) topupMap[String(t.car_type_id)] = topupAmt;
+      if (t.carType) topupMap[String(t.carType)] = topupAmt;
+    });
+
+    // Also map CarType names and ObjectIds to topupAmount
+    const allCarTypes = await CarType.find();
+    allCarTypes.forEach((ct) => {
+      const reqAmount = topupMap[String(ct.mysqlId)] ?? topupMap[String(ct._id)] ?? 0;
+      topupMap[ct.typeName] = reqAmount;
+      topupMap[String(ct._id)] = reqAmount;
+      if (ct.mysqlId) topupMap[String(ct.mysqlId)] = reqAmount;
     });
 
     const nearbyDrivers = [];
@@ -184,10 +246,10 @@ const getAvailableDrivers = async (req, res) => {
       if (isNaN(dLat) || isNaN(dLng)) continue;
 
       // Minimum wallet requirement
-      const requiredWallet = topupMap[String(d.cateogory)] || 0;
+      const requiredWallet = topupMap[String(d.cateogory)] ?? 0;
       if ((d.wallet || 0) < requiredWallet) continue;
 
-      // Haversine formula
+      // Spherical law of cosines / Haversine formula matching PHP DB::raw
       const R = 6371; // Earth radius in KM
       const dLatRad = ((dLat - userLat) * Math.PI) / 180;
       const dLngRad = ((dLng - userLng) * Math.PI) / 180;
@@ -201,11 +263,16 @@ const getAvailableDrivers = async (req, res) => {
       const distance = Math.round(R * c * 100) / 100;
 
       if (distance <= radiusKm) {
+        let driverImage = formatImageUrl(d.image);
+        if (!driverImage || driverImage.endsWith("/uploads/null") || driverImage.endsWith("/uploads/undefined")) {
+          driverImage = "http://localhost:5000/images/dummy-driver.png";
+        }
+
         nearbyDrivers.push({
-          id: d._id,
+          id: d.mysqlId || d._id,
+          driver_mongo_id: d._id,
           name: d.name ? `${d.name} ${d.last_name || ""}`.trim() : "Driver",
-          number: d.number,
-          image: formatImageUrl(d.image),
+          image: driverImage,
           latitude: d.latitude,
           longitude: d.longitude,
           wallet: d.wallet,
@@ -233,44 +300,71 @@ const getAvailableDrivers = async (req, res) => {
 };
 
 // 4. USER BOOK RIDE (In-City)
+// Equivalent to PHP: Route::any('user-book-ride', 'user_book_ride')
 const userBookRide = async (req, res) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      return res.status(404).json({ message: "Invalid user token" });
-    }
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const body = req.body || {};
-    const driver_id = body.driver_id || req?.query?.driver_id;
-    const vehicle_id = body.vehicle_id || req?.query?.vehicle_id;
-    const from = body.from || req?.query?.from;
-    const fromLat = body.fromLat || req?.query?.fromLat;
-    const fromLng = body.fromLng || req?.query?.fromLng;
-    const to = body.to || req?.query?.to;
-    const toLat = body.toLat || req?.query?.toLat;
-    const toLng = body.toLng || req?.query?.toLng;
-    const totalFare = body.totalFare || req?.query?.totalFare;
-    const distance = body.distance || req?.query?.distance;
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
 
-    if (!driver_id || !vehicle_id || !from || !to || !totalFare) {
-      return res.status(400).json({ message: "Missing required booking details" });
-    }
+  const user = await User.findOne({ $or: [{ appToken: token }, { token: token }] });
+  if (!user) {
+    return res.status(404).json({ message: "Invalid user token" });
+  }
 
-    // Single Active Ride Validation: Prevent booking if user already has an active ride
-    const existingActiveRide = await Ride.findOne({
-      user_id: { $in: [user._id, String(user._id)] },
-      status: { $in: ["booked", "arrived", "ongoing", "in_progress"] },
+  // Account verification check (register == 0 or isRegistered === false)
+  if (user.register === 0 || user.isRegistered === false) {
+    return res.status(404).json({
+      message: "Your account is not verified, Please contact Customer Care for more details",
     });
+  }
 
-    if (existingActiveRide) {
-      return res.status(400).json({
-        status: false,
-        message: "You already have an active ride in progress. Please complete or cancel your current ride before booking a new one.",
-        active_booking_id: existingActiveRide._id,
-        current_status: existingActiveRide.status,
-      });
-    }
+  const body = req.body || {};
+  const driver_id = body.driver_id || req?.query?.driver_id;
+  const vehicle_id = body.vehicle_id || req?.query?.vehicle_id;
+  const from = body.from || req?.query?.from;
+  const fromLat = body.fromLat || req?.query?.fromLat;
+  const fromLng = body.fromLng || req?.query?.fromLng;
+  const to = body.to || req?.query?.to;
+  const toLat = body.toLat || req?.query?.toLat;
+  const toLng = body.toLng || req?.query?.toLng;
+  const totalFare = body.totalFare || req?.query?.totalFare;
+  const distance = body.distance || req?.query?.distance;
 
+  if (
+    !driver_id ||
+    !vehicle_id ||
+    !from ||
+    fromLat === undefined ||
+    fromLng === undefined ||
+    !to ||
+    toLat === undefined ||
+    toLng === undefined ||
+    totalFare === undefined ||
+    distance === undefined
+  ) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        driver_id: !driver_id ? ["The driver_id field is required."] : undefined,
+        vehicle_id: !vehicle_id ? ["The vehicle_id field is required."] : undefined,
+        from: !from ? ["The from field is required."] : undefined,
+        fromLat: fromLat === undefined ? ["The fromLat field is required."] : undefined,
+        fromLng: fromLng === undefined ? ["The fromLng field is required."] : undefined,
+        to: !to ? ["The to field is required."] : undefined,
+        toLat: toLat === undefined ? ["The toLat field is required."] : undefined,
+        toLng: toLng === undefined ? ["The toLng field is required."] : undefined,
+        totalFare: totalFare === undefined ? ["The totalFare field is required."] : undefined,
+        distance: distance === undefined ? ["The distance field is required."] : undefined,
+      },
+    });
+  }
+
+  try {
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
     const booking = await Ride.create({
@@ -278,14 +372,14 @@ const userBookRide = async (req, res) => {
       driver_id: mongoose.isValidObjectId(driver_id) ? new mongoose.Types.ObjectId(driver_id) : driver_id,
       vehicle_id: mongoose.isValidObjectId(vehicle_id) ? new mongoose.Types.ObjectId(vehicle_id) : vehicle_id,
       from,
-      from_lat: String(fromLat || "0"),
-      from_lng: String(fromLng || "0"),
+      from_lat: String(fromLat),
+      from_lng: String(fromLng),
       to,
-      to_lat: String(toLat || "0"),
-      to_lng: String(toLng || "0"),
+      to_lat: String(toLat),
+      to_lng: String(toLng),
       rideFare: parseFloat(totalFare) || 0,
       totalFare: String(totalFare),
-      distance: String(distance || "0"),
+      distance: String(distance),
       otp,
       status: "booked",
       booking_type: "inCity",
@@ -293,13 +387,35 @@ const userBookRide = async (req, res) => {
       updated_at: new Date(),
     });
 
+    // Send SMS via DLT Gateway
+    const userPhone = user.phone || user.number || "";
+    const cleanNumber = userPhone.replace(/[^0-9]/g, "").slice(-10);
+    if (cleanNumber.length === 10) {
+      try {
+        const message = `Your Bhrosa Cabs Ride Start OTP is ${otp}. Please share this OTP with your driver to begin your ride. Do not share this OTP with anyone else. It is valid for a limited time. Thanks, Bhrosa Group`;
+        const url = new URL("https://msg.vadvertiseweb.com/submitsms.jsp");
+        url.searchParams.append("user", "Bhrosa");
+        url.searchParams.append("key", process.env.SMS_API_KEY || "880050d0b4XX");
+        url.searchParams.append("mobile", cleanNumber);
+        url.searchParams.append("message", message);
+        url.searchParams.append("senderid", "BHRGRP");
+        url.searchParams.append("accusage", "1");
+        url.searchParams.append("entityid", "1701176768268781357");
+        url.searchParams.append("tempid", "1707177755350501043");
+
+        await fetch(url.toString(), { method: "GET", signal: AbortSignal.timeout(15000) });
+      } catch (smsErr) {
+        console.warn("SMS Gateway warning in userBookRide:", smsErr.message);
+      }
+    }
+
     return res.status(200).json({
       status: true,
       message: "Ride booked successfully",
       booking,
     });
   } catch (error) {
-    console.error("Error in userBookRide:", error);
+    console.error("Ride Booking Error:", error.message);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
@@ -309,30 +425,66 @@ const userBookRide = async (req, res) => {
 };
 
 // 5. DRIVER ARRIVED AT PICKUP
+// Equivalent to PHP: Route::any('user-book-ride-arrived', 'user_book_ride_arrived')
 const userBookRideArrived = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const body = req.body || {};
-    const booking_id = body.booking_id || req?.query?.booking_id;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    if (!booking_id) {
-      return res.status(400).json({ message: "Booking ID is required" });
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid Driver token" });
+  }
+
+  const body = req.body || {};
+  const booking_id = body.booking_id || req?.query?.booking_id;
+
+  if (!booking_id) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: ["The booking_id field is required."],
+      },
+    });
+  }
+
+  try {
+    const bookingQuery = [];
+    if (mongoose.isValidObjectId(booking_id)) {
+      bookingQuery.push({ _id: new mongoose.Types.ObjectId(booking_id) });
+    }
+    bookingQuery.push({ _id: booking_id });
+    if (!isNaN(booking_id)) {
+      bookingQuery.push({ mysqlId: Number(booking_id) });
     }
 
-    const queryId = mongoose.isValidObjectId(booking_id) ? new mongoose.Types.ObjectId(booking_id) : booking_id;
+    const driverMatches = [driver._id, String(driver._id)];
+    if (driver.mysqlId) {
+      driverMatches.push(driver.mysqlId, String(driver.mysqlId));
+    }
+
     const booking = await Ride.findOne({
-      _id: queryId,
-      driver_id: { $in: [driver._id, String(driver._id)] },
+      $or: bookingQuery,
+      driver_id: { $in: driverMatches },
       status: "booked",
     });
 
     if (!booking) {
-      return res.status(404).json({ message: "Invalid booking ID or ride status" });
+      return res.status(404).json({ message: "Invalid booking ID or OTP" });
     }
 
-    const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    const receiveOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
     booking.status = "arrived";
-    booking.otp = newOtp;
+    booking.otp = receiveOtp;
     booking.updated_at = new Date();
     await booking.save();
 
@@ -340,34 +492,70 @@ const userBookRideArrived = async (req, res) => {
       status: true,
       message: "Ride arrived successfully",
     });
-  } catch (error) {
-    console.error("Error in userBookRideArrived:", error);
+  } catch (e) {
+    console.error("Ride Arrived Error:", e.message);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
-      error: error.message,
+      error: e.message,
     });
   }
 };
 
 // 6. DRIVER START RIDE (Verify OTP)
+// Equivalent to PHP: Route::any('user-ride-start', 'user_ride_start')
 const userRideStart = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const body = req.body || {};
-    const booking_id = body.booking_id || req?.query?.booking_id;
-    const otp = body.otp || req?.query?.otp;
-    const waitingMinutes = body.waitingMinutes || req?.query?.waitingMinutes;
-    const waitingCharge = body.waitingCharge || req?.query?.waitingCharge;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    if (!booking_id || !otp) {
-      return res.status(400).json({ message: "Booking ID and OTP are required" });
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid Driver token" });
+  }
+
+  const body = req.body || {};
+  const booking_id = body.booking_id || req?.query?.booking_id;
+  const otp = body.otp || req?.query?.otp;
+  const waitingMinutes = body.waitingMinutes || req?.query?.waitingMinutes || 0;
+  const waitingCharge = body.waitingCharge || req?.query?.waitingCharge || 0;
+
+  if (!booking_id || !otp) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: !booking_id ? ["The booking_id field is required."] : undefined,
+        otp: !otp ? ["The otp field is required."] : undefined,
+      },
+    });
+  }
+
+  try {
+    const bookingQuery = [];
+    if (mongoose.isValidObjectId(booking_id)) {
+      bookingQuery.push({ _id: new mongoose.Types.ObjectId(booking_id) });
+    }
+    bookingQuery.push({ _id: booking_id });
+    if (!isNaN(booking_id)) {
+      bookingQuery.push({ mysqlId: Number(booking_id) });
     }
 
-    const queryId = mongoose.isValidObjectId(booking_id) ? new mongoose.Types.ObjectId(booking_id) : booking_id;
+    const driverMatches = [driver._id, String(driver._id)];
+    if (driver.mysqlId) {
+      driverMatches.push(driver.mysqlId, String(driver.mysqlId));
+    }
+
     const booking = await Ride.findOne({
-      _id: queryId,
-      driver_id: { $in: [driver._id, String(driver._id)] },
+      $or: bookingQuery,
+      driver_id: { $in: driverMatches },
       otp: String(otp),
       status: { $in: ["booked", "arrived"] },
     });
@@ -376,28 +564,65 @@ const userRideStart = async (req, res) => {
       return res.status(404).json({ message: "Invalid booking ID or OTP" });
     }
 
+    const userConditions = [];
+    if (mongoose.isValidObjectId(booking.user_id)) {
+      userConditions.push({ _id: new mongoose.Types.ObjectId(booking.user_id) });
+    }
+    userConditions.push({ _id: booking.user_id });
+    if (!isNaN(booking.user_id)) {
+      userConditions.push({ mysqlId: Number(booking.user_id) });
+    }
+
+    const userOtp = await User.findOne({ $or: userConditions });
+
+
+    const receiveOtp = Math.floor(1000 + Math.random() * 9000).toString();
     const wMins = parseInt(waitingMinutes) || 0;
     const wCharge = parseFloat(waitingCharge) || 0;
-    const completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    booking.status = "ongoing"; // in_progress
-    booking.otp = completionOtp;
+    booking.status = "in_progress";
+    booking.otp = receiveOtp;
     booking.waitingMinutes = wMins;
     booking.waitingCharge = wCharge;
     booking.totalFare = String((parseFloat(booking.totalFare) || 0) + wCharge);
     booking.updated_at = new Date();
     await booking.save();
 
+    // Send SMS via DLT Gateway to Passenger
+    if (userOtp) {
+      const userPhone = userOtp.phone || userOtp.number || "";
+      const cleanNumber = userPhone.replace(/[^0-9]/g, "").slice(-10);
+      if (cleanNumber.length === 10) {
+        try {
+          const message = `Your Bhrosa Cabs Ride Completion OTP is ${receiveOtp}. Please share this OTP with your driver to complete your ride. Do not share this OTP with anyone else. It is valid for a limited time. Thanks, Bhrosa Group`;
+          const url = new URL("https://msg.vadvertiseweb.com/submitsms.jsp");
+          url.searchParams.append("user", "Bhrosa");
+          url.searchParams.append("key", process.env.SMS_API_KEY || "880050d0b4XX");
+          url.searchParams.append("mobile", cleanNumber);
+          url.searchParams.append("message", message);
+          url.searchParams.append("senderid", "BHRGRP");
+          url.searchParams.append("accusage", "1");
+          url.searchParams.append("entityid", "1701176768268781357");
+          url.searchParams.append("tempid", "1707177755355775338");
+
+          await fetch(url.toString(), { method: "GET", signal: AbortSignal.timeout(15000) });
+        } catch (smsErr) {
+          console.warn("SMS Gateway warning in userRideStart:", smsErr.message);
+        }
+      }
+    }
+
     return res.status(200).json({
       status: true,
       message: "Ride started successfully",
       data: {
-        booking_id: booking._id,
+        booking_id: booking.mysqlId || booking._id,
+        booking_mongo_id: booking._id,
         status: booking.status,
       },
     });
   } catch (error) {
-    console.error("Error in userRideStart:", error);
+    console.error("Ride Start Error:", error.message);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
@@ -407,110 +632,173 @@ const userRideStart = async (req, res) => {
 };
 
 // 7. DRIVER COMPLETE RIDE (Auto Commission Settlement)
+// Equivalent to PHP: Route::any('user-ride-complete', 'user_ride_complete')
 const userRideComplete = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const body = req.body || {};
-    const booking_id = body.booking_id || req?.query?.booking_id;
-    const otp = body.otp || req?.query?.otp;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    if (!booking_id || !otp) {
-      return res.status(400).json({ message: "Booking ID and OTP are required" });
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid Driver token" });
+  }
+
+  const body = req.body || {};
+  const booking_id = body.booking_id || req?.query?.booking_id;
+  const otp = body.otp || req?.query?.otp;
+
+  if (!booking_id || !otp) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: !booking_id ? ["The booking_id field is required."] : undefined,
+        otp: !otp ? ["The otp field is required."] : undefined,
+      },
+    });
+  }
+
+  try {
+    const bookingQuery = [];
+    if (mongoose.isValidObjectId(booking_id)) {
+      bookingQuery.push({ _id: new mongoose.Types.ObjectId(booking_id) });
+    }
+    bookingQuery.push({ _id: booking_id });
+    if (!isNaN(booking_id)) {
+      bookingQuery.push({ mysqlId: Number(booking_id) });
     }
 
-    const queryId = mongoose.isValidObjectId(booking_id) ? new mongoose.Types.ObjectId(booking_id) : booking_id;
+    const driverMatches = [driver._id, String(driver._id)];
+    if (driver.mysqlId) {
+      driverMatches.push(driver.mysqlId, String(driver.mysqlId));
+    }
+
     const booking = await Ride.findOne({
-      _id: queryId,
-      driver_id: { $in: [driver._id, String(driver._id)] },
+      $or: bookingQuery,
+      driver_id: { $in: driverMatches },
       otp: String(otp),
-      status: { $in: ["ongoing", "in_progress"] },
+      status: { $in: ["in_progress", "ongoing"] },
     });
 
     if (!booking) {
-      return res.status(404).json({ message: "Invalid booking ID, OTP, or ride status" });
+      return res.status(404).json({
+        message: "Invalid booking ID, OTP, or ride status",
+      });
     }
 
+    // 1. Mark ride as completed
     booking.otp = null;
     booking.status = "completed";
     booking.updated_at = new Date();
     await booking.save();
 
-    // Check Driver Topup rules for platform commission
-    const driverTopup = await DriverTopup.findOne({
-      $or: [
-        { car_type_id: driver.cateogory },
-        { car_type_id: String(driver.cateogory) },
-      ],
-    });
+    // 2. Resolve Driver Topup configuration
+    // Driver category can be mysqlId, ObjectId, or typeName (e.g. 'Sedan')
+    const carTypeConditions = [];
+    if (!isNaN(driver.cateogory)) carTypeConditions.push({ mysqlId: Number(driver.cateogory) });
+    if (mongoose.Types.ObjectId.isValid(driver.cateogory)) carTypeConditions.push({ _id: driver.cateogory });
+    carTypeConditions.push({ typeName: new RegExp(`^${driver.cateogory}$`, "i") });
+
+    const carType = await CarType.findOne({ $or: carTypeConditions });
+
+    const topupMatches = [];
+    if (driver.cateogory) {
+      topupMatches.push({ carTypeId: driver.cateogory }, { car_type_id: driver.cateogory });
+      if (!isNaN(driver.cateogory)) {
+        topupMatches.push({ carTypeId: Number(driver.cateogory) }, { car_type_id: Number(driver.cateogory) });
+      }
+    }
+    if (carType) {
+      if (carType.mysqlId) {
+        topupMatches.push({ carTypeId: carType.mysqlId }, { car_type_id: carType.mysqlId });
+      }
+      if (carType._id) {
+        topupMatches.push({ carType: carType._id });
+      }
+    }
+
+    const driverTopup = await DriverTopup.findOne({ $or: topupMatches });
 
     if (driverTopup) {
       const bFare = parseFloat(booking.totalFare) || 0;
       const bDist = parseFloat(booking.distance) || 0;
 
-      // 1. Extra charge percentage
-      if (!driverTopup.slabs && !driverTopup.above_distance && driverTopup.extra_charge) {
-        const ecRate = parseFloat(driverTopup.extra_charge) || 0;
+      const slabs = driverTopup.slabs;
+      const aboveDistance = driverTopup.aboveDistance ?? driverTopup.above_distance;
+      const extraCharge = driverTopup.extraCharge ?? driverTopup.extra_charge;
+      const topupAmount = parseFloat(driverTopup.topupAmount ?? driverTopup.topup_amount) || 0;
+
+      // Rule A: ONLY EXTRA CHARGE TYPE
+      if (slabs == null && aboveDistance == null && extraCharge != null) {
+        const ecRate = parseFloat(extraCharge) || 0;
         const extraCommission = Math.round(((bFare / 100) * ecRate) * 100) / 100;
-        if (!isNaN(extraCommission) && extraCommission > 0) {
-          driver.wallet = (parseFloat(driver.wallet) || 0) - extraCommission;
-          await driver.save();
 
-          booking.extraChargeParcent = ecRate;
-          booking.extraChargeAmount = extraCommission;
-          await booking.save();
+        driver.wallet = (parseFloat(driver.wallet) || 0) - extraCommission;
+        await driver.save();
 
-          await DriverWalletRecharge.create({
-            driver_id: driver._id,
-            amount: `-${extraCommission}`,
-            status: "1",
-            transaction_id: "Extra charge deduction",
-            booking_id: booking._id,
-          });
-        }
+        booking.extraChargeParcent = ecRate;
+        booking.extraChargeAmount = extraCommission;
+        await booking.save();
+
+        await DriverWalletRecharge.create({
+          driver_id: driver._id,
+          amount: `-${extraCommission}`,
+          status: "1",
+          transaction_id: "Extra charge deduction",
+          booking_id: booking._id,
+        });
       }
-      // 2. Above distance charges
-      else if (driverTopup.above_distance && driverTopup.extra_charge && bDist >= driverTopup.above_distance) {
-        const ecRate = parseFloat(driverTopup.extra_charge) || 0;
+
+      // Rule B: ABOVE DISTANCE CHARGE
+      if (aboveDistance && extraCharge && bDist >= parseFloat(aboveDistance)) {
+        const ecRate = parseFloat(extraCharge) || 0;
         const extraCommission = Math.round(((bFare / 100) * ecRate) * 100) / 100;
-        if (!isNaN(extraCommission) && extraCommission > 0) {
-          driver.wallet = (parseFloat(driver.wallet) || 0) - extraCommission;
-          await driver.save();
 
-          booking.aboveDistanceKm = driverTopup.above_distance;
-          booking.aboveDistancePrice = extraCommission;
-          booking.aboveDistanceParcent = ecRate;
-          await booking.save();
+        driver.wallet = (parseFloat(driver.wallet) || 0) - extraCommission;
+        await driver.save();
 
-          await DriverWalletRecharge.create({
-            driver_id: driver._id,
-            amount: `-${extraCommission}`,
-            status: "1",
-            transaction_id: "Above distance charges deduction",
-            booking_id: booking._id,
-          });
-        }
+        booking.aboveDistanceKm = parseFloat(aboveDistance);
+        booking.aboveDistancePrice = extraCommission;
+        booking.aboveDistanceParcent = ecRate;
+        await booking.save();
+
+        await DriverWalletRecharge.create({
+          driver_id: driver._id,
+          amount: `-${extraCommission}`,
+          status: "1",
+          transaction_id: "Above distance charges deduction",
+          booking_id: booking._id,
+        });
       }
-      // 3. Slabs deduction
-      else if (driverTopup.slabs) {
-        const unpaidRidesTotal = await Ride.aggregate([
-          { $match: { driver_id: driver._id, commission_status: 0 } },
-          { $group: { _id: null, total: { $sum: { $toDouble: "$totalFare" } } } },
-        ]);
-        const sumUnpaid = unpaidRidesTotal[0]?.total || 0;
 
-        if (sumUnpaid >= (parseFloat(driverTopup.slabs) || 0)) {
-          const slabTopupAmt = parseFloat(driverTopup.topup_amount) || 0;
-          driver.wallet = (parseFloat(driver.wallet) || 0) - slabTopupAmt;
+      // Rule C: SLAB COMMISSION
+      if (slabs != null) {
+        const unpaidRides = await Ride.find({
+          driver_id: { $in: driverMatches },
+          commission_status: 0,
+        });
+
+        const sumUnpaid = unpaidRides.reduce((acc, r) => acc + (parseFloat(r.totalFare) || 0), 0);
+
+        if (sumUnpaid >= parseFloat(slabs)) {
+          driver.wallet = (parseFloat(driver.wallet) || 0) - topupAmount;
           await driver.save();
 
           await Ride.updateMany(
-            { driver_id: driver._id, commission_status: 0 },
+            { driver_id: { $in: driverMatches }, commission_status: 0 },
             { $set: { commission_status: 1 } }
           );
 
           await DriverWalletRecharge.create({
             driver_id: driver._id,
-            amount: `-${slabTopupAmt}`,
+            amount: `-${topupAmount}`,
             status: "1",
             transaction_id: "Slabs deduction",
             booking_id: booking._id,
@@ -523,64 +811,121 @@ const userRideComplete = async (req, res) => {
       status: true,
       message: "Ride completed successfully",
       data: {
-        booking_id: booking._id,
+        booking_id: booking.mysqlId || booking._id,
+        booking_mongo_id: booking._id,
         status: booking.status,
         wallet: driver.wallet,
       },
     });
-  } catch (error) {
-    console.error("Error in userRideComplete:", error);
+  } catch (e) {
+    console.error("Ride Complete Error : ", e.message);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
-      error: error.message,
+      error: e.message,
     });
   }
 };
 
 // 8. USER CANCEL RIDE (Compensate Driver +₹50)
+// Equivalent to PHP: Route::any('user-ride-cancel', 'user_ride_cancel')
 const userRideCancel = async (req, res) => {
-  try {
-    const user = req.user;
-    const body = req.body || {};
-    const booking_id = body.booking_id || req?.query?.booking_id;
-    const reason = body.reason || req?.query?.reason;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const queryId = mongoose.isValidObjectId(booking_id) ? new mongoose.Types.ObjectId(booking_id) : booking_id;
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const user = await User.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid User token" });
+  }
+
+  const body = req.body || {};
+  const booking_id = body.booking_id || req?.query?.booking_id;
+  const reason = body.reason || req?.query?.reason;
+
+  if (!booking_id) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: ["The booking_id field is required."],
+      },
+    });
+  }
+
+  try {
+    const bookingQuery = [];
+    if (mongoose.isValidObjectId(booking_id)) {
+      bookingQuery.push({ _id: new mongoose.Types.ObjectId(booking_id) });
+    }
+    bookingQuery.push({ _id: booking_id });
+    if (!isNaN(booking_id)) {
+      bookingQuery.push({ mysqlId: Number(booking_id) });
+    }
+
+    const userMatches = [user._id, String(user._id)];
+    if (user.mysqlId) {
+      userMatches.push(user.mysqlId, String(user.mysqlId));
+    }
+
     const booking = await Ride.findOne({
-      _id: queryId,
-      user_id: { $in: [user._id, String(user._id)] },
-      status: { $in: ["booked", "arrived"] },
+      $or: bookingQuery,
+      user_id: { $in: userMatches },
+      status: "booked",
     });
 
     if (!booking) {
-      return res.status(404).json({ message: "Booking not found or ride cannot be cancelled" });
+      return res.status(404).json({
+        message: "Booking not found or ride cannot be cancelled",
+      });
     }
 
     const cancelReason = reason || "No reason provided";
+    const fullReason = `User ${user.name || "Customer"}: ${cancelReason}`;
+
     booking.status = "cancelled";
-    booking.reson = `User ${user.name || "Customer"}: ${cancelReason}`;
+    booking.reson = fullReason;
     booking.otp = null;
     booking.updated_at = new Date();
     await booking.save();
 
+    // Create cancel fine entry (90 rs)
     await UserRideCancel.create({
       user_booking_id: booking._id,
       fine: 90,
     });
 
-    // Compensate driver with +50
+    // Driver compensation (+₹50 to driver wallet)
     if (booking.driver_id) {
-      const driver = await Driver.findById(booking.driver_id);
+      const driverConditions = [];
+      if (mongoose.isValidObjectId(booking.driver_id)) {
+        driverConditions.push({ _id: new mongoose.Types.ObjectId(booking.driver_id) });
+      }
+      driverConditions.push({ _id: booking.driver_id });
+      if (!isNaN(booking.driver_id)) {
+        driverConditions.push({ mysqlId: Number(booking.driver_id) });
+      }
+
+      const driver = await Driver.findOne({ $or: driverConditions });
       if (driver) {
-        driver.wallet = (driver.wallet || 0) + 50;
+        driver.wallet = (parseFloat(driver.wallet) || 0) + 50;
         await driver.save();
+
+        const bookingIdentifier = booking.mysqlId || booking._id;
+        const userIdentifier = user.mysqlId || user._id;
 
         await DriverWalletRecharge.create({
           driver_id: driver._id,
           amount: "+50",
           status: "1",
-          transaction_id: `Booking ID: ${booking._id} - Ride Cancel Charge (Cancel by User)`,
+          transaction_id: `Booking ID: ${bookingIdentifier}, User ID: ${userIdentifier} - Ride Cancel Charge (Cancel by User)`,
           booking_id: booking._id,
         });
       }
@@ -590,13 +935,14 @@ const userRideCancel = async (req, res) => {
       status: true,
       message: "Ride cancelled successfully",
       data: {
-        booking_id: booking._id,
+        booking_id: booking.mysqlId || booking._id,
+        booking_mongo_id: booking._id,
         status: booking.status,
         reason: booking.reson,
       },
     });
   } catch (error) {
-    console.error("Error in userRideCancel:", error);
+    console.error("Ride Cancel Error: ", error.message);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
@@ -606,40 +952,85 @@ const userRideCancel = async (req, res) => {
 };
 
 // 9. DRIVER CANCEL RIDE (Penalty -₹50)
+// Equivalent to PHP: Route::any('driver-ride-cancel', 'driver_ride_cancel')
 const driverRideCancel = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const body = req.body || {};
-    const booking_id = body.booking_id || req?.query?.booking_id;
-    const reason = body.reason || req?.query?.reason;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const queryId = mongoose.isValidObjectId(booking_id) ? new mongoose.Types.ObjectId(booking_id) : booking_id;
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid Driver token" });
+  }
+
+  const body = req.body || {};
+  const booking_id = body.booking_id || req?.query?.booking_id;
+  const reason = body.reason || req?.query?.reason;
+
+  if (!booking_id) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: ["The booking_id field is required."],
+      },
+    });
+  }
+
+  try {
+    const bookingQuery = [];
+    if (mongoose.isValidObjectId(booking_id)) {
+      bookingQuery.push({ _id: new mongoose.Types.ObjectId(booking_id) });
+    }
+    bookingQuery.push({ _id: booking_id });
+    if (!isNaN(booking_id)) {
+      bookingQuery.push({ mysqlId: Number(booking_id) });
+    }
+
+    const driverMatches = [driver._id, String(driver._id)];
+    if (driver.mysqlId) {
+      driverMatches.push(driver.mysqlId, String(driver.mysqlId));
+    }
+
     const booking = await Ride.findOne({
-      _id: queryId,
-      driver_id: { $in: [driver._id, String(driver._id)] },
-      status: { $in: ["booked", "arrived"] },
+      $or: bookingQuery,
+      driver_id: { $in: driverMatches },
+      status: "booked",
     });
 
     if (!booking) {
-      return res.status(404).json({ message: "Booking not found or ride cannot be cancelled" });
+      return res.status(404).json({
+        message: "Booking not found or ride cannot be cancelled",
+      });
     }
 
     const cancelReason = reason || "No reason provided";
+    const fullReason = `Driver ${driver.name || "Driver"}: ${cancelReason}`;
+
     booking.status = "cancelled";
-    booking.reson = `Driver ${driver.name || "Driver"}: ${cancelReason}`;
+    booking.reson = fullReason;
     booking.otp = null;
     booking.updated_at = new Date();
     await booking.save();
 
-    // Deduct 50 penalty from driver
-    driver.wallet = (driver.wallet || 0) - 50;
+    // Deduct ₹50 penalty from driver wallet
+    driver.wallet = (parseFloat(driver.wallet) || 0) - 50;
     await driver.save();
+
+    const bookingIdentifier = booking.mysqlId || booking._id;
 
     await DriverWalletRecharge.create({
       driver_id: driver._id,
       amount: "-50",
       status: "1",
-      transaction_id: `Booking ID ${booking._id} - Driver Ride Cancel Charge (Cancel By Driver)`,
+      transaction_id: `Booking ID ${bookingIdentifier} - Driver Ride Cancel Charge (Cancel By Driver)`,
       booking_id: booking._id,
     });
 
@@ -647,13 +1038,14 @@ const driverRideCancel = async (req, res) => {
       status: true,
       message: "Ride cancelled successfully",
       data: {
-        booking_id: booking._id,
+        booking_id: booking.mysqlId || booking._id,
+        booking_mongo_id: booking._id,
         status: booking.status,
         reason: booking.reson,
       },
     });
   } catch (error) {
-    console.error("Error in driverRideCancel:", error);
+    console.error("Driver Ride Cancel Error: ", error.message);
     return res.status(500).json({
       status: false,
       message: "Something went wrong",
@@ -663,9 +1055,30 @@ const driverRideCancel = async (req, res) => {
 };
 
 // 10. DRIVER RIDE HISTORY & EARNINGS
+// Equivalent to PHP: Route::any('driver-ride-history', 'driver_ride_history')
 const driverRideHistory = async (req, res) => {
+  if (req.method !== "GET") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
+
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(404).json({ message: "Invalid Driver token" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid Driver token" });
+  }
+
   try {
-    const driver = req.driver;
+    const driverMatches = [driver._id, String(driver._id)];
+    if (driver.mysqlId) {
+      driverMatches.push(driver.mysqlId, String(driver.mysqlId));
+    }
 
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -675,9 +1088,14 @@ const driverRideHistory = async (req, res) => {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-    // Earnings aggregation
+    // Earnings aggregation for completed rides
     const earnings = await Ride.aggregate([
-      { $match: { driver_id: { $in: [driver._id, String(driver._id)] }, status: "completed" } },
+      {
+        $match: {
+          driver_id: { $in: driverMatches },
+          status: "completed",
+        },
+      },
       {
         $group: {
           _id: null,
@@ -697,37 +1115,76 @@ const driverRideHistory = async (req, res) => {
       },
     ]);
 
-    const earningSummary = earnings[0] || { today: 0, this_week: 0, this_month: 0, this_year: 0 };
+    const earningSummary = earnings[0]
+      ? {
+          today: earnings[0].today || 0,
+          this_week: earnings[0].this_week || 0,
+          this_month: earnings[0].this_month || 0,
+          this_year: earnings[0].this_year || 0,
+        }
+      : { today: 0, this_week: 0, this_month: 0, this_year: 0 };
 
-    const bookings = await Ride.find({ driver_id: { $in: [driver._id, String(driver._id)] }, booking_type: "inCity" })
+    const bookings = await Ride.find({
+      driver_id: { $in: driverMatches },
+    })
       .populate("user_id", "name number phone image")
-      .sort({ created_at: -1 });
+      .sort({ created_at: -1, _id: -1 });
 
-    const formattedBookings = bookings.map((b) => ({
-      id: b._id,
-      from: b.from,
-      from_lat: b.from_lat,
-      from_lng: b.from_lng,
-      to: b.to,
-      to_lat: b.to_lat,
-      to_lng: b.to_lng,
-      waitingMinutes: b.waitingMinutes,
-      waitingCharge: b.waitingCharge,
-      distance: b.distance,
-      rideFare: b.rideFare,
-      totalFare: b.totalFare,
-      extraChargeParcent: b.extraChargeParcent,
-      extraChargeAmount: b.extraChargeAmount,
-      aboveDistanceKm: b.aboveDistanceKm,
-      aboveDistancePrice: b.aboveDistancePrice,
-      aboveDistanceParcent: b.aboveDistanceParcent,
-      user_name: b.user_id?.name || "Customer",
-      user_phone: b.user_id?.number || b.user_id?.phone || "",
-      user_image: formatImageUrl(b.user_id?.image),
-      status: b.status,
-      date: b.date || new Date(b.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      time: b.time || new Date(b.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-    }));
+    if (!bookings || bookings.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No ride history found",
+        earning: earningSummary,
+        data: [],
+      });
+    }
+
+    const bookingIds = bookings.map((b) => b._id);
+    const bookingMysqlIds = bookings.map((b) => b.mysqlId).filter(Boolean);
+
+    const walletRecharges = await DriverWalletRecharge.find({
+      booking_id: { $in: [...bookingIds, ...bookingMysqlIds] },
+    });
+
+    const rechargeMap = {};
+    walletRecharges.forEach((r) => {
+      rechargeMap[String(r.booking_id)] = r;
+    });
+
+    const formattedBookings = bookings.map((b) => {
+      const bKey = String(b.mysqlId || b._id);
+      const bKeyMongo = String(b._id);
+      const walletRecharge = rechargeMap[bKey] || rechargeMap[bKeyMongo] || null;
+
+      return {
+        id: b.mysqlId || b._id,
+        booking_mongo_id: b._id,
+        from: b.from,
+        from_lat: b.from_lat,
+        from_lng: b.from_lng,
+        to: b.to,
+        to_lat: b.to_lat,
+        to_lng: b.to_lng,
+        waitingMinutes: b.waitingMinutes,
+        waitingCharge: b.waitingCharge,
+        distance: b.distance,
+        rideFare: b.rideFare,
+        totalFare: b.totalFare,
+        extraChargeParcent: b.extraChargeParcent,
+        extraChargeAmount: b.extraChargeAmount,
+        aboveDistanceKm: b.aboveDistanceKm,
+        aboveDistancePrice: b.aboveDistancePrice,
+        aboveDistanceParcent: b.aboveDistanceParcent,
+        user_name: b.user_id?.name || null,
+        user_phone: b.user_id?.number || b.user_id?.phone || null,
+        user_image: b.user_id?.image ? formatImageUrl(b.user_id.image) : null,
+        status: b.status,
+        is_cancelled_ride: walletRecharge ? true : false,
+        cancel_message: walletRecharge ? "You cancelled this ride." : null,
+        recharge_amount: walletRecharge ? walletRecharge.amount : null,
+        transaction_id: walletRecharge ? walletRecharge.transaction_id : null,
+      };
+    });
 
     return res.status(200).json({
       status: true,
@@ -746,34 +1203,92 @@ const driverRideHistory = async (req, res) => {
 };
 
 // 11. USER RIDE HISTORY
+// Equivalent to PHP: Route::any('user-ride-history', 'user_ride_history')
 const userRideHistory = async (req, res) => {
+  if (req.method !== "GET") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
+
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(404).json({ message: "Invalid user token" });
+  }
+
+  const user = await User.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid user token" });
+  }
+
   try {
-    const user = req.user;
+    const userMatches = [user._id, String(user._id)];
+    if (user.mysqlId) {
+      userMatches.push(user.mysqlId, String(user.mysqlId));
+    }
 
-    const bookings = await Ride.find({ user_id: { $in: [user._id, String(user._id)] }, booking_type: "inCity" })
+    const bookings = await Ride.find({
+      user_id: { $in: userMatches },
+    })
       .populate("driver_id", "name last_name number image")
-      .sort({ created_at: -1 });
+      .sort({ created_at: -1, _id: -1 });
 
-    const formattedBookings = bookings.map((b) => ({
-      id: b._id,
-      from: b.from,
-      from_lat: b.from_lat,
-      from_lng: b.from_lng,
-      to: b.to,
-      to_lat: b.to_lat,
-      to_lng: b.to_lng,
-      waitingMinutes: b.waitingMinutes,
-      waitingCharge: b.waitingCharge,
-      distance: b.distance,
-      rideFare: b.rideFare,
-      totalFare: b.totalFare,
-      driver_name: b.driver_id ? `${b.driver_id.name || ""} ${b.driver_id.last_name || ""}`.trim() : "Driver",
-      driver_phone: b.driver_id?.number || "",
-      driver_image: formatImageUrl(b.driver_id?.image),
-      status: b.status,
-      date: b.date || new Date(b.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      time: b.time || new Date(b.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-    }));
+    if (!bookings || bookings.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No ride history found",
+        data: [],
+      });
+    }
+
+    const bookingIds = bookings.map((b) => b._id);
+    const bookingMysqlIds = bookings.map((b) => b.mysqlId).filter(Boolean);
+
+    const cancelRides = await UserRideCancel.find({
+      user_booking_id: { $in: [...bookingIds, ...bookingMysqlIds] },
+    });
+
+    const cancelMap = {};
+    cancelRides.forEach((c) => {
+      cancelMap[String(c.user_booking_id)] = c;
+    });
+
+    const formattedBookings = bookings.map((b) => {
+      const bKey = String(b.mysqlId || b._id);
+      const bKeyMongo = String(b._id);
+      const cancelData = cancelMap[bKey] || cancelMap[bKeyMongo] || null;
+
+      let driverFullName = null;
+      if (b.driver_id) {
+        driverFullName = `${b.driver_id.name || ""} ${b.driver_id.last_name || ""}`.trim() || null;
+      }
+
+      return {
+        id: b.mysqlId || b._id,
+        booking_mongo_id: b._id,
+        from: b.from,
+        from_lat: b.from_lat,
+        from_lng: b.from_lng,
+        to: b.to,
+        to_lat: b.to_lat,
+        to_lng: b.to_lng,
+        waitingMinutes: b.waitingMinutes,
+        waitingCharge: b.waitingCharge,
+        distance: b.distance,
+        rideFare: b.rideFare,
+        totalFare: b.totalFare,
+        driver_name: driverFullName,
+        driver_phone: b.driver_id?.number || null,
+        driver_image: b.driver_id?.image ? formatImageUrl(b.driver_id.image) : null,
+        status: b.status,
+
+        // Cancel Ride Details
+        is_cancelled_by_user: cancelData ? true : false,
+        cancel_message: cancelData ? "This ride was canceled by you." : null,
+        cancel_fine: cancelData ? cancelData.fine : null,
+      };
+    });
 
     return res.status(200).json({
       status: true,
@@ -795,183 +1310,504 @@ const userRideHistory = async (req, res) => {
    ========================================================================= */
 
 // 12. USER BOOK OUTSTATION RIDE
+// Equivalent to PHP: Route::any('user-book-outStation', 'user_book_outStation')
 const userBookOutStation = async (req, res) => {
-  try {
-    const user = req.user;
-    if (!user) return res.status(404).json({ message: "Invalid user token" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const {
-      driver_id,
-      vehicle_id,
-      from,
-      fromLat,
-      fromLng,
-      to,
-      toLat,
-      toLng,
-      totalFare,
-      distance,
-      date,
-      time,
-    } = req.body;
+  const token = req.header("token") || req.header("authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
 
-    // Single Active Ride Validation: Prevent booking if user already has an active ride
-    const existingActiveRide = await Ride.findOne({
-      user_id: { $in: [user._id, String(user._id)] },
-      status: { $in: ["booked", "arrived", "ongoing", "in_progress"] },
+  const user = await User.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid user token" });
+  }
+
+  // Verification check matching PHP: if ($user->register == 0)
+  if (user.register === 0 || user.isRegistered === false) {
+    return res.status(404).json({
+      message: "Your account is not verified, Please contact Customer Care for more details",
     });
+  }
 
-    if (existingActiveRide) {
-      return res.status(400).json({
-        status: false,
-        message: "You already have an active ride in progress. Please complete or cancel your current ride before booking a new one.",
-        active_booking_id: existingActiveRide._id,
-        current_status: existingActiveRide.status,
-      });
+  const body = req.body || {};
+  const driver_id = body.driver_id || req?.query?.driver_id;
+  const vehicle_id = body.vehicle_id || req?.query?.vehicle_id;
+  const from = body.from || req?.query?.from;
+  const fromLat = body.fromLat || req?.query?.fromLat;
+  const fromLng = body.fromLng || req?.query?.fromLng;
+  const to = body.to || req?.query?.to;
+  const toLat = body.toLat || req?.query?.toLat;
+  const toLng = body.toLng || req?.query?.toLng;
+  const totalFare = body.totalFare || req?.query?.totalFare;
+  const distance = body.distance || req?.query?.distance;
+  const date = body.date || req?.query?.date || null;
+  const time = body.time || req?.query?.time || null;
+
+  if (
+    !driver_id ||
+    !vehicle_id ||
+    !from ||
+    fromLat === undefined ||
+    fromLng === undefined ||
+    !to ||
+    toLat === undefined ||
+    toLng === undefined ||
+    totalFare === undefined ||
+    distance === undefined
+  ) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        driver_id: !driver_id ? ["The driver_id field is required."] : undefined,
+        vehicle_id: !vehicle_id ? ["The vehicle_id field is required."] : undefined,
+        from: !from ? ["The from field is required."] : undefined,
+        fromLat: fromLat === undefined ? ["The fromLat field is required."] : undefined,
+        fromLng: fromLng === undefined ? ["The fromLng field is required."] : undefined,
+        to: !to ? ["The to field is required."] : undefined,
+        toLat: toLat === undefined ? ["The toLat field is required."] : undefined,
+        toLng: toLng === undefined ? ["The toLng field is required."] : undefined,
+        totalFare: totalFare === undefined ? ["The totalFare field is required."] : undefined,
+        distance: distance === undefined ? ["The distance field is required."] : undefined,
+      },
+    });
+  }
+
+  try {
+    // Lookup outstation above km rule from PriceFare
+    const fareConditions = [];
+    if (!isNaN(vehicle_id)) {
+      fareConditions.push({ vehicleType: Number(vehicle_id) });
+    }
+    if (mongoose.isValidObjectId(vehicle_id)) {
+      fareConditions.push({ carType: new mongoose.Types.ObjectId(vehicle_id) });
+      fareConditions.push({ vehicleType: vehicle_id });
     }
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const getOut = await PriceFare.findOne({ $or: fareConditions });
+    const outStationADkm = getOut?.outStationAboveKm || null;
 
-    const booking = await Ride.create({
+    const data = {
       user_id: user._id,
-      driver_id: driver_id || null,
-      vehicle_id: vehicle_id,
+      driver_id: mongoose.isValidObjectId(driver_id) ? new mongoose.Types.ObjectId(driver_id) : driver_id,
+      vehicle_id: mongoose.isValidObjectId(vehicle_id) ? new mongoose.Types.ObjectId(vehicle_id) : vehicle_id,
       from,
-      from_lat: String(fromLat || "0"),
-      from_lng: String(fromLng || "0"),
+      from_lat: String(fromLat),
+      from_lng: String(fromLng),
       to,
-      to_lat: String(toLat || "0"),
-      to_lng: String(toLng || "0"),
+      to_lat: String(toLat),
+      to_lng: String(toLng),
       rideFare: parseFloat(totalFare) || 0,
       totalFare: String(totalFare),
-      distance: String(distance || "0"),
-      date: date || null,
-      time: time || null,
-      otp,
-      status: "booked",
       booking_type: "outStation",
+      date,
+      time,
+      outStationADkm,
+      outStationADparcent: 12,
+      distance: String(distance),
+      status: "booked",
       created_at: new Date(),
       updated_at: new Date(),
-    });
+    };
+
+    const booking = await Ride.create(data);
 
     return res.status(200).json({
       status: true,
-      message: "OutStation ride booked successfully",
+      message: "Ride booked successfully",
       booking,
     });
-  } catch (error) {
-    console.error("Error in userBookOutStation:", error);
-    return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+  } catch (e) {
+    console.error("Ride Booking Error: " + e.message);
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      error: e.message,
+    });
   }
 };
 
 // 13. DRIVER START OUTSTATION
 const driverStartOutStation = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const { booking_id } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const booking = await Ride.findOne({
-      _id: mongoose.isValidObjectId(booking_id) ? booking_id : undefined,
-      driver_id: driver._id,
-      booking_type: "outStation",
+  const token = req.headers.token || req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid driver token" });
+  }
+
+  const { booking_id } = req.body;
+  if (!booking_id) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: ["The booking_id field is required."],
+      },
     });
+  }
 
-    if (!booking) {
-      return res.status(404).json({ message: "OutStation booking not found" });
+  const driverIds = [driver._id];
+  if (driver.mysqlId) driverIds.push(driver.mysqlId);
+  if (driver.id && typeof driver.id === "number") driverIds.push(driver.id);
+
+  const bookingQuery = {
+    $and: [
+      {
+        $or: [
+          ...(mongoose.isValidObjectId(booking_id) ? [{ _id: new mongoose.Types.ObjectId(booking_id) }] : []),
+          { mysqlId: Number(booking_id) || -1 },
+          { id: Number(booking_id) || -1 },
+        ],
+      },
+      {
+        $or: [
+          { driver_id: { $in: driverIds } },
+          { driver_mongo_id: driver._id },
+        ],
+      },
+    ],
+  };
+
+  const booking = await Ride.findOne(bookingQuery);
+  if (!booking) {
+    return res.status(404).json({ message: "Invalid booking ID" });
+  }
+
+  try {
+    const userQuery = [];
+    if (booking.user_id) {
+      if (mongoose.isValidObjectId(booking.user_id)) {
+        userQuery.push({ _id: new mongoose.Types.ObjectId(booking.user_id) });
+      }
+      userQuery.push({ mysqlId: Number(booking.user_id) || -1 });
+      userQuery.push({ id: Number(booking.user_id) || -1 });
+    }
+    if (booking.user_mongo_id) {
+      userQuery.push({ _id: booking.user_mongo_id });
     }
 
-    booking.status = "arrived";
+    const getUser = await User.findOne(userQuery.length > 0 ? { $or: userQuery } : { _id: null });
+    if (!getUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const receiveOtp = Math.floor(1000 + Math.random() * 9000);
+    booking.otp = String(receiveOtp);
     booking.updated_at = new Date();
     await booking.save();
 
+    const userPhone = getUser.number || getUser.phone || getUser.mobile;
+    if (userPhone) {
+      try {
+        const cleanNumber = String(userPhone).replace(/\D/g, "").slice(-10);
+        const message = `Your Bhrosa Cabs Ride Start OTP is ${receiveOtp}. Please share this OTP with your driver to begin your ride. Do not share this OTP with anyone else. It is valid for a limited time. Thanks, Bhrosa Group`;
+        const url = new URL("https://msg.vadvertiseweb.com/submitsms.jsp");
+        url.searchParams.append("user", "Bhrosa");
+        url.searchParams.append("key", process.env.SMS_API_KEY || "a1461568f5XX");
+        url.searchParams.append("mobile", cleanNumber);
+        url.searchParams.append("message", message);
+        url.searchParams.append("senderid", "BHRGRP");
+        url.searchParams.append("accusage", "1");
+        url.searchParams.append("entityid", "1701176768268781357");
+        url.searchParams.append("tempid", "1707177755350501043");
+
+        await fetch(url.toString(), { method: "GET", signal: AbortSignal.timeout(15000) });
+      } catch (smsErr) {
+        console.warn("Outstation Ride OTP SMS Warning:", smsErr.message);
+      }
+    }
+
     return res.status(200).json({
       status: true,
-      message: "OutStation ride started / arrived",
+      message: "Outstation ride OTP Send successfully",
+      otp: receiveOtp,
     });
-  } catch (error) {
-    console.error("Error in driverStartOutStation:", error);
-    return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+  } catch (e) {
+    console.error("Outstation Ride OTP Send Error: " + e.message);
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      error: e.message,
+    });
   }
 };
 
 // 14. DRIVER OTP VERIFY OUTSTATION
 const driverOtpVerifyOutStation = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const { booking_id, otp } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const booking = await Ride.findOne({
-      _id: mongoose.isValidObjectId(booking_id) ? booking_id : undefined,
-      driver_id: driver._id,
-      otp: String(otp),
-      booking_type: "outStation",
+  const token = req.headers.token || req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid driver token" });
+  }
+
+  const { booking_id, otp } = req.body;
+  const errors = {};
+  if (!booking_id) errors.booking_id = ["The booking_id field is required."];
+  if (!otp) errors.otp = ["The otp field is required."];
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors,
     });
+  }
 
-    if (!booking) {
-      return res.status(404).json({ message: "Invalid OTP or OutStation booking ID" });
-    }
+  const driverIds = [driver._id];
+  if (driver.mysqlId) driverIds.push(driver.mysqlId);
+  if (driver.id && typeof driver.id === "number") driverIds.push(driver.id);
 
-    const completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
-    booking.status = "ongoing";
-    booking.otp = completionOtp;
+  const bookingQuery = {
+    $and: [
+      {
+        $or: [
+          ...(mongoose.isValidObjectId(booking_id) ? [{ _id: new mongoose.Types.ObjectId(booking_id) }] : []),
+          { mysqlId: Number(booking_id) || -1 },
+          { id: Number(booking_id) || -1 },
+        ],
+      },
+      {
+        $or: [
+          { driver_id: { $in: driverIds } },
+          { driver_mongo_id: driver._id },
+        ],
+      },
+    ],
+  };
+
+  const booking = await Ride.findOne(bookingQuery);
+  if (!booking) {
+    return res.status(404).json({ message: "Invalid booking ID or OTP" });
+  }
+
+  if (String(booking.otp) !== String(otp)) {
+    return res.status(400).json({ message: "Invalid OTP" });
+  }
+
+  try {
+    booking.status = "in_progress";
+    booking.otp = null;
     booking.updated_at = new Date();
     await booking.save();
 
     return res.status(200).json({
       status: true,
-      message: "OutStation OTP verified successfully",
-      data: { booking_id: booking._id, status: booking.status },
+      message: "Outstation ride started successfully",
     });
-  } catch (error) {
-    console.error("Error in driverOtpVerifyOutStation:", error);
-    return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+  } catch (e) {
+    console.error("Outstation Ride OTP Verify Error: " + e.message);
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      error: e.message,
+    });
   }
 };
 
 // 15. DRIVER COMPLETE OTP OUTSTATION
 const driverCompleteOtpOutStation = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const { booking_id } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const booking = await Ride.findOne({
-      _id: mongoose.isValidObjectId(booking_id) ? booking_id : undefined,
-      driver_id: driver._id,
-      booking_type: "outStation",
+  const token = req.headers.token || req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid driver token" });
+  }
+
+  const { booking_id } = req.body;
+  if (!booking_id) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors: {
+        booking_id: ["The booking_id field is required."],
+      },
     });
+  }
 
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+  const driverIds = [driver._id];
+  if (driver.mysqlId) driverIds.push(driver.mysqlId);
+  if (driver.id && typeof driver.id === "number") driverIds.push(driver.id);
 
-    const completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
-    booking.otp = completionOtp;
+  const bookingQuery = {
+    $and: [
+      {
+        $or: [
+          ...(mongoose.isValidObjectId(booking_id) ? [{ _id: new mongoose.Types.ObjectId(booking_id) }] : []),
+          { mysqlId: Number(booking_id) || -1 },
+          { id: Number(booking_id) || -1 },
+        ],
+      },
+      {
+        $or: [
+          { driver_id: { $in: driverIds } },
+          { driver_mongo_id: driver._id },
+        ],
+      },
+    ],
+  };
+
+  const booking = await Ride.findOne(bookingQuery);
+  if (!booking) {
+    return res.status(404).json({ message: "Invalid booking ID" });
+  }
+
+  try {
+    const userQuery = [];
+    if (booking.user_id) {
+      if (mongoose.isValidObjectId(booking.user_id)) {
+        userQuery.push({ _id: new mongoose.Types.ObjectId(booking.user_id) });
+      }
+      userQuery.push({ mysqlId: Number(booking.user_id) || -1 });
+      userQuery.push({ id: Number(booking.user_id) || -1 });
+    }
+    if (booking.user_mongo_id) {
+      userQuery.push({ _id: booking.user_mongo_id });
+    }
+
+    const getUser = await User.findOne(userQuery.length > 0 ? { $or: userQuery } : { _id: null });
+    if (!getUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const receiveOtp = Math.floor(1000 + Math.random() * 9000);
+    booking.otp = String(receiveOtp);
+    booking.updated_at = new Date();
     await booking.save();
+
+    const userPhone = getUser.number || getUser.phone || getUser.mobile;
+    if (userPhone) {
+      try {
+        const cleanNumber = String(userPhone).replace(/\D/g, "").slice(-10);
+        const message = `Your Bhrosa Cabs Ride Completion OTP is ${receiveOtp}. Please share this OTP with your driver to complete your ride. Do not share this OTP with anyone else. It is valid for a limited time. Thanks, Bhrosa Group`;
+        const url = new URL("https://msg.vadvertiseweb.com/submitsms.jsp");
+        url.searchParams.append("user", "Bhrosa");
+        url.searchParams.append("key", process.env.SMS_API_KEY || "a1461568f5XX");
+        url.searchParams.append("mobile", cleanNumber);
+        url.searchParams.append("message", message);
+        url.searchParams.append("senderid", "BHRGRP");
+        url.searchParams.append("accusage", "1");
+        url.searchParams.append("entityid", "1701176768268781357");
+        url.searchParams.append("tempid", "1707177755350501043");
+
+        await fetch(url.toString(), { method: "GET", signal: AbortSignal.timeout(15000) });
+      } catch (smsErr) {
+        console.warn("Outstation Ride Completion OTP SMS Warning:", smsErr.message);
+      }
+    }
 
     return res.status(200).json({
       status: true,
-      message: "Completion OTP generated",
-      otp: completionOtp,
+      message: "Outstation ride OTP Send successfully",
+      otp: receiveOtp,
     });
-  } catch (error) {
-    return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+  } catch (e) {
+    console.error("Outstation Ride OTP Send Error: " + e.message);
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      error: e.message,
+    });
   }
 };
 
-// 16. DRIVER COMPLETE OUTSTATION
-const driverCompleteOutStation = async (req, res) => {
-  try {
-    const driver = req.driver;
-    const { booking_id, otp } = req.body;
+// 16. DRIVER COMPLETE OTP VERIFY OUTSTATION
+const driverCompleteOtpVerifyOutStation = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Invalid Method" });
+  }
 
-    const booking = await Ride.findOne({
-      _id: mongoose.isValidObjectId(booking_id) ? booking_id : undefined,
-      driver_id: driver._id,
-      otp: String(otp),
-      booking_type: "outStation",
+  const token = req.headers.token || req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  if (!token) {
+    return res.status(400).json({ message: "Token not provided" });
+  }
+
+  const driver = await Driver.findOne({
+    $or: [{ token: token }, { appToken: token }],
+  });
+
+  if (!driver) {
+    return res.status(404).json({ message: "Invalid driver token" });
+  }
+
+  const { booking_id, otp } = req.body;
+  const errors = {};
+  if (!booking_id) errors.booking_id = ["The booking_id field is required."];
+  if (!otp) errors.otp = ["The otp field is required."];
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(422).json({
+      message: "The given data was invalid.",
+      errors,
     });
+  }
 
-    if (!booking) return res.status(404).json({ message: "Invalid OTP or Booking" });
+  const driverIds = [driver._id];
+  if (driver.mysqlId) driverIds.push(driver.mysqlId);
+  if (driver.id && typeof driver.id === "number") driverIds.push(driver.id);
 
+  const bookingQuery = {
+    $and: [
+      {
+        $or: [
+          ...(mongoose.isValidObjectId(booking_id) ? [{ _id: new mongoose.Types.ObjectId(booking_id) }] : []),
+          { mysqlId: Number(booking_id) || -1 },
+          { id: Number(booking_id) || -1 },
+        ],
+      },
+      {
+        $or: [
+          { driver_id: { $in: driverIds } },
+          { driver_mongo_id: driver._id },
+        ],
+      },
+    ],
+  };
+
+  const booking = await Ride.findOne(bookingQuery);
+  if (!booking) {
+    return res.status(404).json({ message: "Invalid booking ID or OTP" });
+  }
+
+  if (String(booking.otp) !== String(otp)) {
+    return res.status(400).json({ message: "Invalid OTP" });
+  }
+
+  try {
     booking.status = "completed";
     booking.otp = null;
     booking.updated_at = new Date();
@@ -979,13 +1815,19 @@ const driverCompleteOutStation = async (req, res) => {
 
     return res.status(200).json({
       status: true,
-      message: "OutStation ride completed successfully",
-      data: { booking_id: booking._id, status: booking.status },
+      message: "Outstation ride completed successfully",
     });
-  } catch (error) {
-    return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+  } catch (e) {
+    console.error("Outstation Ride OTP Verify Error: " + e.message);
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      error: e.message,
+    });
   }
 };
+
+const driverCompleteOutStation = driverCompleteOtpVerifyOutStation;
 
 // 17. USER OUTSTATION HISTORY
 const userOutstationHistory = async (req, res) => {
@@ -1211,6 +2053,7 @@ module.exports = {
   driverStartOutStation,
   driverOtpVerifyOutStation,
   driverCompleteOtpOutStation,
+  driverCompleteOtpVerifyOutStation,
   driverCompleteOutStation,
   userOutstationHistory,
   driverOutstationHistory,

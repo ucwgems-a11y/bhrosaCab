@@ -1,10 +1,6 @@
 /**
- * =========================================================================
- * BHROSA CAB - CENTRAL ROUTER (backend/src/routes/index.js)
- * =========================================================================
- * Ye master router file hai jo backend ke sabhi modules, CMS website endpoints,
- * Admin APIs, CRM APIs aur Mobile App endpoints ko cleanly mount karti hai.
- * =========================================================================
+ * Master Router
+ * Mounts all API modules, CMS endpoints, Admin, CRM, and Mobile App routes.
  */
 
 const express = require("express");
@@ -96,8 +92,24 @@ router.all("/get-profile", verifyUserToken, userController.getProfile);
 router.all("/edit-profile", verifyUserToken, userUpload.any(), userController.editProfile);
 router.all("/user-logout", userController.logoutUser);
 router.all("/logout", userController.logoutUser);
+router.all("/user-recharge-wallet", verifyUserToken, userController.userRechargeWallet);
+router.all("/get-transactions-list", verifyUserToken, userController.getTransactionsList);
+router.all("/get-address-list", verifyUserToken, userController.getAddressList);
+router.all("/send-user-location", verifyUserToken, userController.sendUserLocation);
+router.all("/get-user-location", verifyUserToken, userController.getUserLocation);
+router.all("/user-save-location", verifyUserToken, userController.userSaveLocation);
+router.all("/edit-save-location", verifyUserToken, userController.editSaveLocation);
+router.all("/get-save-location", verifyUserToken, userController.getSaveLocations);
+
+// App Static Content & Policy Endpoints
+const { getPrivacyPolicyMobile } = require("../controllers/privacyPolicyController");
+router.all("/get-privacy-policy", getPrivacyPolicyMobile);
 
 // Ride Engine Mobile Endpoints at root /api/
 router.use("/", rideRoutes);
+
+// Notification Test Endpoint (Equivalent to PHP: ApiController::testNotification)
+const { testNotification } = require("../services/fcmService");
+router.all("/test-notification", testNotification);
 
 module.exports = router;

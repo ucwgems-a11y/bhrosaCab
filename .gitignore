@@ -11,3 +11,6 @@ client/dist/
 logs/
 *.log
 .DS_Store
+
+# Private API Migration Tracker (Local only)
+api.md

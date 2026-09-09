@@ -1,7 +1,6 @@
 /**
- * =========================================================================
- * DRIVER CONTROLLER (ADMIN + MOBILE APP FULL SUITE)
- * =========================================================================
+ * Driver Controller
+ * Handles driver registration, authentication, profile, wallet, and admin management.
  */
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");

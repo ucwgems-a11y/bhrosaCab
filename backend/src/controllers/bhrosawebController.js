@@ -1,19 +1,6 @@
- /**
- * =========================================================================
- * BHROSA CAB - UNIFIED WEBSITE CONTENT CONTROLLER (bhrosawebController.js)
- * =========================================================================
- * Ye controller public website ke sabhi dynamic sections aur pages ko manage
- * karta hai. Har section ke liye GET (Public website) aur PUT/POST/DELETE (Admin
- * CMS management) methods shamil hain.
- *
- * SECTIONS COVERED:
- * 1. Global Header, Footer & Company Info (SiteHeader, CompanyInfo, FooterTop, FooterMiddle, FooterVehicle)
- * 2. Home Page (HeroSlides, AboutSection, OfferHeading, OfferCards, OnlineBooking, DownloadSection, WhyChooseLeft, RegistrationSection, CtaSection, TaxiCta)
- * 3. About Us Page (AboutBanner, AboutCompany)
- * 4. Services & Pricing (ServiceBanner, ServiceCards, PricingHeading, PricingCards)
- * 5. Event & Franchise (EventGuests, FranchiseBanner, FranchiseBenefits, FranchiseApplications)
- * 6. Contact Us (ContactMap, ContactInfo, ContactMessages)
- * =========================================================================
+/**
+ * Website Content Controller
+ * Manages public website sections and admin CMS operations.
  */
 
 // Models Import

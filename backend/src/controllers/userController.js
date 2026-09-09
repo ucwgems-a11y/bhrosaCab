@@ -1,6 +1,12 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const RegistrationEvent = require("../models/RegistrationEvent");
+const UserWalletRecharge = require("../models/UserWalletRecharge");
+const Driver = require("../models/Driver");
+const Ride = require("../models/Ride");
+const UserAddress = require("../models/UserAddress");
+const SendLocation = require("../models/SendLocation");
+const UserSaveLocation = require("../models/UserSaveLocation");
 
 // Helper to format Image URL with domain if local path 
 const formatImageUrl = (imgPath, req) => {
@@ -30,6 +36,12 @@ const getRelativeUploadPath = (file) => {
 // @route   POST /api/user-register  OR  POST /api/user/register
 exports.userRegister = async (req, res) => {
   try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
     const number = req.body.number;
 
     if (!number || typeof number !== "string" || number.trim().length === 0) {
@@ -52,9 +64,21 @@ exports.userRegister = async (req, res) => {
     let accountExit = 0;
 
     if (!user) {
+      // Generate Unique Welcome Coupon (e.g., WELCOME5832)
+      let welcomeCoupon;
+      let couponExists = true;
+      while (couponExists) {
+        welcomeCoupon = "WELCOME" + Math.floor(1000 + Math.random() * 9000).toString();
+        const existingCouponUser = await User.findOne({ welcomeCoupon });
+        couponExists = !!existingCouponUser;
+      }
+
       user = await User.create({
         phone: cleanNumber,
         otp: otp,
+        welcomeCoupon: welcomeCoupon,
+        couponAmount: 200,
+        coupon_status: 0,
         isRegistered: false,
         isActive: false,
         wallet: 0,
@@ -524,6 +548,414 @@ exports.logoutUser = async (req, res) => {
     });
   } catch (error) {
     console.error("logoutUser Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    7. User Recharge Wallet
+// @route   POST /api/user-recharge-wallet
+exports.userRechargeWallet = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+    const amount = parseFloat(req.body.amount);
+
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).json({
+        message: "Valid recharge amount is required",
+      });
+    }
+
+    // Generate 10-character alphanumeric transaction ID
+    const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let randomId = "";
+    for (let i = 0; i < 10; i++) {
+      randomId += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const transac_id = randomId;
+
+    await UserWalletRecharge.create({
+      user_id: user._id,
+      amount: "+" + Math.abs(amount),
+      transaction_id: transac_id,
+      status: "1",
+    });
+
+    const newWalletBalance = (Number(user.wallet) || 0) + amount;
+    user.wallet = newWalletBalance;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Payment Successful",
+      new_wallet_balance: newWalletBalance,
+    });
+  } catch (error) {
+    console.error("userRechargeWallet Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    8. Get User Wallet Transactions List
+// @route   GET /api/get-transactions-list
+exports.getTransactionsList = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+
+    // Fetch user wallet recharge history
+    const transactions = await UserWalletRecharge.find({
+      $or: [{ user_id: user._id }, { user_id: user.mysqlId }],
+    })
+      .sort({ created_at: -1 })
+      .lean();
+
+    const history = [];
+
+    for (const tx of transactions) {
+      let driverId = null;
+      let driverImage = null;
+      let driverName = user.name || "";
+      let vehicleNumber = null;
+      let vehicleName = null;
+      let averageRating = null;
+
+      if (tx.booking_id) {
+        // Find ride by booking_id
+        const ride = await Ride.findOne({
+          $or: [{ _id: tx.booking_id }, { booking_id: tx.booking_id }],
+        }).lean();
+
+        if (ride && ride.driver_id) {
+          driverId = ride.driver_id;
+          const driver = await Driver.findById(driverId).lean();
+          if (driver) {
+            driverName = driver.name || "";
+            driverImage = formatImageUrl(driver.image, req);
+            vehicleNumber = driver.vehicleNumber || null;
+            vehicleName = driver.vehicleName || null;
+            averageRating = driver.rating ? parseFloat(Number(driver.rating).toFixed(2)) : null;
+          }
+        }
+      }
+
+      const txDate = tx.created_at ? new Date(tx.created_at) : new Date();
+      // Format d-m-Y H:i:s in IST
+      const day = String(txDate.getDate()).padStart(2, "0");
+      const month = String(txDate.getMonth() + 1).padStart(2, "0");
+      const year = txDate.getFullYear();
+      const hours = String(txDate.getHours()).padStart(2, "0");
+      const minutes = String(txDate.getMinutes()).padStart(2, "0");
+      const seconds = String(txDate.getSeconds()).padStart(2, "0");
+      const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+
+      history.push({
+        id: tx._id,
+        amount: tx.amount,
+        created_at: formattedDate,
+        username: driverName,
+        user_image: driverImage || formatImageUrl(user.image, req),
+        transaction_id: tx.transaction_id,
+        booking_id: tx.booking_id || null,
+        driver_id: driverId,
+        vehicle_number: vehicleNumber,
+        vehicle_name: vehicleName,
+        category: driverId ? "Taxi Expense" : "Money Added in Wallet",
+        average_rating: averageRating,
+        status: 1,
+        date_time: tx.created_at,
+        payment_methods: "My e-wallet",
+      });
+    }
+
+    const walletBalance = Number(user.wallet || 0).toFixed(2);
+
+    return res.status(200).json({
+      message: "User Wallet amount Get Successfully",
+      username: user.name || "",
+      wallet: walletBalance,
+      History: history,
+    });
+  } catch (error) {
+    console.error("getTransactionsList Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    9. Get User Address List
+// @route   GET /api/get-address-list
+exports.getAddressList = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+
+    const addressList = await UserAddress.find({
+      $or: [{ user_id: user._id }, { user_id: user.mysqlId }],
+    })
+      .sort({ created_at: -1 })
+      .lean();
+
+    return res.status(200).json({
+      message: "Address list Get Successfully",
+      address: addressList,
+    });
+  } catch (error) {
+    console.error("getAddressList Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    10. Send User Location
+// @route   POST /api/send-user-location
+exports.sendUserLocation = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+
+    // Update active bookings where accept_status=1 and arrive_status=0 to accept_status=2
+    await Ride.updateMany(
+      {
+        $or: [{ user_id: user._id }, { user_id: user.mysqlId }],
+        status: "booked",
+      },
+      {
+        $set: { status: "ongoing" },
+      }
+    );
+
+    await SendLocation.create({
+      user_id: user._id,
+      from_address: req.body.from_address || "",
+      from_latitude: req.body.from_latitude || null,
+      from_longitude: req.body.from_longitude || null,
+      destination_address: req.body.destination_address || "",
+      destination_latitude: req.body.destination_latitude || null,
+      destination_longitude: req.body.destination_longitude || null,
+    });
+
+    return res.status(200).json({
+      message: "Address Send Successfully",
+    });
+  } catch (error) {
+    console.error("sendUserLocation Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    11. Get User Location & Calculate Distance
+// @route   GET /api/get-user-location
+exports.getUserLocation = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+
+    const location = await SendLocation.findOne({
+      $or: [{ user_id: user._id }, { user_id: user.mysqlId }],
+    })
+      .sort({ created_at: -1 })
+      .lean();
+
+    if (!location) {
+      return res.status(404).json({
+        message: "Address not found",
+      });
+    }
+
+    let distance = "0.0";
+
+    const fromLat = parseFloat(location.from_latitude);
+    const fromLng = parseFloat(location.from_longitude);
+    const toLat = parseFloat(location.destination_latitude);
+    const toLng = parseFloat(location.destination_longitude);
+
+    if (!isNaN(fromLat) && !isNaN(fromLng) && !isNaN(toLat) && !isNaN(toLng)) {
+      const earthRadius = 6371000; // meters
+
+      const toRad = (deg) => (deg * Math.PI) / 180;
+
+      const latDelta = toRad(toLat - fromLat);
+      const lonDelta = toRad(toLng - fromLng);
+
+      const a =
+        Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+        Math.cos(toRad(fromLat)) *
+          Math.cos(toRad(toLat)) *
+          Math.sin(lonDelta / 2) *
+          Math.sin(lonDelta / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distanceInMeters = earthRadius * c;
+      const distanceInKm = distanceInMeters / 1000;
+      distance = distanceInKm.toFixed(1);
+    }
+
+    const details = {
+      ...location,
+      distance_in_kilometers: distance,
+    };
+
+    return res.status(200).json({
+      message: "Address and Distance Retrieved Successfully",
+      details: details,
+    });
+  } catch (error) {
+    console.error("getUserLocation Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    12. Save User Favorite Location
+// @route   POST /api/user-save-location
+exports.userSaveLocation = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+
+    const saved = await UserSaveLocation.create({
+      user_id: user._id,
+      name: req.body.name || "",
+      from_address: req.body.from_address || "",
+      from_latitude: req.body.from_latitude || null,
+      from_longitude: req.body.from_longitude || null,
+    });
+
+    return res.status(200).json({
+      message: "Address Saved Successfully",
+      data: saved,
+    });
+  } catch (error) {
+    console.error("userSaveLocation Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    13. Edit Saved Location
+// @route   POST /api/edit-save-location
+exports.editSaveLocation = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+    const locationId = req.body.id || req.body._id;
+
+    if (!locationId) {
+      return res.status(400).json({
+        message: "Location ID is required",
+      });
+    }
+
+    const updateData = {
+      user_id: user._id,
+      name: req.body.name || "",
+      from_address: req.body.from_address || "",
+      from_latitude: req.body.from_latitude || null,
+      from_longitude: req.body.from_longitude || null,
+    };
+
+    const isMongoId = locationId.toString().match(/^[0-9a-fA-F]{24}$/);
+    const filter = isMongoId
+      ? { _id: locationId, $or: [{ user_id: user._id }, { user_id: user.mysqlId }] }
+      : { id: locationId, $or: [{ user_id: user._id }, { user_id: user.mysqlId }] };
+
+    await UserSaveLocation.findOneAndUpdate(filter, { $set: updateData });
+
+    return res.status(200).json({
+      success: true,
+      message: "Address updated Successfully",
+    });
+  } catch (error) {
+    console.error("editSaveLocation Error:", error);
+    return res.status(500).json({
+      message: "Error",
+      details: error.message,
+    });
+  }
+};
+
+// @desc    14. Get User Saved Locations
+// @route   GET /api/get-save-location
+exports.getSaveLocations = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const user = req.user;
+
+    const data = await UserSaveLocation.find({
+      $or: [{ user_id: user._id }, { user_id: user.mysqlId }],
+    })
+      .sort({ created_at: -1 })
+      .lean();
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        message: "No data found for this user",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Data Retrieved Successfully",
+      details: data,
+    });
+  } catch (error) {
+    console.error("getSaveLocations Error:", error);
     return res.status(500).json({
       message: "Error",
       details: error.message,

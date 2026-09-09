@@ -62,3 +62,31 @@ exports.deletePrivacyPolicy = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+/**
+ * Mobile App Privacy Policy Endpoint
+ * Equivalent to PHP: Route::any('get-privacy-policy', 'fourteen')
+ */
+exports.getPrivacyPolicyMobile = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({ message: "Invalid Method" });
+    }
+
+    const data = await PrivacyPolicyClause.find().sort({ createdAt: 1 });
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: "No data found" });
+    }
+
+    return res.status(200).json({
+      message: "Data Retrieved Successfully",
+      details: data,
+    });
+  } catch (ex) {
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+

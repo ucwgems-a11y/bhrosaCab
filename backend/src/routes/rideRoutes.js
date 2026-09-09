@@ -18,6 +18,7 @@ const {
   driverStartOutStation,
   driverOtpVerifyOutStation,
   driverCompleteOtpOutStation,
+  driverCompleteOtpVerifyOutStation,
   driverCompleteOutStation,
   userOutstationHistory,
   driverOutstationHistory,
@@ -32,28 +33,29 @@ const {
 // Vehicle Types & Fare Estimates
 router.all("/get-vehicle-types", getVehicleTypes);
 router.all("/get-vehicle-type-fare", getVehicleTypeFare);
-router.all("/get-available-drivers", verifyUserToken, getAvailableDrivers);
+router.all("/get-available-drivers", getAvailableDrivers);
 
 // In-City Booking Lifecycle
-router.all("/user-book-ride", verifyUserToken, userBookRide);
-router.all("/user-book-ride-arrived", verifyDriverToken, userBookRideArrived);
-router.all("/user-ride-start", verifyDriverToken, userRideStart);
-router.all("/user-ride-complete", verifyDriverToken, userRideComplete);
+router.all("/user-book-ride", userBookRide);
+router.all("/user-book-ride-arrived", userBookRideArrived);
+router.all("/user-ride-start", userRideStart);
+router.all("/user-ride-complete", userRideComplete);
 
 // Cancellations
-router.all("/user-ride-cancel", verifyUserToken, userRideCancel);
-router.all("/driver-ride-cancel", verifyDriverToken, driverRideCancel);
+router.all("/user-ride-cancel", userRideCancel);
+router.all("/driver-ride-cancel", driverRideCancel);
 
 // Histories & Earnings
-router.all("/driver-ride-history", verifyDriverToken, driverRideHistory);
-router.all("/user-ride-history", verifyUserToken, userRideHistory);
+router.all("/driver-ride-history", driverRideHistory);
+router.all("/user-ride-history", userRideHistory);
 
 // OutStation Rides Lifecycle
-router.all("/user-book-outStation", verifyUserToken, userBookOutStation);
-router.all("/driver-start-outStation", verifyDriverToken, driverStartOutStation);
-router.all("/driver-otp-verify-outStation", verifyDriverToken, driverOtpVerifyOutStation);
-router.all("/driver-complete-otp-outStation", verifyDriverToken, driverCompleteOtpOutStation);
-router.all("/driver-complete-outStation", verifyDriverToken, driverCompleteOutStation);
+router.all("/user-book-outStation", userBookOutStation);
+router.all("/driver-start-outStation", driverStartOutStation);
+router.all("/driver-otp-verify-outStation", driverOtpVerifyOutStation);
+router.all("/driver-complete-otp-outStation", driverCompleteOtpOutStation);
+router.all("/driver-complete-otp-verify-outStation", driverCompleteOtpVerifyOutStation);
+router.all("/driver-complete-outStation", driverCompleteOutStation);
 router.all("/user-outstation-history", verifyUserToken, userOutstationHistory);
 router.all("/driver-outstation-history", verifyDriverToken, driverOutstationHistory);
 
