@@ -214,6 +214,7 @@ exports.userOtpVerifyLogin = async (req, res) => {
 
 //  3. Complete User Profile (Upload Photo & KYC Aadhaar)
 // POST /api/user-complete-profile
+// add aadhaar
 exports.userCompleteProfile = async (req, res) => {
   try {
     const user = req.user;
