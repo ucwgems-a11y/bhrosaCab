@@ -1,0 +1,98 @@
+/* ===============================
+   Event Banner
+================================ */
+
+.event-page-header {
+  background: url("../../../../assets/img/bg-1.jpg") no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 350px;
+
+  display: flex;
+  align-items: center;
+
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Dark Overlay */
+
+.event-page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(34, 34, 34, 0.8);
+  z-index: -1;
+}
+
+/* Container */
+
+.event-container {
+  width: 90%;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* Content */
+
+.event-page-info {
+  position: relative;
+  z-index: 5;
+}
+
+.event-page-info h2 {
+  font-size: 72px;
+  font-weight: 700;
+  color: #87ceeb;
+  margin: 0;
+}
+
+/* ===================================
+        Bottom Right Shape
+=================================== */
+
+.event-page-shape {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  width: 52%;
+  height: 100px;
+}
+
+/* Blue Shape */
+
+.event-page-shape::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: #87CEEB;
+  background-image: repeating-linear-gradient(45deg,
+      #87CEEB 0,
+      #87CEEB 2px,
+      transparent 2px,
+      transparent 10px);
+
+  clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+}
+
+/* Black Cut */
+
+.event-page-shape::after {
+  content: "";
+  position: absolute;
+
+  left: -150px;
+  bottom: 0;
+
+  width: 100%;
+  height: 80px;
+
+  background: #222 url("../../../../assets/img/texture.png") repeat;
+
+  clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+
+  z-index: -1;
+}

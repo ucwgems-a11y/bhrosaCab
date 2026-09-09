@@ -1,0 +1,269 @@
+/* ===============================
+   About Banner
+================================ */
+
+.about-page-header {
+    background: url("../../../../assets/img/bg-1.jpg") no-repeat center center;
+    background-size: cover;
+    width: 100%;
+    height: 350px;
+
+    display: flex;
+    align-items: center;
+
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Overlay */
+
+.about-page-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(34, 34, 34, 0.8);
+    z-index: -1;
+}
+
+/* Container */
+
+.about-container {
+    width: 90%;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* ===============================
+   Content
+================================ */
+
+.about-page-info {
+    position: relative;
+    z-index: 5;
+}
+
+.about-page-info h4 {
+    display: inline-block;
+    padding: 0 15px;
+    height: 25px;
+    line-height: 25px;
+
+    background: #87CEEB;
+
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    clip-path: polygon(93% 0%, 100% 30%, 100% 100%, 0 100%, 0 0);
+
+    margin-bottom: 20px;
+}
+
+.about-page-info h2 {
+    color: #fff;
+    font-size: 46px;
+    line-height: 56px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.about-page-info h2 span {
+    color: #87CEEB;
+}
+
+.about-page-info p {
+    color: #ddd;
+    font-size: 18px;
+    line-height: 30px;
+    margin: 0;
+}
+
+/* ===============================
+   Bottom Shape
+================================ */
+
+.about-page-shape {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+
+    width: 50%;
+    height: 100px;
+
+    z-index: 2;
+}
+
+/* Blue Shape */
+
+.about-page-shape::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: #87CEEB;
+    background-image: repeating-linear-gradient(45deg,
+            #87CEEB 0,
+            #87CEEB 2px,
+            transparent 2px,
+            transparent 10px);
+
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+}
+
+/* Black Shape */
+
+.about-page-shape::after {
+    content: "";
+    position: absolute;
+
+    left: -150px;
+    bottom: 0;
+
+    width: 100%;
+    height: 80px;
+
+    background: #222 url("../../../../assets/img/texture.png") repeat;
+
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+
+    z-index: -1;
+}
+
+
+/* ===================================
+   TABLET (769px - 992px)
+=================================== */
+
+@media (max-width:992px) {
+
+    .about-page-header {
+        height: 320px;
+    }
+
+    .about-container {
+        width: 92%;
+    }
+
+    .about-page-info h4 {
+        font-size: 11px;
+        padding: 0 14px;
+        height: 24px;
+        line-height: 24px;
+        margin-bottom: 18px;
+    }
+
+    .about-page-info h2 {
+        font-size: 38px;
+        line-height: 48px;
+        margin-bottom: 15px;
+    }
+
+    .about-page-info p {
+        font-size: 17px;
+        line-height: 28px;
+    }
+
+    .about-page-shape {
+        width: 55%;
+        height: 80px;
+    }
+
+    .about-page-shape::after {
+        height: 65px;
+        left: -110px;
+    }
+
+}
+
+/* ===================================
+   MOBILE (481px - 768px)
+=================================== */
+
+@media (max-width:768px) {
+
+    .about-page-header {
+        height: 300px;
+    }
+
+    .about-container {
+        width: 92%;
+    }
+
+    .about-page-info h4 {
+        font-size: 11px;
+        padding: 0 12px;
+        height: 22px;
+        line-height: 22px;
+        margin-bottom: 15px;
+    }
+
+    .about-page-info h2 {
+        font-size: 32px;
+        line-height: 42px;
+        margin-bottom: 15px;
+    }
+
+    .about-page-info p {
+        font-size: 16px;
+        line-height: 26px;
+    }
+
+    .about-page-shape {
+        width: 60%;
+        height: 70px;
+    }
+
+    .about-page-shape::after {
+        height: 55px;
+        left: -90px;
+    }
+
+}
+
+/* ===================================
+   SMALL MOBILE (480px)
+=================================== */
+
+@media (max-width:480px) {
+
+    .about-page-header {
+        height: 270px;
+    }
+
+    .about-container {
+        width: 90%;
+    }
+
+    .about-page-info h4 {
+        font-size: 10px;
+        padding: 0 10px;
+        height: 20px;
+        line-height: 20px;
+        margin-bottom: 12px;
+    }
+
+    .about-page-info h2 {
+        font-size: 26px;
+        line-height: 36px;
+        margin-bottom: 12px;
+    }
+
+    .about-page-info p {
+        font-size: 15px;
+        line-height: 24px;
+    }
+
+    .about-page-shape {
+        width: 65%;
+        height: 60px;
+    }
+
+    .about-page-shape::after {
+        height: 45px;
+        left: -70px;
+    }
+
+}

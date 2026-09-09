@@ -36,15 +36,15 @@ import CrmChangePassword from "../components/crmpage/CrmChangePassword";
 /* =========================================================
    2. PUBLIC WEBSITE & LEGAL PAGES IMPORTS
 ========================================================= */
-import MainLayout from "../components/layout/MainLayout/MainLayout";
-import Home from "../components/pages/Home";
-import About from "../components/pages/About";
-import Services from "../components/pages/Services";
-import Contact from "../components/pages/Contact";
-import Event from "../components/pages/Event";
-import Franchise from "../components/pages/Franchise";
-import PrivacyPolicyPage from "../components/pages/legal/PrivacyPolicyPage";
-import RefundPolicyPage from "../components/pages/legal/RefundPolicyPage"; 
+import MainLayout from "../components/bhrosawebsite/layout/MainLayout/MainLayout";
+import Home from "../components/bhrosawebsitepage/Home";
+import About from "../components/bhrosawebsitepage/About";
+import Services from "../components/bhrosawebsitepage/Services";
+import Contact from "../components/bhrosawebsitepage/Contact";
+import Event from "../components/bhrosawebsitepage/Event";
+import Franchise from "../components/bhrosawebsitepage/Franchise";
+import PrivacyPolicyPage from "../components/bhrosawebsitepage/legal/PrivacyPolicyPage";
+import RefundPolicyPage from "../components/bhrosawebsitepage/legal/RefundPolicyPage"; 
 
 /* =========================================================
    3. ADMIN AUTH & DASHBOARD CORE IMPORTS
