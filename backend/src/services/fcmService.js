@@ -5,7 +5,12 @@
 
 const fs = require("fs");
 const path = require("path");
-const { GoogleAuth } = require("google-auth-library");
+let GoogleAuth;
+try {
+  GoogleAuth = require("google-auth-library").GoogleAuth;
+} catch (e) {
+  console.warn("Warning: google-auth-library not immediately available:", e.message);
+}
 
 const FCM_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
 const DEFAULT_PROJECT_ID = "bharosacab";
@@ -84,6 +89,14 @@ async function generateAccessToken() {
       }
     } else if (credsConfig.keyFile) {
       authOptions.keyFile = credsConfig.keyFile;
+    }
+
+    if (!GoogleAuth) {
+      try {
+        GoogleAuth = require("google-auth-library").GoogleAuth;
+      } catch (err) {
+        throw new Error("google-auth-library is required for FCM notifications: " + err.message);
+      }
     }
 
     const auth = new GoogleAuth(authOptions);
