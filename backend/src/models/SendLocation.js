@@ -1,4 +1,4 @@
-﻿const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const sendLocationSchema = new mongoose.Schema(
   {
@@ -32,6 +32,18 @@ const sendLocationSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    coupon_id: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    distance_in_kilometers: {
+      type: Number,
+      default: null,
+    },
+    fares: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
     created_at: {
       type: Date,
       default: Date.now,
@@ -43,6 +55,7 @@ const sendLocationSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    strict: false,
   }
 );
 

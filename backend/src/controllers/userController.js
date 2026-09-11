@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const RegistrationEvent = require("../models/RegistrationEvent");
@@ -7,6 +10,17 @@ const Ride = require("../models/Ride");
 const UserAddress = require("../models/UserAddress");
 const SendLocation = require("../models/SendLocation");
 const UserSaveLocation = require("../models/UserSaveLocation");
+const CarBooking = require("../models/CarBooking");
+const DriverCheckBooking = require("../models/DriverCheckBooking");
+const DriverVehicleDetail = require("../models/DriverVehicleDetail");
+const CancelReason = require("../models/CancelReason");
+const UserFeedback = require("../models/UserFeedback");
+const DriverRating = require("../models/DriverRating");
+const Tip = require("../models/Tip");
+const Guardian = require("../models/Guardian");
+const State = require("../models/State");
+const UserApp = require("../models/UserApp");
+const fcmService = require("../services/fcmService");
 
 // Helper to format Image URL with domain if local path 
 const formatImageUrl = (imgPath, req) => {
@@ -183,9 +197,12 @@ exports.userOtpVerifyLogin = async (req, res) => {
 
     user.otp = null;
     user.isActive = true;
+    user.active_status = 1;
     user.appToken = token;
+    user.token = token;
     if (reg_id) {
       user.fcmToken = reg_id;
+      user.reg_id = reg_id;
     }
     await user.save();
 
@@ -507,7 +524,9 @@ exports.logoutUser = async (req, res) => {
       });
     }
 
-    let user = await User.findOne({ appToken: token });
+    let user = await User.findOne({
+      $or: [{ appToken: token }, { token: token }],
+    });
 
     if (!user) {
       try {
@@ -537,8 +556,10 @@ exports.logoutUser = async (req, res) => {
 
     // Nullify active session, token, and status (exact PHP match)
     user.appToken = null;
+    user.token = null;
     user.fcmToken = null;
     user.isActive = false;
+    user.active_status = 0;
     await user.save();
 
     console.log(`🔒 [APP LOGOUT] User self logged out successfully: ${user.name} (${user.phone})`);
@@ -1345,4 +1366,2538 @@ exports.getMediaSourceUsers = async (req, res) => {
     });
   }
 };
+
+// Check Coupon Number (PHP: ApiController::checkCouponNumber)
+exports.checkCouponNumber = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const coupon = req.query.coupon || req.body?.coupon;
+    if (!coupon || String(coupon).trim() === "") {
+      return res.status(400).json({
+        message: "Coupon not provided",
+      });
+    }
+
+    const user = await User.findOne({ welcomeCoupon: String(coupon).trim() });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid coupon",
+      });
+    }
+
+    const couponStatus = user.couponStatus !== undefined ? user.couponStatus : user.coupon_status;
+    if (couponStatus == 1 || String(couponStatus) === "1") {
+      return res.status(200).json({
+        message: "Coupon already used",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Coupon found",
+      data: {
+        userName: user.name || "N/A",
+        welcomeCoupon: user.welcomeCoupon || "N/A",
+        couponStatus: couponStatus ?? "N/A",
+        couponAmount: user.couponAmount ?? "N/A",
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({
+      message: "An error occurred",
+      details: e.message,
+    });
+  }
+};
+
+// Use Coupon (PHP: ApiController::userUseCoupon)
+exports.userUseCoupon = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const coupon = req.query.coupon || req.body?.coupon;
+    if (!coupon || String(coupon).trim() === "") {
+      return res.status(400).json({
+        message: "Coupon not provided",
+      });
+    }
+
+    const user = await User.findOne({ welcomeCoupon: String(coupon).trim() });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid coupon",
+      });
+    }
+
+    user.couponStatus = 1;
+    user.coupon_status = 1;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Coupon found and used successfully",
+      data: {
+        userName: user.name || "N/A",
+        welcomeCoupon: user.welcomeCoupon || "N/A",
+        couponStatus: user.couponStatus ?? "N/A",
+        couponAmount: user.couponAmount ?? "N/A",
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({
+      message: "An error occurred",
+      details: e.message,
+    });
+  }
+};
+
+// @desc    Car Booking (PHP: ApiController::twentySix)
+// @route   POST /api/car-booking
+exports.carBooking = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const randomBookingId = Math.floor(1111 + Math.random() * 8888);
+
+    const savedBooking = await CarBooking.create({
+      booking_id: randomBookingId,
+      user_id: user._id,
+      car_type: req.body?.car_type ?? null,
+      amount: req.body?.amount ?? null,
+      Currency: req.body?.Currency ?? "₹",
+    });
+
+    if (savedBooking) {
+      return res.status(200).json({
+        message: "Car Booking successfully",
+        Data: savedBooking,
+      });
+    } else {
+      return res.status(400).json({
+        message: "No changes made or Technical Error",
+      });
+    }
+  } catch (ex) {
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+
+// @desc    RazorPay User Details & Driver Notification (PHP: ApiController::thirtyThree)
+// @route   POST /api/razorPay-user-details
+exports.razorPayUserDetails = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const rawAmount =
+      req.body.amount !== undefined ? String(req.body.amount) : "";
+    const amount = rawAmount.replace(/[^0-9.]/g, "");
+    const paymentStatus =
+      req.body.payment_method !== undefined
+        ? req.body.payment_method
+        : req.body.payment_status !== undefined
+        ? req.body.payment_status
+        : 1;
+
+    if (String(paymentStatus) === "0") {
+      const walletBalance = Number(user.wallet) || 0;
+      if (walletBalance < parseFloat(amount || 0)) {
+        return res.status(200).json({
+          success: false,
+          message: "Insufficient wallet balance",
+        });
+      }
+    }
+
+    const randomBookingId = Math.floor(1111 + Math.random() * 8888);
+    const data = {
+      booking_id: randomBookingId,
+      user_id: user._id,
+      transection_id: req.body.transection_id || null,
+      address_id: req.body.address_id || null,
+      amount: amount,
+      type: req.body.type || req.body.car_type || null,
+      car_type: req.body.type || req.body.car_type || null,
+      payment_status: String(paymentStatus),
+      currency: "INR",
+      Currency: "₹",
+      driver_reject_status: 0,
+      driver_id: null,
+    };
+
+    const razorPay = await CarBooking.create(data);
+    try {
+      if (mongoose.connection && mongoose.connection.db) {
+        await mongoose.connection.db
+          .collection("book_section_razor_pays")
+          .insertOne({
+            ...data,
+            _id: razorPay._id,
+            created_at: new Date(),
+            updated_at: new Date(),
+          });
+      }
+    } catch (e) {}
+
+    const type = req.body.type || req.body.car_type;
+    if (!type) {
+      return res.status(400).json({
+        message: "Type not provided",
+      });
+    }
+
+    const vTypeFilter = [
+      type,
+      String(type),
+      !isNaN(Number(type)) ? Number(type) : null,
+    ].filter((v) => v !== null);
+
+    const drivers = await Driver.find({
+      cateogory: { $in: vTypeFilter },
+    });
+
+    if (!drivers || drivers.length === 0) {
+      return res.status(404).json({
+        message: "No drivers found for the given vehicle type",
+      });
+    }
+
+    const onlineDrivers = drivers.filter(
+      (d) =>
+        Number(d.active_status) === 1 &&
+        d.reg_id &&
+        String(d.reg_id).trim() !== ""
+    );
+
+    const regIds = onlineDrivers.map((d) => String(d.reg_id).trim());
+    if (regIds.length === 0) {
+      return res.status(404).json({
+        message: "No registration IDs found for the drivers",
+      });
+    }
+
+    const title = "New Ride Assigned";
+    const body = "Assigned on Amount: " + amount;
+
+    for (const regId of regIds) {
+      try {
+        await fcmService.sendNotification(regId, title, body);
+      } catch (ex) {
+        console.error(`Notification error for reg_id ${regId}:`, ex.message);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment Successfully Done and Notifications Sent",
+    });
+  } catch (ex) {
+    console.error("razorPayUserDetails Error:", ex);
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+
+// @desc    Book User Ride with Direct Driver Notification (PHP: ApiController::book_ride)
+// @route   POST /api/book-user-ride
+exports.bookRide = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const randomBookingId = Math.floor(1111 + Math.random() * 8888);
+    const data = {
+      booking_id: randomBookingId,
+      user_id: user._id,
+      transection_id: null,
+      address_id: req.body.address_id || null,
+      amount: req.body.amount !== undefined ? String(req.body.amount) : null,
+      type: req.body.type || req.body.car_type || null,
+      car_type: req.body.type || req.body.car_type || null,
+      payment_status: null,
+      currency: null,
+      driver_reject_status: 0,
+      driver_id: null,
+    };
+
+    const razorPay = await CarBooking.create(data);
+    try {
+      if (mongoose.connection && mongoose.connection.db) {
+        await mongoose.connection.db
+          .collection("book_section_razor_pays")
+          .insertOne({
+            ...data,
+            _id: razorPay._id,
+            created_at: new Date(),
+            updated_at: new Date(),
+          });
+      }
+    } catch (e) {}
+
+    const regId = req.body.reg_id;
+    if (!regId) {
+      return res.status(400).json({
+        message: "Registration ID (reg_id) not provided",
+      });
+    }
+
+    const title = "New Ride Assigned";
+    const body = "Assigned on Amount: " + (req.body.amount || "");
+    try {
+      await fcmService.sendNotification(regId, title, body);
+    } catch (ex) {
+      console.error(`Notification error for reg_id ${regId}:`, ex.message);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking Successfully and Notification Sent",
+    });
+  } catch (ex) {
+    console.error("bookRide Error:", ex);
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+
+// @desc    Get Cancel / Complete / Active Bookings History (PHP: ApiController::thirtyFour)
+// @route   GET /api/get-cancel-complete-bookings
+exports.getCancelCompleteBookings = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const type = req.query.type !== undefined ? String(req.query.type) : "0";
+    const dateQuery = req.query.date;
+
+    const buildDateFilter = (query) => {
+      if (dateQuery) {
+        const start = new Date(dateQuery);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(dateQuery);
+        end.setHours(23, 59, 59, 999);
+        query.created_at = { $gte: start, $lte: end };
+      }
+    };
+
+    let getDetails = [];
+
+    // Helper to format ride details item
+    const formatRideItem = async (item, isCanceled = false) => {
+      const driver = await Driver.findOne({
+        $or: [
+          ...(mongoose.isValidObjectId(item.driver_id)
+            ? [{ _id: item.driver_id }]
+            : []),
+          { id: item.driver_id },
+          ...(!isNaN(Number(item.driver_id))
+            ? [{ mysqlId: Number(item.driver_id) }]
+            : []),
+        ],
+      }).lean();
+
+      let vehicledetail = null;
+      if (driver) {
+        vehicledetail = await DriverVehicleDetail.findOne({
+          $or: [
+            ...(mongoose.isValidObjectId(driver._id)
+              ? [{ driver_id: driver._id }]
+              : []),
+            { driver_id: driver._id.toString() },
+            { driver_id: driver.id },
+          ],
+        }).lean();
+      }
+
+      let address = null;
+      if (item.address_id) {
+        address = await SendLocation.findOne({
+          $or: [
+            ...(mongoose.isValidObjectId(item.address_id)
+              ? [{ _id: item.address_id }]
+              : []),
+            { id: item.address_id },
+            { id: String(item.address_id) },
+          ],
+        }).lean();
+      }
+      if (!address) {
+        address = await SendLocation.findOne({
+          $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+        })
+          .sort({ createdAt: -1, created_at: -1, _id: -1 })
+          .lean();
+      }
+      if (!address) {
+        address = {
+          from_address: item.from_address || "",
+          destination_address: item.destination_address || "",
+          from_latitude: item.from_latitude || null,
+          from_longitude: item.from_longitude || null,
+          destination_latitude: item.destination_latitude || null,
+          destination_longitude: item.destination_longitude || null,
+        };
+      }
+
+      const createdAt = item.created_at || item.createdAt;
+      const updatedAt = item.updated_at || item.updatedAt;
+
+      const formattedAddress = {
+        ...address,
+        id: address._id ? String(address._id) : address.id,
+        price: item.price !== undefined ? item.price : "0",
+        distance: item.distance !== undefined ? item.distance : 0,
+        created_att: createdAt
+          ? new Date(createdAt).toISOString().replace("T", " ").substring(0, 19)
+          : null,
+        time:
+          createdAt && updatedAt
+            ? `${Math.max(1, Math.round((new Date(updatedAt) - new Date(createdAt)) / 60000))} minutes`
+            : null,
+      };
+
+      if (isCanceled && item.reason_id) {
+        const reasonIds = String(item.reason_id)
+          .split(",")
+          .map((r) => r.trim())
+          .filter(Boolean);
+        const reasonDocs = await CancelReason.find({
+          $or: [
+            {
+              _id: {
+                $in: reasonIds.filter((id) => mongoose.isValidObjectId(id)),
+              },
+            },
+            { id: { $in: reasonIds } },
+            { mysqlId: { $in: reasonIds.map(Number).filter((n) => !isNaN(n)) } },
+          ],
+        }).lean();
+        formattedAddress.reasons = reasonDocs.map((r) => r.reason);
+      }
+
+      const driverDetailsWithVehicle = {
+        id: driver?._id ? String(driver._id) : null,
+        name: driver?.name || "",
+        number: driver?.number || "",
+        image: formatImageUrl(driver?.image, req),
+        vehicle_number: vehicledetail?.vehicle_number || "",
+        vehicle_name: vehicledetail?.vehicle_name || "",
+      };
+
+      return {
+        driver_details: driverDetailsWithVehicle,
+        address: formattedAddress,
+      };
+    };
+
+    // TYPE 0: Active / Ongoing rides
+    if (type === "0") {
+      const activeRides = await DriverCheckBooking.find({
+        $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+        arrive_status: "0",
+        accept_status: "1",
+      })
+        .sort({ created_at: -1, createdAt: -1, _id: -1 })
+        .lean();
+
+      if (activeRides.length > 0) {
+        const lastRide = activeRides[0];
+        const canceledRides = activeRides.slice(1);
+
+        if (canceledRides.length > 0) {
+          const cancelIds = canceledRides.map((r) => r._id);
+          await DriverCheckBooking.updateMany(
+            { _id: { $in: cancelIds } },
+            { $set: { accept_status: "2" } }
+          );
+
+          for (const cRide of canceledRides) {
+            const driver = await Driver.findOne({
+              $or: [
+                ...(mongoose.isValidObjectId(cRide.driver_id)
+                  ? [{ _id: cRide.driver_id }]
+                  : []),
+                { id: cRide.driver_id },
+              ],
+            });
+            if (driver && driver.reg_id) {
+              const driverName = driver.name || "Driver";
+              const title = "Booking Canceled";
+              const body = `Dear ${driverName}, the booking has been canceled. Please contact support for more details.`;
+              try {
+                await fcmService.sendNotification(driver.reg_id, title, body);
+              } catch (e) {
+                console.error("Cancel notification error:", e.message);
+              }
+            }
+          }
+        }
+
+        const formatted = await formatRideItem(lastRide);
+        getDetails = [formatted];
+      }
+    }
+
+    // TYPE 1: Completed rides
+    if (type === "1") {
+      const query = {
+        $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+        accept_status: "1",
+        arrive_status: "2",
+      };
+      buildDateFilter(query);
+
+      const completedRides = await DriverCheckBooking.find(query)
+        .sort({ created_at: -1, createdAt: -1, _id: -1 })
+        .lean();
+
+      getDetails = await Promise.all(
+        completedRides.map((ride) => formatRideItem(ride))
+      );
+    }
+
+    // TYPE 2: Canceled rides
+    if (type === "2") {
+      const query = {
+        $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+        accept_status: "2",
+      };
+      buildDateFilter(query);
+
+      const canceledRides = await DriverCheckBooking.find(query)
+        .sort({ created_at: -1, createdAt: -1, _id: -1 })
+        .lean();
+
+      getDetails = await Promise.all(
+        canceledRides.map((ride) => formatRideItem(ride, true))
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking History Get Successfully",
+      details: getDetails,
+    });
+  } catch (ex) {
+    console.error("getCancelCompleteBookings Error:", ex);
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+
+// 70. Accept Booking Driver Detail (PHP: ApiController::fortytfive -> 'accept-booking-driver-detail')
+exports.acceptBookingDriverDetail = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const userCriteria = [
+      user._id,
+      user._id.toString(),
+      ...(user.id ? [user.id, String(user.id)] : []),
+      ...(user.mysqlId ? [user.mysqlId, Number(user.mysqlId)] : []),
+    ];
+
+    const booking = await DriverCheckBooking.findOne({
+      $or: [
+        { user_id: { $in: userCriteria } },
+        { accept_status: 1 },
+        { accept_status: "1" },
+      ],
+    })
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "No booking found",
+      });
+    }
+
+    // Driver Data
+    const driver = await Driver.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(booking.driver_id)
+          ? [{ _id: booking.driver_id }]
+          : []),
+        { id: booking.driver_id },
+        ...(!isNaN(Number(booking.driver_id))
+          ? [{ mysqlId: Number(booking.driver_id) }]
+          : []),
+      ],
+    }).lean();
+
+    // Driver Vehicle Details
+    let driverVehicleDetails = null;
+    if (driver) {
+      driverVehicleDetails = await DriverVehicleDetail.findOne({
+        $or: [
+          ...(mongoose.isValidObjectId(driver._id)
+            ? [{ driver_id: driver._id }]
+            : []),
+          { driver_id: driver._id.toString() },
+          { driver_id: driver.id },
+        ],
+      })
+        .sort({ created_at: -1, createdAt: -1, _id: -1 })
+        .lean();
+    }
+
+    // Address & Haversine Distance
+    const address = await SendLocation.findOne({
+      user_id: { $in: userCriteria },
+    })
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    let distance = "N/A";
+    let distanceUserToDriver = 0;
+    let estimatedTime = "";
+
+    const earthRadius = 6371000;
+    const toRad = (val) => (Number(val) * Math.PI) / 180;
+
+    if (
+      address &&
+      address.from_latitude &&
+      address.from_longitude &&
+      address.destination_latitude &&
+      address.destination_longitude
+    ) {
+      const latFrom = toRad(address.from_latitude);
+      const lonFrom = toRad(address.from_longitude);
+      const latTo = toRad(address.destination_latitude);
+      const lonTo = toRad(address.destination_longitude);
+
+      const latDelta = latTo - latFrom;
+      const lonDelta = lonTo - lonFrom;
+      const a =
+        Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+        Math.cos(latFrom) *
+          Math.cos(latTo) *
+          Math.sin(lonDelta / 2) *
+          Math.sin(lonDelta / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distanceInMeters = earthRadius * c;
+      distance = Math.round((distanceInMeters / 1000) * 100) / 100;
+    }
+
+    const userLat = address?.from_latitude;
+    const userLng = address?.from_longitude;
+    const driverLat = driver?.latitude || driver?.current_lat;
+    const driverLng = driver?.longitude || driver?.current_lng;
+
+    if (userLat && userLng && driverLat && driverLng) {
+      const latFrom = toRad(userLat);
+      const lonFrom = toRad(userLng);
+      const latTo = toRad(driverLat);
+      const lonTo = toRad(driverLng);
+
+      const latDelta = latTo - latFrom;
+      const lonDelta = lonTo - lonFrom;
+      const a =
+        Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+        Math.cos(latFrom) *
+          Math.cos(latTo) *
+          Math.sin(lonDelta / 2) *
+          Math.sin(lonDelta / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distanceInMeters = earthRadius * c;
+      distanceUserToDriver =
+        Math.round((distanceInMeters / 1000) * 100) / 100;
+
+      const speed = 40;
+      const timeInHours = distanceUserToDriver / speed;
+      const hours = Math.floor(timeInHours);
+      const minutes = Math.round((timeInHours - hours) * 60);
+
+      if (hours > 0) {
+        estimatedTime += hours + " hour" + (hours > 1 ? "s " : " ");
+      }
+      if (minutes > 0) {
+        estimatedTime += minutes + " minute" + (minutes > 1 ? "s" : "");
+      }
+    }
+
+    const driverCreatedAt = driver?.created_at || driver?.createdAt;
+    let driverFormattedDate = null;
+    let workingYears = "0 Years";
+
+    if (driverCreatedAt) {
+      const d = new Date(driverCreatedAt);
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      driverFormattedDate = `${monthNames[d.getMonth()]} ${String(d.getDate()).padStart(2, "0")}, ${d.getFullYear()}`;
+      const diffYears = Math.max(0, Math.floor((new Date() - d) / (365.25 * 24 * 60 * 60 * 1000)));
+      workingYears = `${diffYears} Years`;
+    }
+
+    // Driver Ratings Average
+    let averageRating = "No ratings yet";
+    if (driver) {
+      const driverRatingCriteria = [
+        driver._id,
+        driver._id.toString(),
+        ...(driver.id ? [driver.id, String(driver.id)] : []),
+        ...(driver.mysqlId ? [driver.mysqlId, Number(driver.mysqlId)] : []),
+      ];
+      const ratingAgg = await DriverRating.aggregate([
+        { $match: { driver_id: { $in: driverRatingCriteria } } },
+        { $group: { _id: null, avgRating: { $avg: "$rating" } } },
+      ]);
+      if (ratingAgg.length > 0 && ratingAgg[0].avgRating !== null) {
+        averageRating = Math.round(ratingAgg[0].avgRating * 10) / 10;
+      }
+    }
+
+    return res.status(200).json({
+      message: "Data retrieved successfully",
+      data: {
+        booking: {
+          id: booking._id ? String(booking._id) : booking.id,
+          booking_id: booking.booking_id,
+          driver_id: booking.driver_id,
+        },
+        driver_data: {
+          id: driver?._id ? String(driver._id) : driver?.id || null,
+          name: driver?.name ?? "N/A",
+          driver_image: formatImageUrl(driver?.image, req),
+          driver_number: driver?.number ?? null,
+          working_years: workingYears,
+          registered_date: driverFormattedDate,
+          "Vehicle Model": driverVehicleDetails?.vehicle_name ?? "N/A",
+          Vehicle_number: driverVehicleDetails?.vehicle_number ?? "N/A",
+          reg_id: driver?.reg_id ?? "N/A",
+          from_address: address?.from_address ?? "N/A",
+          from_latitude: address?.from_latitude ?? "N/A",
+          from_longitude: address?.from_longitude ?? "N/A",
+          destination_address: address?.destination_address ?? "N/A",
+          destination_latitude: address?.destination_latitude ?? "N/A",
+          destination_longitude: address?.destination_longitude ?? "N/A",
+          distance: distance,
+          driver_latitude: driverLat ?? "N/A",
+          driver_longitude: driverLng ?? "N/A",
+          user_to_driver_distance: distanceUserToDriver,
+          driver_time: estimatedTime,
+          otp: booking.otp || null,
+          ratings: averageRating,
+        },
+      },
+    });
+  } catch (ex) {
+    console.error("acceptBookingDriverDetail Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 71. User Wallet Recharges List (PHP: ApiController::fortytsix -> 'user-wallet-recharges-list')
+exports.userWalletRechargesList = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const userCriteria = [
+      user._id,
+      user._id.toString(),
+      ...(user.id ? [user.id, String(user.id)] : []),
+      ...(user.mysqlId ? [user.mysqlId, Number(user.mysqlId)] : []),
+    ];
+
+    const recharges = await UserWalletRecharge.find({
+      user_id: { $in: userCriteria },
+    })
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const rechargeData = recharges.map((item) => {
+      const createdAt = item.created_at || item.createdAt;
+      const d = createdAt ? new Date(createdAt) : new Date();
+
+      const formattedDate = `${monthNames[d.getMonth()]} ${String(d.getDate()).padStart(2, "0")}, ${d.getFullYear()}`;
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const formattedTime = `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
+
+      return {
+        transaction_id: item.transaction_id || "",
+        amount: item.amount || "0",
+        date: formattedDate,
+        time: formattedTime,
+      };
+    });
+
+    return res.status(200).json({
+      message: "User wallet recharge list",
+      data: {
+        "user name": user.name || "",
+        recharges: rechargeData,
+      },
+    });
+  } catch (ex) {
+    console.error("userWalletRechargesList Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 72. User Mood Emoji Get (PHP: ApiController::fortytseven -> 'user-mood-emoji-get')
+exports.userMoodEmojiGet = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const feedbacks = await UserFeedback.find().sort({ created_at: -1, _id: -1 }).lean();
+
+    const formattedFeedbacks = feedbacks.map((fb) => ({
+      id: fb._id ? String(fb._id) : fb.id,
+      title: fb.title || "",
+      created_at: fb.created_at || fb.createdAt,
+      emoji_image: formatImageUrl(fb.emoji, req),
+    }));
+
+    return res.status(200).json({
+      message: "User mood emoji data",
+      data: formattedFeedbacks,
+    });
+  } catch (ex) {
+    console.error("userMoodEmojiGet Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 73. Driver Get Full Details (PHP: ApiController::fortyteight -> 'driver-get-full-details')
+exports.driverGetFullDetails = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const userCriteria = [
+      user._id,
+      user._id.toString(),
+      ...(user.id ? [user.id, String(user.id)] : []),
+      ...(user.mysqlId ? [user.mysqlId, Number(user.mysqlId)] : []),
+    ];
+
+    const driverCheckBooking = await DriverCheckBooking.findOne({
+      $or: [
+        { user_id: { $in: userCriteria } },
+        { accept_status: 1 },
+        { accept_status: "1" },
+      ],
+    })
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    if (!driverCheckBooking) {
+      return res.status(404).json({
+        message: "No booking found",
+      });
+    }
+
+    const driver = await Driver.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(driverCheckBooking.driver_id)
+          ? [{ _id: driverCheckBooking.driver_id }]
+          : []),
+        { id: driverCheckBooking.driver_id },
+        ...(!isNaN(Number(driverCheckBooking.driver_id))
+          ? [{ mysqlId: Number(driverCheckBooking.driver_id) }]
+          : []),
+      ],
+    }).lean();
+
+    if (!driver) {
+      return res.status(404).json({
+        message: "Driver not found",
+      });
+    }
+
+    const driverCriteria = [
+      driver._id,
+      driver._id.toString(),
+      ...(driver.id ? [driver.id, String(driver.id)] : []),
+      ...(driver.mysqlId ? [driver.mysqlId, Number(driver.mysqlId)] : []),
+    ];
+
+    // Trips count where arrive_status == 2
+    const trips = await DriverCheckBooking.countDocuments({
+      driver_id: { $in: driverCriteria },
+      $or: [{ arrive_status: 2 }, { arrive_status: "2" }],
+    });
+
+    // Driver Vehicle Details
+    const vehicle = await DriverVehicleDetail.findOne({
+      driver_id: { $in: driverCriteria },
+    })
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    // Driver Ratings Average
+    let averageRating = "No ratings yet";
+    const ratingAgg = await DriverRating.aggregate([
+      { $match: { driver_id: { $in: driverCriteria } } },
+      { $group: { _id: null, avgRating: { $avg: "$rating" } } },
+    ]);
+    if (ratingAgg.length > 0 && ratingAgg[0].avgRating !== null) {
+      averageRating = Math.round(ratingAgg[0].avgRating * 10) / 10;
+    }
+
+    // Calculate experience breakdown
+    const createdAt = driver.created_at || driver.createdAt || new Date();
+    const start = new Date(createdAt);
+    const now = new Date();
+
+    let diffY = now.getFullYear() - start.getFullYear();
+    let diffM = now.getMonth() - start.getMonth();
+    let diffD = now.getDate() - start.getDate();
+
+    if (diffD < 0) {
+      diffM -= 1;
+      const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+      diffD += prevMonthLastDay;
+    }
+    if (diffM < 0) {
+      diffY -= 1;
+      diffM += 12;
+    }
+
+    let years = "";
+    if (diffY > 0) {
+      years = `${diffY}Y`;
+      if (diffM > 0) {
+        years += ` ${diffM}M`;
+      }
+    } else if (diffM > 0) {
+      years = `${diffM}M`;
+      if (diffD > 0) {
+        years += ` ${diffD}D`;
+      }
+    } else if (diffD > 0) {
+      years = `${diffD}D`;
+    } else {
+      years = "1D";
+    }
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const startingDate = `${pad(start.getDate())}-${pad(start.getMonth() + 1)}-${start.getFullYear()}`;
+
+    const driverDetails = {
+      ...driver,
+      id: driver._id ? String(driver._id) : driver.id,
+      image: formatImageUrl(driver.image, req),
+      vehicle_name: vehicle?.vehicle_name ?? "Not available",
+      vehicle_number: vehicle?.vehicle_number ?? "Not available",
+      ratings: averageRating,
+      trips: trips,
+      years: years,
+      startingDate: startingDate,
+    };
+
+    return res.status(200).json({
+      message: "Details Get Successfully",
+      details: driverDetails,
+    });
+  } catch (ex) {
+    console.error("driverGetFullDetails Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 74. Get Cancel Reasons (PHP: ApiController::fortytnine -> 'get-cancel-reason')
+exports.getCancelReasons = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const reasons = await CancelReason.find({ status: { $ne: "0" } })
+      .sort({ created_at: -1, _id: -1 })
+      .lean();
+
+    const formattedReasons = reasons.map((r) => ({
+      id: r._id ? String(r._id) : r.id,
+      reason: r.reason || "",
+      created_at: r.created_at || r.createdAt,
+      updated_at: r.updated_at || r.updatedAt,
+    }));
+
+    return res.status(200).json({
+      message: "Reason Get Successfully",
+      data: formattedReasons,
+    });
+  } catch (ex) {
+    console.error("getCancelReasons Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 76. Get Accept Status To User (PHP: ApiController::fiftyOne -> 'get-accept-status-to-user')
+exports.getAcceptStatusToUser = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const userCriteria = [
+      user._id,
+      user._id.toString(),
+      ...(user.id ? [user.id, String(user.id)] : []),
+      ...(user.mysqlId ? [user.mysqlId, Number(user.mysqlId)] : []),
+    ];
+
+    const trip = await CarBooking.findOne({
+      user_id: { $in: userCriteria },
+    })
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    if (!trip) {
+      return res.status(404).json({
+        message: "No booking records found for this user",
+      });
+    }
+
+    const statusValue =
+      trip.driver_reject_status !== undefined
+        ? Number(trip.driver_reject_status)
+        : 0;
+
+    return res.status(200).json({
+      message: "Status retrieved successfully",
+      status: statusValue,
+      booking_id: trip.booking_id || (trip._id ? String(trip._id) : trip.id),
+    });
+  } catch (ex) {
+    console.error("getAcceptStatusToUser Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 78. User Reject Booking (PHP: ApiController::fiftyThree -> 'user-reject-booking')
+exports.userRejectBooking = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const userCriteria = [
+      user._id,
+      user._id.toString(),
+      ...(user.id ? [user.id, String(user.id)] : []),
+      ...(user.mysqlId ? [user.mysqlId, Number(user.mysqlId)] : []),
+    ];
+
+    const trip = await DriverCheckBooking.findOne({
+      user_id: { $in: userCriteria },
+    }).sort({ created_at: -1, createdAt: -1, _id: -1 });
+
+    if (!trip) {
+      return res.status(404).json({
+        message: "No booking records found for this user",
+      });
+    }
+
+    const reasonId = req.body?.reason_id;
+    if (!reasonId) {
+      return res.status(400).json({
+        message: "Reason ID is required",
+      });
+    }
+
+    // 1. Update DriverCheckBooking
+    trip.accept_status = 2;
+    trip.reason_id = reasonId;
+    await trip.save();
+
+    // 2. Update CarBooking / book_section_razor_pays
+    await CarBooking.updateMany(
+      {
+        $or: [
+          ...(mongoose.isValidObjectId(trip.booking_id)
+            ? [{ _id: trip.booking_id }]
+            : []),
+          { id: trip.booking_id },
+          { booking_id: trip.booking_id },
+          { user_id: { $in: userCriteria } },
+        ],
+      },
+      {
+        $set: {
+          driver_reject_status: 2,
+          reason_id: reasonId,
+        },
+      }
+    );
+
+    try {
+      if (mongoose.connection && mongoose.connection.db) {
+        await mongoose.connection.db
+          .collection("book_section_razor_pays")
+          .updateMany(
+            {
+              $or: [
+                ...(mongoose.isValidObjectId(trip.booking_id)
+                  ? [{ _id: trip.booking_id }]
+                  : []),
+                { id: trip.booking_id },
+                { user_id: { $in: userCriteria } },
+              ],
+            },
+            {
+              $set: {
+                driver_reject_status: 2,
+                reason_id: reasonId,
+              },
+            }
+          );
+      }
+    } catch (e) {}
+
+    // 3. Send FCM Push Notification to Driver
+    const driver = await Driver.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(trip.driver_id)
+          ? [{ _id: trip.driver_id }]
+          : []),
+        { id: trip.driver_id },
+        ...(!isNaN(Number(trip.driver_id))
+          ? [{ mysqlId: Number(trip.driver_id) }]
+          : []),
+      ],
+    });
+
+    if (driver && driver.reg_id) {
+      const title = "Booking Rejected";
+      const body = "Your booking request has been rejected by the user.";
+      try {
+        await fcmService.sendNotification(driver.reg_id, title, body);
+      } catch (err) {
+        console.error("FCM error in userRejectBooking:", err.message);
+      }
+    }
+
+    // 4. Reset coupon in last SendLocation
+    await SendLocation.findOneAndUpdate(
+      { user_id: { $in: userCriteria } },
+      { $set: { coupon_id: null } },
+      { sort: { created_at: -1, _id: -1 } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "User rejected successfully",
+    });
+  } catch (ex) {
+    console.error("userRejectBooking Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 80. User Get Reject Booking Status (PHP: ApiController::fiftyfor -> 'user-get-reject-booking-status')
+exports.userGetRejectBookingStatus = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const userCriteria = [
+      user._id,
+      user._id.toString(),
+      ...(user.id ? [user.id, String(user.id)] : []),
+      ...(user.mysqlId ? [user.mysqlId, Number(user.mysqlId)] : []),
+    ];
+
+    const trip = await DriverCheckBooking.findOne({
+      user_id: { $in: userCriteria },
+    })
+      .select("accept_status arrive_status")
+      .sort({ created_at: -1, createdAt: -1, _id: -1 })
+      .lean();
+
+    if (!trip) {
+      return res.status(404).json({
+        message: "No booking records found for this user",
+      });
+    }
+
+    // Reset coupon_id if present on the user's latest SendLocation
+    await SendLocation.findOneAndUpdate(
+      { user_id: { $in: userCriteria }, coupon_id: { $ne: null } },
+      { $set: { coupon_id: null } },
+      { sort: { created_at: -1, _id: -1 } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Status retrieved successfully",
+      status: {
+        accept_status: !isNaN(Number(trip.accept_status))
+          ? Number(trip.accept_status)
+          : trip.accept_status,
+        arrive_status: !isNaN(Number(trip.arrive_status))
+          ? Number(trip.arrive_status)
+          : trip.arrive_status,
+      },
+    });
+  } catch (ex) {
+    console.error("userGetRejectBookingStatus Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 89. Get Cancle Reasons Mobile (PHP: ApiController::sixtythree -> 'get-cancle-reason')
+exports.getCancleReasonsMobile = async (req, res) => {
+  try {
+    const reasons = await CancelReason.find({ status: { $ne: "0" } })
+      .sort({ created_at: -1, _id: -1 })
+      .lean();
+
+    if (!reasons || reasons.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No data found",
+      });
+    }
+
+    const formattedReasons = reasons.map((r) => ({
+      id: r._id ? String(r._id) : r.id,
+      _id: r._id,
+      reason: r.reason || "",
+      status: r.status || "1",
+      created_at: r.created_at || r.createdAt,
+      updated_at: r.updated_at || r.updatedAt,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: formattedReasons,
+    });
+  } catch (ex) {
+    console.error("getCancleReasonsMobile Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 90. Rate Driver (PHP: ApiController::sixtyfour -> 'rate-driver')
+exports.rateDriver = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.header("token") ||
+      req.header("authorization")?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or unauthorized token",
+      });
+    }
+
+    const driverId = req.body?.driver_id;
+    const ratingValue = Number(req.body?.rating);
+
+    if (!driverId || isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+      return res.status(422).json({
+        success: false,
+        message: "Validation error",
+        errors: {
+          ...(!driverId ? { driver_id: ["The driver id field is required."] } : {}),
+          ...(isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5
+            ? { rating: ["The rating must be between 1 and 5."] }
+            : {}),
+        },
+      });
+    }
+
+    const driver = await Driver.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(driverId) ? [{ _id: driverId }] : []),
+        { id: driverId },
+        ...(!isNaN(Number(driverId)) ? [{ mysqlId: Number(driverId) }] : []),
+      ],
+    });
+
+    if (!driver) {
+      return res.status(422).json({
+        success: false,
+        message: "Validation error",
+        errors: {
+          driver_id: ["The selected driver id is invalid."],
+        },
+      });
+    }
+
+    const rating = await DriverRating.create({
+      driver_id: driver._id,
+      user_id: user._id,
+      rating: ratingValue,
+      review: req.body?.review || null,
+      booking_id: req.body?.booking_id || null,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Driver rated successfully",
+      data: {
+        id: rating._id ? String(rating._id) : rating.id,
+        _id: rating._id,
+        driver_id: driverId,
+        user_id: user.id || (user.mysqlId ? Number(user.mysqlId) : String(user._id)),
+        rating: ratingValue,
+        review: rating.review,
+        created_at: rating.created_at || rating.createdAt,
+        updated_at: rating.updated_at || rating.updatedAt,
+      },
+    });
+  } catch (ex) {
+    console.error("rateDriver Error:", ex);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while rating the driver",
+      error: ex.message,
+    });
+  }
+};
+
+// 92. Add Tip To Driver (PHP: ApiController::sixtysix -> 'add-tip-to-driver')
+exports.addTipToDriver = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.header("token") ||
+      req.header("authorization")?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const { driver_id, tip_id, booking_id } = req.body;
+    if (!driver_id || !tip_id || !booking_id) {
+      return res.status(422).json({
+        message: "Validation error: driver_id, tip_id, and booking_id are required",
+      });
+    }
+
+    // Find tip
+    const tip = await Tip.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(tip_id) ? [{ _id: tip_id }] : []),
+        { id: tip_id },
+        ...(!isNaN(Number(tip_id)) ? [{ mysqlId: Number(tip_id) }] : []),
+      ],
+    });
+    if (!tip) {
+      return res.status(404).json({
+        message: "Tip not found",
+      });
+    }
+
+    const tipAmount = Number(tip.amount) || 0;
+    const userWallet = Number(user.wallet) || 0;
+
+    if (userWallet < tipAmount) {
+      return res.status(200).json({
+        message: "Insufficient wallet balance",
+      });
+    }
+
+    // Find driver
+    const driver = await Driver.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(driver_id) ? [{ _id: driver_id }] : []),
+        { id: driver_id },
+        ...(!isNaN(Number(driver_id)) ? [{ mysqlId: Number(driver_id) }] : []),
+      ],
+    });
+    if (!driver) {
+      return res.status(404).json({
+        message: "Driver not found",
+      });
+    }
+
+    const driverCriteria = [
+      driver._id,
+      driver._id.toString(),
+      ...(driver.id ? [driver.id, String(driver.id)] : []),
+      ...(driver.mysqlId ? [driver.mysqlId, Number(driver.mysqlId)] : []),
+    ];
+
+    const bookingCriteria = [
+      ...(mongoose.isValidObjectId(booking_id)
+        ? [{ booking_id: booking_id }, { _id: booking_id }]
+        : [{ booking_id: booking_id }]),
+      { id: booking_id },
+    ];
+
+    const booking = await DriverCheckBooking.findOne({
+      driver_id: { $in: driverCriteria },
+      $or: bookingCriteria,
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found or does not belong to the specified driver",
+      });
+    }
+
+    // Execute wallet transfer
+    user.wallet = userWallet - tipAmount;
+    await user.save();
+
+    driver.wallet = (Number(driver.wallet) || 0) + tipAmount;
+    await driver.save();
+
+    booking.tip_id = tip._id ? String(tip._id) : tip.id;
+    await booking.save();
+
+    const txnId = "TIP" + Math.random().toString(36).substring(2, 12).toUpperCase();
+    const now = new Date();
+
+    await UserWalletRecharge.create({
+      user_id: user._id,
+      amount: String(-tipAmount),
+      status: "1",
+      booking_id: booking_id,
+      transaction_id: txnId,
+      created_at: now,
+      updated_at: now,
+    });
+
+    return res.status(200).json({
+      message: "Tip successfully transferred and recorded",
+    });
+  } catch (ex) {
+    console.error("addTipToDriver Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 93. Send OTP To Update Number (PHP: ApiController::sixtyseven -> 'send-otp-to-update-number')
+exports.sendOtpToUpdateNumber = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.header("token") ||
+      req.header("authorization")?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const number = req.body?.number || req.body?.mobile;
+    if (!number || !String(number).trim()) {
+      return res.status(422).json({
+        message: "Invalid phone number",
+      });
+    }
+
+    const rawNumber = String(number).trim();
+    const cleanNumber = rawNumber.replace(/\D/g, "");
+
+    // Find user by token
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid token or user not found",
+      });
+    }
+
+    // Check if number is already taken
+    const existingUser = await User.findOne({
+      $or: [
+        { number: rawNumber },
+        { number: cleanNumber },
+        { mobile: rawNumber },
+        { mobile: cleanNumber },
+        { phone: rawNumber },
+        { phone: cleanNumber },
+        { mobile: "+91" + cleanNumber },
+        { phone: "+91" + cleanNumber },
+      ],
+      _id: { $ne: user._id },
+    });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "This number is already taken.",
+      });
+    }
+
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    user.otp = otp;
+    await user.save();
+
+    const message = `Your Bhrosa Cabs Driver Login OTP is ${otp}. Please do not share this OTP with anyone. It is valid for a limited time. Thanks Bhrosa Group`;
+
+    let gatewayResponse = "SUCCESS";
+    try {
+      const url = new URL("https://msg.vadvertiseweb.com/submitsms.jsp");
+      url.searchParams.append("user", "Bhrosa");
+      url.searchParams.append("key", process.env.SMS_API_KEY || "880050d0b4XX");
+      url.searchParams.append("mobile", cleanNumber);
+      url.searchParams.append("message", message);
+      url.searchParams.append("senderid", "BHRGRP");
+      url.searchParams.append("accusage", "1");
+      url.searchParams.append("entityid", "1701176768268781357");
+      url.searchParams.append("tempid", "1707176769746011196");
+
+      const smsRes = await fetch(url.toString(), {
+        method: "GET",
+        signal: AbortSignal.timeout(15000),
+      });
+      gatewayResponse = await smsRes.text();
+    } catch (smsErr) {
+      console.warn("SMS Gateway warning:", smsErr.message);
+      gatewayResponse = "GATEWAY_TIMEOUT_OR_SIMULATED";
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP has been sent to your phone number.",
+      otp: otp,
+      gateway_response: gatewayResponse,
+    });
+  } catch (ex) {
+    console.error("sendOtpToUpdateNumber Error:", ex);
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+// 94. Verify OTP To Update Number (PHP: ApiController::sixtyeight -> 'verify-otp-to-update-number')
+exports.verifyOtpToUpdateNumber = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.header("token") ||
+      req.header("authorization")?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const number = req.body?.number || req.body?.mobile;
+    const otp = req.body?.otp;
+
+    if (!number || !otp) {
+      return res.status(400).json({
+        message: "Number or OTP not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid token or user not found",
+      });
+    }
+
+    if (String(user.otp).trim() !== String(otp).trim()) {
+      return res.status(400).json({
+        message: "Invalid OTP",
+      });
+    }
+
+    const rawNumber = String(number).trim();
+    const cleanNumber = rawNumber.replace(/\D/g, "");
+    user.number = cleanNumber;
+    user.mobile = cleanNumber;
+    user.phone = cleanNumber;
+    user.otp = null;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Phone number updated successfully",
+    });
+  } catch (ex) {
+    console.error("verifyOtpToUpdateNumber Error:", ex);
+    return res.status(500).json({
+      message: "Error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+/**
+ * Function 106: getDriverLocation
+ * PHP: eighty
+ * Route: GET /api/get-driver-location
+ */
+exports.getDriverLocation = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({ message: "Invalid Method" });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({ message: "Token not provided" });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { remember_token: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Invalid user token" });
+    }
+
+    const userCriteria = [user._id];
+    if (user.id) userCriteria.push(user.id);
+    try {
+      userCriteria.push(String(user._id));
+    } catch (e) {}
+
+    const booking = await DriverCheckBooking.findOne({
+      user_id: { $in: userCriteria },
+      accept_status: { $in: [1, "1"] },
+      arrive_status: { $in: [0, "0"] },
+    }).sort({ created_at: -1, createdAt: -1, _id: -1 });
+
+    if (!booking) {
+      return res.status(404).json({ message: "No booking found" });
+    }
+
+    let driverData = null;
+    if (booking.driver_id) {
+      driverData = await Driver.findOne({
+        $or: [
+          ...(mongoose.isValidObjectId(booking.driver_id) ? [{ _id: booking.driver_id }] : []),
+          { id: booking.driver_id },
+          { id: String(booking.driver_id) },
+          { driver_id: booking.driver_id },
+        ],
+      }).lean();
+    }
+
+    return res.status(200).json({
+      message: "Driver location retrieved successfully",
+      data: {
+        id: driverData ? (driverData._id ? String(driverData._id) : driverData.id) : null,
+        name: driverData?.name ?? "N/A",
+        driver_latitude: driverData?.latitude ?? "N/A",
+        driver_longitude: driverData?.longitude ?? "N/A",
+      },
+    });
+  } catch (ex) {
+    console.error("getDriverLocation error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+/**
+ * Function 109: checkUserToken
+ * PHP: userTokenCheck
+ * Route: GET /api/check-token-user
+ */
+exports.checkUserToken = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({ message: "Invalid Method" });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({ message: "Token not provided" });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { remember_token: token },
+      ],
+    });
+
+    if (user) {
+      return res.status(200).json({
+        message: "the user exist",
+      });
+    } else {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+  } catch (ex) {
+    console.error("checkUserToken error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
+/**
+ * Function 112: addGuardian
+ * PHP: add_guardian
+ * Route: POST /api/add-guardian
+ */
+exports.addGuardian = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { rememberToken: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const { guardian_name, guardian_number, relation } = req.body || {};
+
+    if (!guardian_name || !guardian_number || !relation) {
+      return res.status(400).json({
+        message: "guardian_name, guardian_number, and relation are required",
+      });
+    }
+
+    // Check duplicate guardian number
+    const existingGuardian = await Guardian.findOne({
+      user_id: user._id,
+      number: String(guardian_number).trim(),
+    });
+
+    if (existingGuardian) {
+      return res.status(400).json({
+        message: "You have already added this guardian number",
+      });
+    }
+
+    // Create guardian
+    const create = await Guardian.create({
+      user_id: user._id,
+      name: String(guardian_name).trim(),
+      number: String(guardian_number).trim(),
+      relation: String(relation).trim(),
+    });
+
+    if (create) {
+      user.guardian_status = "1";
+      user.guardianStatus = "1";
+      user.updatedAt = new Date();
+      await user.save();
+
+      return res.status(200).json({
+        message: "Guardian Added Successfully",
+      });
+    } else {
+      return res.status(400).json({
+        message: "Failed to add guardian",
+      });
+    }
+  } catch (ex) {
+    console.error("addGuardian error:", ex);
+    return res.status(500).json({
+      message: "Server Error",
+      details: ex.message,
+    });
+  }
+};
+
+/**
+ * Function 113: seeGuardian
+ * PHP: see_guardian
+ * Route: GET /api/see-guardian
+ */
+exports.seeGuardian = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { rememberToken: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const list = await Guardian.find({ user_id: user._id }).sort({ createdAt: 1 });
+
+    const formattedList = list.map((g) => ({
+      id: g._id,
+      user_id: g.user_id,
+      name: g.name,
+      number: g.number,
+      relation: g.relation,
+      created_at: g.createdAt,
+      updated_at: g.updatedAt,
+    }));
+
+    return res.status(200).json({
+      message: "List Get Successfully",
+      details: formattedList,
+    });
+  } catch (ex) {
+    console.error("seeGuardian error:", ex);
+    return res.status(500).json({
+      message: "Server Error",
+      details: ex.message,
+    });
+  }
+};
+exports.getGuardianList = exports.seeGuardian;
+
+/**
+ * Function 114: deleteGuardian
+ * PHP: delete_guardian
+ * Route: GET /api/delete-guardian
+ */
+exports.deleteGuardian = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { rememberToken: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const guardianId = req.query.guardian_id || req.query.id;
+    if (!guardianId) {
+      return res.status(400).json({
+        message: "Guardian ID not provided",
+      });
+    }
+
+    const guardian = await Guardian.findOne({
+      _id: guardianId,
+      user_id: user._id,
+    });
+
+    if (!guardian) {
+      return res.status(404).json({
+        message: "Guardian not found",
+      });
+    }
+
+    // Get user's first added guardian
+    const firstGuardian = await Guardian.findOne({ user_id: user._id }).sort({
+      createdAt: 1,
+      _id: 1,
+    });
+
+    // Check if deleting first guardian
+    if (firstGuardian && String(firstGuardian._id) === String(guardian._id)) {
+      return res.status(400).json({
+        message: "You cannot delete your first added guardian",
+      });
+    }
+
+    await Guardian.deleteOne({ _id: guardian._id });
+
+    return res.status(200).json({
+      message: "Guardian deleted successfully",
+    });
+  } catch (ex) {
+    console.error("deleteGuardian error:", ex);
+    return res.status(500).json({
+      message: "Server Error",
+      details: ex.message,
+    });
+  }
+};
+
+/**
+ * Function 115: seeGuardianStatus
+ * PHP: see_guardian_status
+ * Route: GET /api/see-guardian-status
+ */
+exports.seeGuardianStatus = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { rememberToken: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    let status = user.guardian_status !== undefined ? user.guardian_status : user.guardianStatus;
+    if (status === undefined || status === null) {
+      status = "0";
+    }
+
+    if (String(status) === "2") {
+      const updatedAt = user.updatedAt ? new Date(user.updatedAt) : new Date();
+      const now = new Date();
+      const diffInHours = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60);
+
+      if (diffInHours >= 24) {
+        user.guardian_status = "0";
+        user.guardianStatus = "0";
+        await user.save();
+        status = "0";
+      }
+    }
+
+    return res.status(200).json({
+      message: "Status retrieved successfully",
+      guardian_status: status,
+    });
+  } catch (ex) {
+    console.error("seeGuardianStatus error:", ex);
+    return res.status(500).json({
+      message: "Server Error",
+      details: ex.message,
+    });
+  }
+};
+exports.getGuardianStatus = exports.seeGuardianStatus;
+
+/**
+ * Function 116: addGuardianLater
+ * PHP: add_guardian_later
+ * Route: ALL /api/add-guardian-later
+ */
+exports.addGuardianLater = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { rememberToken: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    user.guardian_status = "2";
+    user.guardianStatus = "2";
+    user.updatedAt = new Date();
+    await user.save();
+
+    return res.status(200).json({
+      message: "Later Add Guardian",
+    });
+  } catch (ex) {
+    console.error("addGuardianLater error:", ex);
+    return res.status(500).json({
+      message: "Server Error",
+      details: ex.message,
+    });
+  }
+};
+
+/**
+ * Function 117: getStates
+ * PHP: get_state
+ * Route: ALL /api/get-state
+ */
+exports.getStates = async (req, res) => {
+  try {
+    const states = await State.getIndianStatesList();
+    return res.status(200).json({
+      message: "Countries retrieved successfully",
+      details: states,
+    });
+  } catch (e) {
+    console.error("getStates error:", e);
+    return res.status(500).json({
+      message: "Failed to retrieve countries",
+      error: e.message,
+    });
+  }
+};
+exports.getState = exports.getStates;
+
+/**
+ * Route: ALL /api/test-login-user
+ */
+exports.userTestLogin = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      message: "Invalid Method",
+    });
+  }
+
+  const number = req.body?.number;
+  if (!number || String(number).trim() === "") {
+    return res.status(400).json({
+      message: "NUMBER_REQ",
+    });
+  }
+
+  try {
+    const cleanNum = String(number).trim();
+    const user = await User.findOne({
+      $or: [
+        { number: cleanNum },
+        { mobile: cleanNum },
+        { phone: cleanNum },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User Not Found",
+      });
+    }
+
+    const crypto = require("crypto");
+    const token = crypto.randomBytes(32).toString("hex");
+
+    user.token = token;
+    user.active_status = 1;
+    if (req.body?.reg_id) user.reg_id = req.body.reg_id;
+    await user.save();
+
+    return res.status(200).json({
+      message: "OTP VERIFIED SUCCESSFULLY",
+      token: token || "0",
+      register: user.isRegistered ? 1 : user.register || 0,
+    });
+  } catch (ex) {
+    console.error("Error in testLoginUser:", ex);
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+exports.testLoginUser = exports.userTestLogin;
+
+/**
+ * Function 124: userAppWorkOrNot
+ * PHP: userAppWorkOrNot
+ * Route: ALL /api/user-app-work-or-not
+ */
+exports.userAppWorkOrNot = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    let userApp = await UserApp.findOne();
+    if (!userApp) {
+      userApp = await UserApp.create({ status: 1 });
+    }
+
+    // Toggle status (0 -> 1 , 1 -> 0)
+    userApp.status = userApp.status === 0 ? 1 : 0;
+    await userApp.save();
+
+    const statusText = userApp.status === 1 ? "active" : "inactive";
+
+    return res.status(200).json({
+      message: "Status updated successfully",
+      status: statusText,
+      data: {
+        status: userApp.status,
+      },
+    });
+  } catch (ex) {
+    console.error("Error in userAppWorkOrNot:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+    });
+  }
+};
+
+/**
+ * Function 126: deleteUserAccount (Simulated Safe Account Deletion for Play Store & App Store Compliance)
+ * PHP: deleteAccount
+ * Route: ALL /api/delete-user-account
+ */
+exports.deleteUserAccount = async (req, res) => {
+  try {
+    const token = req.headers.token || req.header("token");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { token: token },
+        { api_token: token },
+        { rememberToken: token },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid User token",
+      });
+    }
+
+    // All image/document fields
+    const files = [
+      user.image,
+      user.aadhaar_front_image,
+      user.aadhaar_back_image,
+      user.aadhaarFront,
+      user.aadhaarBack,
+    ];
+
+    for (const file of files) {
+      if (file && typeof file === "string" && !file.startsWith("http://") && !file.startsWith("https://")) {
+        try {
+          let clean = file.replace(/\\/g, "/");
+          if (clean.startsWith("/")) clean = clean.substring(1);
+          const fullPath = path.resolve(__dirname, "../../", clean);
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+          }
+        } catch (e) {
+          // ignore file unlink errors
+        }
+      }
+    }
+
+    await User.deleteOne({ _id: user._id });
+
+    return res.status(200).json({
+      message: "Account deleted successfully",
+    });
+  } catch (e) {
+    console.error("deleteUserAccount error:", e);
+    return res.status(500).json({
+      message: "Server error",
+      error: e.message,
+    });
+  }
+};
+exports.deleteAccount = exports.deleteUserAccount;
+
+/**
+ * User Account Deleted
+ * Route: ALL /api/user-account-deleted, /api/user-account-delete, /api/user-delete-account
+ */
+exports.userAccountDeleted = async (req, res) => {
+  try {
+    return res.status(200).json({
+      message: "Account deleted successfully",
+    });
+  } catch (e) {
+    console.error("userAccountDeleted error:", e);
+    return res.status(500).json({
+      message: "Server error",
+      error: e.message,
+    });
+  }
+};
+exports.userAccountDelete = exports.userAccountDeleted;
+
+
+
+
+
 

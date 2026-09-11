@@ -62,3 +62,33 @@ exports.deleteEmergencyNumber = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Mobile endpoint - Get Emergency Numbers (PHP fiftyNine / get-emergency-number)
+// @route   GET/ALL /api/get-emergency-number
+exports.getEmergencyNumbersMobile = async (req, res) => {
+  try {
+    const list = await EmergencyNumber.find().sort({ createdAt: 1 }).lean();
+    const data = list.map((item, idx) => ({
+      id: item._id ? String(item._id) : idx + 1,
+      _id: item._id,
+      name: item.name,
+      number: item.number,
+      status: item.status || "1",
+      created_at: item.createdAt || item.created_at,
+      updated_at: item.updatedAt || item.updated_at,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      message: "Data retrieved successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching data",
+      error: e.message,
+    });
+  }
+};
+

@@ -20,6 +20,8 @@ const {
   createDriverTopup,
   updateDriverTopup,
   deleteDriverTopup,
+  getVehicleFaresDetails,
+  getKilometerPrices,
 } = require("../controllers/carController");
 
 // 1. Car Types
@@ -35,6 +37,9 @@ router.get("/fares/:id", getPriceFareById);
 router.post("/fares", carUpload.any(), createPriceFare);
 router.put("/fares/:id", carUpload.any(), updatePriceFare);
 router.delete("/fares/:id", deletePriceFare);
+router.all("/vehice-details", getVehicleFaresDetails);
+router.all("/vehicle-details", getVehicleFaresDetails);
+router.all("/get-kilometer-price", getKilometerPrices);
 
 // 3. Auto Prices
 router.get("/auto-prices", getAutoPrices);

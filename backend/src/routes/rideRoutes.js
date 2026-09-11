@@ -5,6 +5,8 @@ const verifyDriverToken = require("../middleware/verifyDriverToken");
 const {
   getVehicleTypes,
   getVehicleTypeFare,
+  getVehicleTypePrice,
+  usePromoCode,
   getAvailableDrivers,
   userBookRide,
   userBookRideArrived,
@@ -13,6 +15,7 @@ const {
   userRideCancel,
   driverRideCancel,
   driverRideHistory,
+  driverActiveRide,
   userRideHistory,
   userBookOutStation,
   driverStartOutStation,
@@ -33,6 +36,8 @@ const {
 // Vehicle Types & Fare Estimates
 router.all("/get-vehicle-types", getVehicleTypes);
 router.all("/get-vehicle-type-fare", getVehicleTypeFare);
+router.all("/get-vehicle-type-price", getVehicleTypePrice);
+router.all("/use-promo-code", usePromoCode);
 router.all("/get-available-drivers", getAvailableDrivers);
 
 // In-City Booking Lifecycle
@@ -47,6 +52,7 @@ router.all("/driver-ride-cancel", driverRideCancel);
 
 // Histories & Earnings
 router.all("/driver-ride-history", driverRideHistory);
+router.all("/driver-active-ride", driverActiveRide);
 router.all("/user-ride-history", userRideHistory);
 
 // OutStation Rides Lifecycle

@@ -101,3 +101,35 @@ exports.deleteContactChannel = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Mobile endpoint - Get Contact Us Channels (PHP sixty / get-contact-us)
+// @route   GET/ALL /api/get-contact-us
+exports.getContactUsMobile = async (req, res) => {
+  try {
+    const list = await ContactChannel.find().sort({ createdAt: 1 }).lean();
+    const data = list.map((item) => ({
+      id: item._id ? String(item._id) : item.id,
+      _id: item._id,
+      name: item.name,
+      address: item.address,
+      logo: item.logo || "📞",
+      image: item.image ? formatImageUrl(item.image, req) : null,
+      status: item.status || "1",
+      created_at: item.createdAt || item.created_at,
+      updated_at: item.updatedAt || item.updated_at,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      message: "Data retrieved successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve data",
+      error: e.message,
+    });
+  }
+};
+

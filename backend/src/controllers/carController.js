@@ -2,6 +2,7 @@ const CarType = require("../models/CarType");
 const PriceFare = require("../models/PriceFare");
 const AutoPrice = require("../models/AutoPrice");
 const DriverTopup = require("../models/DriverTopup");
+const KilometerPrice = require("../models/KilometerPrice");
 
 // Helper to format image URL
 const getRelativeUploadPath = (file) => {
@@ -671,3 +672,81 @@ exports.deleteDriverTopup = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+/**
+ * Function 119: getVehicleFaresDetails
+ * PHP: eightySix
+ * Route: GET /api/vehice-details
+ */
+exports.getVehicleFaresDetails = async (req, res) => {
+  try {
+    const fares = await PriceFare.find().populate("carType").sort({ mysqlId: 1, createdAt: 1 });
+    const carTypes = await CarType.find();
+    const typeMap = {};
+    carTypes.forEach((c) => {
+      typeMap[c.mysqlId] = c.typeName;
+    });
+
+    const host = req ? req.get("host") : "localhost:5000";
+    const protocol = req && req.protocol ? req.protocol : "http";
+
+    const formatted = fares.map((f) => {
+      const typeName = f.carType?.typeName || typeMap[f.vehicleType] || "";
+      let img = f.image || null;
+      if (img && !img.startsWith("http://") && !img.startsWith("https://")) {
+        let cleanPath = img.replace(/\\/g, "/");
+        if (cleanPath.startsWith("/")) cleanPath = cleanPath.substring(1);
+        img = `${protocol}://${host}/${cleanPath}`;
+      }
+      return {
+        id: f.mysqlId || f._id,
+        vehicle_type: f.vehicleType,
+        vehicle_type_name: typeName,
+        fare_per_km: f.farePerKm ? String(f.farePerKm) : "0.00",
+        image: img,
+      };
+    });
+
+    return res.status(200).json({
+      status: true,
+      message: "Fare list fetched successfully",
+      details: formatted,
+    });
+  } catch (ex) {
+    console.error("EightySix API Error: " + ex.message);
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong. Please try again later",
+    });
+  }
+};
+
+/**
+ * Function 125: getKilometerPrices
+ * PHP: get_kilometer_price
+ * Route: ALL /api/get-kilometer-price
+ */
+exports.getKilometerPrices = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const kilometerPrices = await KilometerPrice.find().populate("carType");
+
+    return res.status(200).json({
+      message: "Kilometer prices retrieved successfully",
+      data: kilometerPrices,
+    });
+  } catch (ex) {
+    console.error("Error in get_kilometer_price:", ex);
+    return res.status(500).json({
+      message: "An error occurred while fetching kilometer prices",
+    });
+  }
+};
+exports.get_kilometer_price = exports.getKilometerPrices;
+
+

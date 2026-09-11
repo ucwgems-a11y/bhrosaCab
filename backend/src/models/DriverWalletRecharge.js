@@ -25,6 +25,12 @@ const driverWalletRechargeSchema = new mongoose.Schema(
       default: null,
       ref: "Ride",
     },
+    user_id: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+      ref: "User",
+      index: true,
+    },
     created_at: {
       type: Date,
       default: Date.now,
@@ -36,6 +42,7 @@ const driverWalletRechargeSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    strict: false,
   }
 );
 

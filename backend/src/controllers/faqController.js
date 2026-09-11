@@ -204,3 +204,57 @@ exports.deleteFaq = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Mobile endpoint - Get FAQ List (PHP fiftyEight / get-FAQ-list)
+// @route   GET /api/get-FAQ-list
+exports.getFaqList = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const type = req.query.type || req.body?.type;
+    let query = {};
+    if (type) {
+      query.$or = [
+        { type: String(type) },
+        { category: String(type) },
+      ];
+    }
+
+    const faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
+
+    if (!faqs || faqs.length === 0) {
+      return res.status(404).json({
+        message: "No FAQ records found",
+      });
+    }
+
+    const data = faqs.map((f) => ({
+      id: f.mysqlId || f._id,
+      _id: f._id,
+      question: f.question,
+      answer: f.answer,
+      category: f.category || f.type || "general",
+      type: f.type || f.category || "general",
+      order: f.order || 0,
+      status: f.status || "1",
+      created_at: f.createdAt,
+      updated_at: f.updatedAt,
+    }));
+
+    return res.status(200).json({
+      message: "FAQ get successfully",
+      Data: data,
+    });
+  } catch (ex) {
+    console.error("getFaqList Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+

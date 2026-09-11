@@ -12,6 +12,8 @@ const PriceFare = require("../models/PriceFare");
 const DriverTopup = require("../models/DriverTopup");
 const DriverWalletRecharge = require("../models/DriverWalletRecharge");
 const UserRideCancel = require("../models/UserRideCancel");
+const SendLocation = require("../models/SendLocation");
+const Promo = require("../models/Promo");
 
 // Helper to format clean image URL with domain
 function formatImageUrl(image, req) {
@@ -155,6 +157,370 @@ const getVehicleTypeFare = async (req, res) => {
     return res.status(500).json({
       message: "Something went wrong",
       error: error.message,
+    });
+  }
+};
+
+// @desc    Get Vehicle Type Prices based on User Location & Live Drivers (PHP: ApiController::twentyNine)
+// @route   GET /api/get-vehicle-type-price
+const getVehicleTypePrice = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    // Retrieve user's latest saved location
+    const location = await SendLocation.findOne({
+      $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+    }).sort({ createdAt: -1 });
+
+    if (!location) {
+      return res.status(404).json({
+        message: "Address not found",
+      });
+    }
+
+    const fromLat = parseFloat(location.from_latitude);
+    const fromLng = parseFloat(location.from_longitude);
+    const destLat = parseFloat(location.destination_latitude);
+    const destLng = parseFloat(location.destination_longitude);
+
+    let distance = 0;
+    if (
+      !isNaN(fromLat) &&
+      !isNaN(fromLng) &&
+      !isNaN(destLat) &&
+      !isNaN(destLng)
+    ) {
+      const earthRadius = 6371; // in KM
+      const dLat = ((destLat - fromLat) * Math.PI) / 180;
+      const dLon = ((destLng - fromLng) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((fromLat * Math.PI) / 180) *
+          Math.cos((destLat * Math.PI) / 180) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      distance = Math.round(earthRadius * c * 100) / 100;
+    }
+
+    // Coupon calculation
+    const couponId = req.query.coupon_id || location.coupon_id;
+    let discountPercentage = 0;
+    if (couponId) {
+      const coupon = await Promo.findById(couponId);
+      if (coupon) {
+        discountPercentage = Number(coupon.discount) || 0;
+        location.coupon_id = couponId;
+        await location.save();
+      }
+    }
+
+    // Find active vehicle categories from online drivers
+    const activeDrivers = await Driver.find({
+      active_status: 1,
+      block_status: { $ne: 1 },
+    });
+    let rawCategories = activeDrivers
+      .map((d) => d.cateogory)
+      .filter((c) => c !== null && c !== undefined && c !== "");
+    rawCategories = [...new Set(rawCategories)];
+
+    const numericVehicleTypes = [];
+    const objectIdCarTypes = [];
+    for (const cat of rawCategories) {
+      if (!isNaN(cat)) {
+        numericVehicleTypes.push(Number(cat));
+      } else if (mongoose.isValidObjectId(cat)) {
+        objectIdCarTypes.push(cat);
+      } else {
+        const found = await CarType.findOne({
+          typeName: new RegExp(`^${cat}$`, "i"),
+        });
+        if (found) {
+          if (found.mysqlId) numericVehicleTypes.push(found.mysqlId);
+          if (found._id) objectIdCarTypes.push(found._id);
+        }
+      }
+    }
+
+    const fareConditions = [];
+    if (numericVehicleTypes.length > 0) {
+      fareConditions.push({ vehicleType: { $in: numericVehicleTypes } });
+    }
+    if (objectIdCarTypes.length > 0) {
+      fareConditions.push({ carType: { $in: objectIdCarTypes } });
+    }
+
+    let fareRates = [];
+    if (fareConditions.length > 0) {
+      fareRates = await PriceFare.find({ $or: fareConditions }).populate("carType");
+    }
+    if (!fareRates || fareRates.length === 0) {
+      fareRates = await PriceFare.find().populate("carType");
+    }
+
+    const vehicleInfo = {
+      1: {
+        id: "1",
+        name: "Minni",
+        title: "Comfy, comfortable economical cars",
+      },
+      2: {
+        id: "2",
+        name: "Prime Sedan",
+        title: "Spacious sedans, top drivers",
+      },
+      3: { id: "3", name: "Premium SUV", title: "Spacious SUVs" },
+      4: {
+        id: "4",
+        name: "Premium Plus",
+        title: "Ride at hourly packages",
+      },
+    };
+
+    const currencySymbol = "₹";
+    const fares = [];
+
+    for (const fare of fareRates) {
+      const vType = fare.vehicleType;
+      const baseFarePerKm = parseFloat(fare.farePerKm) || 10;
+      let originalPrice = Math.round(distance * baseFarePerKm);
+      // Minimum fare fallback
+      if (originalPrice <= 0) {
+        originalPrice = vType === 1 ? 30 : vType === 2 ? 40 : 90;
+      }
+      const discountedPrice = Math.round(
+        originalPrice - (discountPercentage / 100) * originalPrice
+      );
+
+      const info = vehicleInfo[vType] || {
+        id: String(vType),
+        name: fare.carType?.typeName || "Unknown",
+        title: "Comfortable city ride",
+      };
+
+      fares.push({
+        price: `${currencySymbol}${discountedPrice.toFixed(2)}`,
+        old_price: `${currencySymbol}${originalPrice.toFixed(2)}`,
+        vehicle_type: vType,
+        name: info.name,
+        title: info.title,
+        image: formatImageUrl(fare.image, req),
+      });
+    }
+
+    return res.status(200).json({
+      message: "Address, Distance, and Fares Retrieved Successfully",
+      details: {
+        id: location._id ? String(location._id) : null,
+        user_id: user._id ? String(user._id) : null,
+        from_address: location.from_address || null,
+        from_latitude: location.from_latitude || null,
+        from_longitude: location.from_longitude || null,
+        destination_address: location.destination_address || null,
+        destination_latitude: location.destination_latitude || null,
+        destination_longitude: location.destination_longitude || null,
+        distance_in_kilometers: distance,
+        coupon_id: location.coupon_id || null,
+        cabDetails: fares,
+      },
+    });
+  } catch (ex) {
+    console.error("getVehicleTypePrice Error:", ex);
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
+  }
+};
+
+// 2.1 USE PROMO CODE (Equivalent to PHP: Route::any('use-promo-code', 'thirtyTwo'))
+const usePromoCode = async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Invalid Method" });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({ message: "Token not provided" });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({ message: "Invalid user token" });
+    }
+
+    const location = await SendLocation.findOne({
+      $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+    }).sort({ createdAt: -1, _id: -1 });
+
+    if (!location) {
+      return res.status(404).json({ error: "Location not found or inactive" });
+    }
+
+    const from_latitude = parseFloat(location.from_latitude);
+    const from_longitude = parseFloat(location.from_longitude);
+    const destination_latitude = parseFloat(location.destination_latitude);
+    const destination_longitude = parseFloat(location.destination_longitude);
+    const earthRadius = 6371000;
+
+    let distance = 0;
+    if (
+      !isNaN(from_latitude) &&
+      !isNaN(from_longitude) &&
+      !isNaN(destination_latitude) &&
+      !isNaN(destination_longitude)
+    ) {
+      const latFrom = (from_latitude * Math.PI) / 180;
+      const lonFrom = (from_longitude * Math.PI) / 180;
+      const latTo = (destination_latitude * Math.PI) / 180;
+      const lonTo = (destination_longitude * Math.PI) / 180;
+
+      const latDelta = latTo - latFrom;
+      const lonDelta = lonTo - lonFrom;
+
+      const a =
+        Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+        Math.cos(latFrom) *
+          Math.cos(latTo) *
+          Math.sin(lonDelta / 2) *
+          Math.sin(lonDelta / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distanceInMeters = earthRadius * c;
+      const distanceInKilometers = distanceInMeters / 1000;
+      distance = Math.round(distanceInKilometers * 100) / 100;
+    }
+
+    const vehicleType = req.body.vehicle_type || req.body.vehicleType || req.query.vehicle_type;
+    const vTypeNum = !isNaN(Number(vehicleType)) ? Number(vehicleType) : null;
+    const fareRateQuery = {
+      $or: [
+        ...(vTypeNum !== null ? [{ vehicleType: vTypeNum }, { vehicle_type: vTypeNum }] : []),
+        { vehicleType: vehicleType },
+        { vehicle_type: vehicleType },
+      ],
+    };
+    if (vehicleType && mongoose.isValidObjectId(vehicleType)) {
+      fareRateQuery.$or.push({ carType: vehicleType });
+    }
+
+    const fare_rates = await PriceFare.find(fareRateQuery).populate("carType");
+    if (!fare_rates || fare_rates.length === 0) {
+      return res.status(404).json({
+        message: "Fare rates not found for the selected vehicle type",
+      });
+    }
+
+    const vehicleInfo = {
+      1: { name: "Minni", title: "Comfy, comfortable economical cars" },
+      2: { name: "Prime Sedan", title: "Spacious sedans, top drivers" },
+      3: { name: "Premium SUV", title: "Spacious SUVs" },
+      4: { name: "Premium Plus", title: "Ride at hourly packages" },
+    };
+
+    const fares = [];
+    for (const fare of fare_rates) {
+      const vType = fare.vehicleType || fare.vehicle_type;
+      const vehicleInfoForType = vehicleInfo[vType] || {
+        name: fare.carType?.typeName || "Unknown Vehicle",
+        title: "Unknown",
+      };
+      const farePerKm = parseFloat(fare.farePerKm || fare.fare_per_km) || 0;
+      fares.push({
+        price: Math.round(distance * farePerKm * 100) / 100,
+        name: vehicleInfoForType.name,
+        title: vehicleInfoForType.title,
+      });
+    }
+
+    const promoCode = req.body.promo_code || req.body.code || req.query.promo_code;
+    let discountPercentage = 0;
+    let matchedPromo = null;
+
+    if (promoCode) {
+      const codeStr = String(promoCode).trim();
+      const todayStr = new Date().toISOString().split("T")[0];
+      const promo = await Promo.findOne({
+        $or: [
+          { code: new RegExp(`^${codeStr}$`, "i") },
+          { promo_code: new RegExp(`^${codeStr}$`, "i") },
+        ],
+        status: { $nin: ["Inactive", "0"] },
+      });
+
+      if (promo) {
+        const isStarted =
+          !promo.startDate ||
+          promo.startDate <= todayStr ||
+          new Date(promo.startDate) <= new Date();
+        const isNotExpired =
+          !promo.endDate ||
+          promo.endDate >= todayStr ||
+          new Date(promo.endDate) >= new Date();
+
+        if (isStarted && isNotExpired) {
+          discountPercentage = Number(promo.discount) || 0;
+          matchedPromo = promo;
+        }
+      }
+    }
+
+    if (discountPercentage > 0) {
+      for (let index = 0; index < fares.length; index++) {
+        fares[index].price =
+          Math.round(
+            (fares[index].price - (fares[index].price * discountPercentage) / 100) * 100
+          ) / 100;
+      }
+    }
+
+    location.distance_in_kilometers = distance;
+    location.fares = fares;
+    if (matchedPromo) {
+      location.coupon_id = matchedPromo._id;
+    }
+    await location.save();
+
+    return res.status(200).json({
+      message:
+        discountPercentage > 0
+          ? "Fare Calculation with Promo Code Applied"
+          : "Fare Calculation without Promo Code",
+      details: fares,
+    });
+  } catch (ex) {
+    console.error("usePromoCode Error:", ex);
+    return res.status(500).json({
+      message: "Error occurred during fare calculation",
+      details: ex.message,
     });
   }
 };
@@ -316,8 +682,8 @@ const userBookRide = async (req, res) => {
     return res.status(404).json({ message: "Invalid user token" });
   }
 
-  // Account verification check (register == 0 or isRegistered === false)
-  if (user.register === 0 || user.isRegistered === false) {
+  // Account verification check (register == 0 and isRegistered === false)
+  if (user.register === 0 && !user.isRegistered) {
     return res.status(404).json({
       message: "Your account is not verified, Please contact Customer Care for more details",
     });
@@ -709,22 +1075,19 @@ const userRideComplete = async (req, res) => {
     const carType = await CarType.findOne({ $or: carTypeConditions });
 
     const topupMatches = [];
-    if (driver.cateogory) {
-      topupMatches.push({ carTypeId: driver.cateogory }, { car_type_id: driver.cateogory });
-      if (!isNaN(driver.cateogory)) {
-        topupMatches.push({ carTypeId: Number(driver.cateogory) }, { car_type_id: Number(driver.cateogory) });
-      }
+    if (driver.cateogory && !isNaN(driver.cateogory)) {
+      topupMatches.push({ carTypeId: Number(driver.cateogory) });
     }
     if (carType) {
-      if (carType.mysqlId) {
-        topupMatches.push({ carTypeId: carType.mysqlId }, { car_type_id: carType.mysqlId });
+      if (carType.mysqlId && !isNaN(carType.mysqlId)) {
+        topupMatches.push({ carTypeId: Number(carType.mysqlId) });
       }
       if (carType._id) {
         topupMatches.push({ carType: carType._id });
       }
     }
 
-    const driverTopup = await DriverTopup.findOne({ $or: topupMatches });
+    const driverTopup = topupMatches.length > 0 ? await DriverTopup.findOne({ $or: topupMatches }) : null;
 
     if (driverTopup) {
       const bFare = parseFloat(booking.totalFare) || 0;
@@ -1387,10 +1750,9 @@ const userBookOutStation = async (req, res) => {
     }
     if (mongoose.isValidObjectId(vehicle_id)) {
       fareConditions.push({ carType: new mongoose.Types.ObjectId(vehicle_id) });
-      fareConditions.push({ vehicleType: vehicle_id });
     }
 
-    const getOut = await PriceFare.findOne({ $or: fareConditions });
+    const getOut = fareConditions.length > 0 ? await PriceFare.findOne({ $or: fareConditions }) : null;
     const outStationADkm = getOut?.outStationAboveKm || null;
 
     const data = {
@@ -1829,6 +2191,71 @@ const driverCompleteOtpVerifyOutStation = async (req, res) => {
 
 const driverCompleteOutStation = driverCompleteOtpVerifyOutStation;
 
+// 17. DRIVER ACTIVE RIDE
+const driverActiveRide = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token = req.headers.token || req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const driver = await Driver.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+
+    if (!driver) {
+      return res.status(404).json({
+        message: "Invalid driver token",
+      });
+    }
+
+    const driverIds = [driver._id];
+    if (driver.mysqlId) driverIds.push(driver.mysqlId);
+    if (driver.id && typeof driver.id === "number") driverIds.push(driver.id);
+
+    const booking = await Ride.findOne({
+      $or: [
+        { driver_id: { $in: driverIds } },
+        { driver_mongo_id: driver._id },
+      ],
+      status: { $in: ["in_progress", "booked", "arrived"] },
+    }).sort({ created_at: -1, _id: -1 });
+
+    if (!booking) {
+      return res.status(200).json({
+        message: "No booking found",
+      });
+    }
+
+    const bookingObj = booking.toObject ? booking.toObject() : booking;
+    bookingObj.id = booking.mysqlId || booking._id;
+
+    return res.status(200).json({
+      message: "Driver location retrieved successfully",
+      data: {
+        id: driver.mysqlId || driver.id || driver._id,
+        name: driver.name || "N/A",
+        driver_latitude: driver.latitude ?? "N/A",
+        driver_longitude: driver.longitude ?? "N/A",
+        ride_deltails: bookingObj,
+      },
+    });
+  } catch (ex) {
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+
 // 17. USER OUTSTATION HISTORY
 const userOutstationHistory = async (req, res) => {
   try {
@@ -2040,6 +2467,8 @@ const getRideStats = async (req, res) => {
 module.exports = {
   getVehicleTypes,
   getVehicleTypeFare,
+  getVehicleTypePrice,
+  usePromoCode,
   getAvailableDrivers,
   userBookRide,
   userBookRideArrived,
@@ -2048,6 +2477,7 @@ module.exports = {
   userRideCancel,
   driverRideCancel,
   driverRideHistory,
+  driverActiveRide,
   userRideHistory,
   userBookOutStation,
   driverStartOutStation,

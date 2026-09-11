@@ -1,4 +1,6 @@
 const Promo = require("../models/Promo");
+const User = require("../models/User");
+const SendLocation = require("../models/SendLocation");
 
 const computePromoStatus = (startDate, endDate, status) => {
   if (status === "Inactive" || status === "0") return "Inactive";
@@ -159,5 +161,91 @@ exports.deletePromo = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// MOBILE APP PROMO DETAIL (Equivalent to PHP: Route::any('get-promo-detail', 'thirty'))
+exports.getPromoDetail = async (req, res) => {
+  try {
+    if (req.method !== "GET") {
+      return res.status(405).json({
+        message: "Invalid Method",
+      });
+    }
+
+    const token =
+      req.headers.token ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return res.status(400).json({
+        message: "Token not provided",
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [{ token: token }, { appToken: token }],
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: "Invalid user token",
+      });
+    }
+
+    const todayStr = new Date().toISOString().split("T")[0];
+    const allPromos = await Promo.find({
+      status: { $nin: ["Inactive", "0"] },
+    });
+
+    const validPromos = allPromos.filter((p) => {
+      const isStarted =
+        !p.startDate ||
+        p.startDate <= todayStr ||
+        new Date(p.startDate) <= new Date();
+      const isNotExpired =
+        !p.endDate ||
+        p.endDate >= todayStr ||
+        new Date(p.endDate) >= new Date();
+      return isStarted && isNotExpired;
+    });
+
+    if (!validPromos || validPromos.length === 0) {
+      return res.status(404).json({
+        message: "No promo codes found",
+      });
+    }
+
+    const response = [];
+    for (const promo of validPromos) {
+      const promoIdStr = promo._id.toString();
+      const applied = await SendLocation.exists({
+        $or: [{ user_id: user._id }, { user_id: String(user._id) }],
+        $or: [
+          { coupon_id: promo._id },
+          { coupon_id: promoIdStr },
+          { coupon_id: promo.id },
+        ],
+      });
+
+      response.push({
+        id: promo._id,
+        promo_code: promo.code || promo.promo_code,
+        title: promo.title,
+        discount: promo.discount,
+        startDate: promo.startDate,
+        endDate: promo.endDate,
+        applied_status: applied ? 1 : 0,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Promo codes retrieved successfully",
+      data: response,
+    });
+  } catch (ex) {
+    console.error("getPromoDetail Error:", ex);
+    return res.status(500).json({
+      message: "Error",
+      details: ex.message,
+    });
   }
 };

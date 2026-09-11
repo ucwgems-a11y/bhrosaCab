@@ -71,6 +71,10 @@ async function generateAccessToken() {
   const credsConfig = getCredentials();
 
   if (!credsConfig) {
+    if (process.env.NODE_ENV !== "production" || process.env.FCM_MOCK === "true") {
+      console.warn("[FCM] Service account file not found; using development fallback.");
+      return "mock_fcm_access_token";
+    }
     const errorMsg =
       "[FCM] Service account file not found! Please place 'notificationSympa.json' in backend or set FIREBASE_SERVICE_ACCOUNT in .env";
     console.warn(errorMsg);
@@ -153,6 +157,10 @@ async function sendNotification(deviceToken, title, body) {
   const accessToken = await getAccessToken();
   if (!accessToken) {
     throw new Error("Access Token is not available. Please generate it first.");
+  }
+
+  if (accessToken === "mock_fcm_access_token") {
+    return { name: "projects/mock/messages/mock_msg_123", success: true };
   }
 
   const url = getFcmEndpoint();

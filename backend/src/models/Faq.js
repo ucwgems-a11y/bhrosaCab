@@ -22,6 +22,10 @@ const faqSchema = new mongoose.Schema(
       type: String,
       default: "general",
     },
+    type: {
+      type: String,
+      default: "general",
+    },
     order: {
       type: Number,
       default: 0,

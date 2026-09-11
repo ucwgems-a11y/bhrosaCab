@@ -1,44 +1,71 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Car, Search, Eye, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Car, Search, Eye } from "lucide-react";
 import Pagination from "../../rides/Pagination/Pagination";
+import api from "../../../../api/axios";
 import "../../shared/formCard.css";
 import "./SubAdminDriversPage.css";
-
-const mockSubAdminDrivers = {
-  15: [
-    { id: 101, name: "Ramesh Patel", phone: "+91 9825012345", vehicle: "Sedan (GJ-01-AB-1234)", rides: 142, wallet: "₹ 1,450", status: "Active", image: "https://ui-avatars.com/api/?name=Ramesh+Patel&background=2e9e5b&color=fff" },
-    { id: 102, name: "Hitesh Shah", phone: "+91 9898012345", vehicle: "Hatchback (GJ-01-XY-5678)", rides: 89, wallet: "₹ 820", status: "Active", image: "https://ui-avatars.com/api/?name=Hitesh+Shah&background=2e9e5b&color=fff" },
-    { id: 103, name: "Jignesh Desai", phone: "+91 9724012345", vehicle: "Mini SUV (GJ-05-CD-9012)", rides: 210, wallet: "₹ 2,300", status: "Active", image: "https://ui-avatars.com/api/?name=Jignesh+Desai&background=2e9e5b&color=fff" },
-  ],
-  default: [
-    { id: 201, name: "Vikram Singh", phone: "+91 9414012345", vehicle: "Sedan (MH-02-AA-4321)", rides: 98, wallet: "₹ 1,120", status: "Active", image: "https://ui-avatars.com/api/?name=Vikram+Singh&background=2e9e5b&color=fff" },
-    { id: 202, name: "Anil Kumar", phone: "+91 9166012345", vehicle: "Hatchback (MH-03-BB-8765)", rides: 45, wallet: "₹ 450", status: "Inactive", image: "https://ui-avatars.com/api/?name=Anil+Kumar&background=e5484d&color=fff" },
-  ],
-};
-
-const subAdminNames = {
-  15: "Gujarat",
-  14: "Madhya Pradesh",
-  13: "Jharkhand",
-  12: "Bihar",
-  11: "Maharashtra",
-};
 
 export default function SubAdminDriversPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [subAdmin, setSubAdmin] = useState(null);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const regionName = subAdminNames[id] || `Sub-Admin #${id}`;
-  const driverList = mockSubAdminDrivers[id] || mockSubAdminDrivers.default;
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        // Fetch subadmin details
+        let regionState = "";
+        try {
+          const sRes = await api.get(`/subadmins/${id}`);
+          if (sRes.data?.subAdmin) {
+            setSubAdmin(sRes.data.subAdmin);
+            regionState = sRes.data.subAdmin.state || sRes.data.subAdmin.name || "";
+          }
+        } catch (e) {
+          console.warn("Could not fetch subadmin by id:", e.message);
+        }
 
-  const filtered = driverList.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase()) ||
-    d.phone.includes(search) ||
-    d.vehicle.toLowerCase().includes(search.toLowerCase())
-  );
+        // Fetch drivers
+        const dRes = await api.get("/drivers?limit=100");
+        if (dRes.data?.drivers) {
+          let list = dRes.data.drivers;
+          if (regionState) {
+            const matched = list.filter(
+              (d) =>
+                (d.state && d.state.toLowerCase() === regionState.toLowerCase()) ||
+                (d.address && d.address.toLowerCase().includes(regionState.toLowerCase()))
+            );
+            if (matched.length > 0) {
+              list = matched;
+            }
+          }
+          setDrivers(list);
+        }
+      } catch (err) {
+        console.error("Failed to load subadmin drivers:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (id) loadData();
+  }, [id]);
+
+  const regionName = subAdmin?.state || subAdmin?.name || `Sub-Admin #${id}`;
+
+  const filtered = drivers.filter((d) => {
+    const q = search.toLowerCase().trim();
+    if (!q) return true;
+    const name = (d.name || "").toLowerCase();
+    const phone = (d.phone || d.number || "").toLowerCase();
+    const vehicle = (d.vehicleNumber || d.vehicle_number || "").toLowerCase();
+    return name.includes(q) || phone.includes(q) || vehicle.includes(q);
+  });
 
   return (
     <div className="fc-page-wrap">
@@ -58,7 +85,8 @@ export default function SubAdminDriversPage() {
             <div>
               <h4 className="fc-card-title">Assigned Drivers — {regionName}</h4>
               <p className="subadmin-drivers-subtitle">
-                Viewing all active registered drivers managed by Sub-Admin #{id} ({regionName} State)
+                Viewing registered drivers managed by Sub-Admin {subAdmin?.name ? `"${subAdmin.name}"` : `#${id}`}
+                {subAdmin?.state ? ` (${subAdmin.state} Region)` : ""}
               </p>
             </div>
           </div>
@@ -93,40 +121,72 @@ export default function SubAdminDriversPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.length === 0 ? (
+                {loading ? (
                   <tr>
                     <td colSpan={9} className="fc-no-data">
-                      No assigned drivers found
+                      Loading drivers from database...
+                    </td>
+                  </tr>
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="fc-no-data">
+                      No assigned drivers found for this region
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((d, i) => (
-                    <tr key={d.id}>
-                      <td>{i + 1}</td>
-                      <td>
-                        <img src={d.image} alt="" className="subadmin-avatar" />
-                      </td>
-                      <td style={{ fontWeight: 600 }}>{d.name}</td>
-                      <td>{d.phone}</td>
-                      <td>{d.vehicle}</td>
-                      <td>{d.rides}</td>
-                      <td style={{ color: "var(--accent)", fontWeight: 600 }}>{d.wallet}</td>
-                      <td>
-                        <span className={`subadmin-status-badge ${d.status.toLowerCase()}`}>
-                          {d.status}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          className="fc-icon-btn edit"
-                          title="View Driver Profile"
-                          onClick={() => navigate(`/admin/driver/profile/${d.id}`)}
-                        >
-                          <Eye size={14} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  filtered.map((d, i) => {
+                    const driverId = d.id || d._id;
+                    const statusText = d.approved || (d.status === 2 || d.status === "2" ? "Approved" : d.status === 3 || d.status === "3" ? "Rejected" : "Pending");
+                    return (
+                      <tr key={driverId}>
+                        <td>{i + 1}</td>
+                        <td>
+                          <img
+                            src={d.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name || "Driver")}&background=random`}
+                            alt=""
+                            className="subadmin-avatar"
+                            onError={(e) => {
+                              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name || "Driver")}&background=random`;
+                            }}
+                          />
+                        </td>
+                        <td style={{ fontWeight: 600 }}>{d.name} {d.lastName || d.last_name || ""}</td>
+                        <td>{d.phone || d.number || "N/A"}</td>
+                        <td>{d.vehicleNumber || d.vehicle_number || "N/A"} ({d.brand || d.vehicleBrand || "Cab"})</td>
+                        <td>{d.totalRides ?? 0}</td>
+                        <td style={{ color: "var(--accent)", fontWeight: 600 }}>₹ {Number(d.wallet || 0).toFixed(2)}</td>
+                        <td>
+                          <span
+                            className="subadmin-status-badge"
+                            style={{
+                              background:
+                                statusText === "Approved"
+                                  ? "#22c55e"
+                                  : statusText === "Rejected"
+                                  ? "#ef4444"
+                                  : "#f59e0b",
+                              color: "#fff",
+                              padding: "4px 8px",
+                              borderRadius: "4px",
+                              fontSize: "11px",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {statusText}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            className="fc-icon-btn edit"
+                            title="View Driver Profile"
+                            onClick={() => navigate(`/admin/driver/profile/${driverId}`)}
+                          >
+                            <Eye size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -142,4 +202,3 @@ export default function SubAdminDriversPage() {
     </div>
   );
 }
-

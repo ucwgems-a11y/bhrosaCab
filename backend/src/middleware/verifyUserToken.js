@@ -16,7 +16,9 @@ const verifyUserToken = async (req, res, next) => {
     }
 
     // Try finding user by token string directly (handles both PHP tokens and JWT)
-    let user = await User.findOne({ appToken: token });
+    let user = await User.findOne({
+      $or: [{ appToken: token }, { token: token }],
+    });
 
     if (!user) {
       // Try verifying as JWT

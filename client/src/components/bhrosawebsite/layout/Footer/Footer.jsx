@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from "react";
+import { Link } from "react-router-dom";
 import "./Footer.css";
 import { FaPhoneVolume } from "react-icons/fa6";
 import api from "../../../../api/axios";
@@ -61,11 +62,18 @@ function Footer() {
             <div className="footer-item">
               <h3>Useful Links</h3>
               <ul className="footer-links">
-                {(middle.links || []).map((link, i) => (
-                  <li key={i}>
-                    <a href={link.url}>{link.label}</a>
-                  </li>
-                ))}
+                {(middle.links || []).map((link, i) => {
+                  const isInternal = link.url && (link.url.startsWith("/") || !link.url.startsWith("http"));
+                  return (
+                    <li key={i}>
+                      {isInternal ? (
+                        <Link to={link.url.startsWith("/") ? link.url : `/${link.url}`}>{link.label}</Link>
+                      ) : (
+                        <a href={link.url}>{link.label}</a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 

@@ -61,6 +61,18 @@ const userSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+    mobile: {
+      type: String,
+      default: null,
+      trim: true,
+      index: true,
+    },
+    number: {
+      type: String,
+      default: null,
+      trim: true,
+      index: true,
+    },
     countryCode: {
       type: String,
       default: "+91",
@@ -70,6 +82,10 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     appToken: {
+      type: String,
+      default: null,
+    },
+    token: {
       type: String,
       default: null,
     },
@@ -90,6 +106,14 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: false,
+    },
+    active_status: {
+      type: Number,
+      default: 0,
+    },
+    reg_id: {
+      type: String,
+      default: null,
     },
     isRegistered: {
       type: Boolean,
@@ -132,6 +156,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "0",
     },
+    guardian_status: {
+      type: String,
+      default: "0",
+    },
     welcomeCoupon: {
       type: String,
       default: null,
@@ -144,6 +172,10 @@ const userSchema = new mongoose.Schema(
       default: 200,
     },
     coupon_status: {
+      type: Number,
+      default: 0,
+    },
+    couponStatus: {
       type: Number,
       default: 0,
     },

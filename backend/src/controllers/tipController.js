@@ -175,3 +175,43 @@ exports.deleteTip = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Mobile endpoint - Get Tips (PHP sixtyfive / get-tips)
+// @route   GET/ALL /api/get-tips
+exports.getTipsMobile = async (req, res) => {
+  try {
+    const tips = await Tip.find({
+      $or: [{ status: "1" }, { status: "active" }, { status: { $exists: false } }],
+    })
+      .sort({ amount: 1 })
+      .lean();
+
+    if (!tips || tips.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No data found",
+      });
+    }
+
+    const data = tips.map((t) => ({
+      id: t.mysqlId || t._id,
+      _id: t._id,
+      amount: t.amount,
+      status: t.status,
+      created_at: t.createdAt || t.created_at,
+      updated_at: t.updatedAt || t.updated_at,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: data,
+    });
+  } catch (ex) {
+    console.error("getTipsMobile Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+

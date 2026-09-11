@@ -1,331 +1,302 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { swalWithBootstrapButtons } from "../../../utils/sweetAlert";
+import { Check, X, ArrowLeft, Eye } from "lucide-react";
+import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
+import api from "../../../api/axios";
 import "./CrmDriverProfile.css";
-
-const mockDriversProfileDatabase = [
-  {
-    id: 13878,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/edfa16e5-b8ca-4cea-be6c-670fbd4ae2dd.jpg",
-    name: "Harvinder Singh",
-    phone: "+919855897719",
-    licenseNumber: "CH0120080000454",
-    aadharNumber: "760477836031",
-    aadharStatus: "approved",
-    vehicleBrand: "N/A",
-    vehicleNumber: "PB01C1987",
-    vehicleCategory: "Sedan",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13852,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/b0483cb9-6daa-4d45-aa08-cde840b986dd.jpg",
-    name: "Rahul",
-    phone: "+918685896408",
-    licenseNumber: "HR0620180009182",
-    aadharNumber: "452178963214",
-    aadharStatus: "approved",
-    vehicleBrand: "Maruti Suzuki",
-    vehicleNumber: "HR06AB1234",
-    vehicleCategory: "Hatchback",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13848,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/978f68ec-a3e3-4294-8851-123b210677ed.jpg",
-    name: "kuldeep",
-    phone: "+917404046446",
-    licenseNumber: "HR2020190004512",
-    aadharNumber: "998877665544",
-    aadharStatus: "approved",
-    vehicleBrand: "Hyundai",
-    vehicleNumber: "HR20CD5678",
-    vehicleCategory: "Sedan",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13828,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/645c1fb2-8ddd-4861-a4d5-8501ab4e11aa.jpg",
-    name: "rohit",
-    phone: "+918950038024",
-    licenseNumber: "HR1220200003412",
-    aadharNumber: "887766554433",
-    aadharStatus: "approved",
-    vehicleBrand: "Honda",
-    vehicleNumber: "HR12EF9012",
-    vehicleCategory: "Bike",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13824,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/118b255a-bb34-4412-988c-d569b29bca04.jpg",
-    name: "Gurpreet singh",
-    phone: "+919772528300",
-    licenseNumber: "PB0220170001234",
-    aadharNumber: "776655443322",
-    aadharStatus: "approved",
-    vehicleBrand: "Bajaj",
-    vehicleNumber: "PB02GH3456",
-    vehicleCategory: "Auto",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13821,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/f378db5a-9ece-49d9-8d4a-db5d197e13c1.jpg",
-    name: "Mohinder Pal",
-    phone: "+918303027895",
-    licenseNumber: "UP3220160005678",
-    aadharNumber: "665544332211",
-    aadharStatus: "approved",
-    vehicleBrand: "Tata",
-    vehicleNumber: "UP32IJ7890",
-    vehicleCategory: "Mini SUV",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13816,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/94bfc15c-e442-43c3-80d5-d8a31a25bcc4.jpg",
-    name: "Jeet Singh",
-    phone: "+918219543510",
-    licenseNumber: "PB0120150009876",
-    aadharNumber: "554433221100",
-    aadharStatus: "approved",
-    vehicleBrand: "Toyota",
-    vehicleNumber: "PB01D3856",
-    vehicleCategory: "Premium SUV",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13815,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/93806b41-7450-4edf-b55d-0e95e4c6d892.jpg",
-    name: "Gurmail Singh",
-    phone: "+916239345514",
-    licenseNumber: "PB0120140004321",
-    aadharNumber: "443322110099",
-    aadharStatus: "approved",
-    vehicleBrand: "Maruti",
-    vehicleNumber: "PB01E4275",
-    vehicleCategory: "Sedan",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13813,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/7fec7e14-048b-405c-9152-687576b838ca.jpg",
-    name: "Arvind Kumar Dogra",
-    phone: "+919736320205",
-    licenseNumber: "HP0120130008765",
-    aadharNumber: "332211009988",
-    aadharStatus: "approved",
-    vehicleBrand: "Hyundai",
-    vehicleNumber: "HP01KL1357",
-    vehicleCategory: "Hatchback",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-  {
-    id: 13811,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/612b7863-9e96-4025-914b-2643c109b456.jpg",
-    name: "avdhesh Kumar Prajapati",
-    phone: "+916284398018",
-    licenseNumber: "PB6520120006543",
-    aadharNumber: "221100998877",
-    aadharStatus: "approved",
-    vehicleBrand: "Tata",
-    vehicleNumber: "PB65MN2468",
-    vehicleCategory: "Sedan",
-    vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-    vehicleInterior: null,
-    vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-    licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-    vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-    govtIdProof: null,
-  },
-];
 
 export default function CrmDriverProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [zoomImage, setZoomImage] = useState(null);
+  const [driver, setDriver] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submittingStatus, setSubmittingStatus] = useState(false);
 
-  const profile =
-    mockDriversProfileDatabase.find((d) => String(d.id) === String(id)) || {
-      id: id || 13878,
-      image: "https://kalasalingam.ac.in/wp-content/uploads/2021/08/Achievements-dummy-profile.png",
-      name: `Driver #${id}`,
-      phone: "+91 9876543210",
-      licenseNumber: `CH01202${id}`,
-      aadharNumber: `7604778${id}`,
-      aadharStatus: "approved",
-      vehicleBrand: "N/A",
-      vehicleNumber: `PB01${id}`,
-      vehicleCategory: "Sedan",
-      vehicleFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/99e2fae8-8949-4b49-93a5-fd6de8f6e3e4.jpg",
-      vehicleInterior: null,
-      vehicleBack: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/f3d2db02-9332-425d-86ea-a70305742cdc.jpg",
-      licenceFront: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/6d3a5cdc-4eea-4ff3-b612-4d267e1e1a25.jpg",
-      vehicleRc: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/vehicle_rc/7f9b9846-77eb-4afe-a35e-e0cc0e327d65.jpg",
-      govtIdProof: null,
-    };
+  useEffect(() => {
+    fetchDriverProfile();
+  }, [id]);
 
-  function handleActionAlert(actionName) {
-    swalWithBootstrapButtons.fire({
-      title: actionName,
-      text: `${actionName} for driver ${profile.name} (ID #${profile.id})`,
-      icon: "info",
-    });
+  async function fetchDriverProfile() {
+    setLoading(true);
+    try {
+      const res = await api.get(`/drivers/${id}`);
+      if (res.data && (res.data.driver || res.data.data)) {
+        setDriver(res.data.driver || res.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to load CRM driver profile:", err);
+      showErrorAlert("Failed to load driver details");
+    } finally {
+      setLoading(false);
+    }
   }
 
+  function handleApprove() {
+    swalWithBootstrapButtons
+      .fire({
+        title: "Approve Driver?",
+        text: "Are you sure you want to approve this driver and activate their account?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, approve driver!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          setSubmittingStatus(true);
+          try {
+            await api.put(`/drivers/${id}/status`, {
+              status: 2,
+              document_verify_status: "accepted",
+              driving_licence_status: "approved",
+              aadhaar_number_status: "approved",
+            });
+            showSuccessAlert("Driver has been approved successfully!");
+            fetchDriverProfile();
+          } catch (err) {
+            console.error("Failed to approve driver:", err);
+            showErrorAlert("Failed to approve driver");
+          } finally {
+            setSubmittingStatus(false);
+          }
+        }
+      });
+  }
+
+  function handleReject() {
+    swalWithBootstrapButtons
+      .fire({
+        title: "Reject Driver?",
+        text: "Are you sure you want to reject this driver's application?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, reject driver!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          setSubmittingStatus(true);
+          try {
+            await api.put(`/drivers/${id}/status`, {
+              status: 3,
+              document_verify_status: "rejected",
+              driving_licence_status: "rejected",
+              aadhaar_number_status: "rejected",
+            });
+            showSuccessAlert("Driver application has been rejected.");
+            fetchDriverProfile();
+          } catch (err) {
+            console.error("Failed to reject driver:", err);
+            showErrorAlert("Failed to reject driver");
+          } finally {
+            setSubmittingStatus(false);
+          }
+        }
+      });
+  }
+
+  if (loading) {
+    return (
+      <div className="crm-driverprofile-page-wrap" style={{ textAlign: "center", padding: "60px", color: "var(--text-muted)" }}>
+        <h2>Loading Driver Profile from Database...</h2>
+      </div>
+    );
+  }
+
+  if (!driver) {
+    return (
+      <div className="crm-driverprofile-page-wrap" style={{ textAlign: "center", padding: "60px" }}>
+        <h2>Driver not found</h2>
+        <button
+          className="crm-dp-btn btn-warning"
+          onClick={() => navigate("/crm-user-driver")}
+          style={{ marginTop: "16px" }}
+        >
+          Back to Drivers List
+        </button>
+      </div>
+    );
+  }
+
+  const isApproved = driver.status === 2 || driver.status === "Approved" || driver.statusCode === 2;
+  const isRejected = driver.status === 3 || driver.status === "Rejected" || driver.statusCode === 3;
+  const isPending = !isApproved && !isRejected;
+
   const rows = [
-    { label: "Driver name:", value: profile.name },
-    // { label: "Phone Number:", value: profile.phone },
-    { label: "License Number:", value: profile.licenseNumber },
-    { label: "Aadhar Number:", value: profile.aadharNumber },
-    { label: "Aadhar Status:", value: profile.aadharStatus },
-    { label: "Vehicle Brand:", value: profile.vehicleBrand },
-    { label: "Vehicle Number:", value: profile.vehicleNumber },
-    { label: "Vehicle Cateogory:", value: profile.vehicleCategory },
+    { label: "Driver Name:", value: (driver.name || "") + (driver.lastName || driver.last_name ? " " + (driver.lastName || driver.last_name) : "") },
+    { label: "Phone Number:", value: driver.number || driver.phone || "N/A" },
+    { label: "Email Address:", value: driver.email || "N/A" },
+    { label: "State / Location:", value: driver.state || "N/A" },
+    { label: "Wallet Balance:", value: "₹ " + Number(driver.wallet || 0).toFixed(2) },
+    { label: "License Number:", value: driver.license_number || driver.licenseNumber || "N/A" },
+    { label: "Aadhaar Number:", value: driver.aadhaar_number || driver.aadhaarNumber || "N/A" },
+    { label: "Aadhaar Status:", value: driver.aadhaar_number_status || driver.aadhaarStatus || "pending" },
+    { label: "Licence Status:", value: driver.driving_licence_status || driver.licenceStatus || "pending" },
+    { label: "Vehicle Brand:", value: driver.brand || driver.vehicleBrand || "N/A" },
+    { label: "Vehicle Model:", value: driver.model || driver.vehicleModel || "N/A" },
+    { label: "Vehicle Number:", value: driver.vehicle_number || driver.vehicleNumber || "N/A" },
+    { label: "Vehicle Category:", value: driver.category || driver.cateogory || driver.vehicleCategory || "Hatchback" },
+    { label: "Application Status:", value: isApproved ? "Approved" : isRejected ? "Rejected" : "Pending" },
   ];
 
   const imageRows = [
-    { label: "Vehicle Front Image:", src: profile.vehicleFront },
-    { label: "Vehicle Interior Image:", src: profile.vehicleInterior },
-    { label: "Vehicle Back Image:", src: profile.vehicleBack },
-    { label: "Licence Front:", src: profile.licenceFront },
-    { label: "Vehicle RC Front:", src: profile.vehicleRc },
-    { label: "Government Id Proof:", src: profile.govtIdProof },
+    { label: "Driver Photo:", src: driver.image || driver.driver_image },
+    { label: "Vehicle Front Image:", src: driver.vehicleFront || driver.vehicle_front_image },
+    { label: "Vehicle Back Image:", src: driver.vehicleBack || driver.vehicle_back_image },
+    { label: "Vehicle Interior Image:", src: driver.vehicleInterior || driver.vehicle_interior_image },
+    { label: "Licence Front:", src: driver.licenceFront || driver.driving_licence_front },
+    { label: "Licence Back:", src: driver.licenceBack || driver.driving_licence_back },
+    { label: "Vehicle RC Front:", src: driver.rcFront || driver.vehicle_rc_front },
+    { label: "Vehicle RC Back:", src: driver.rcBack || driver.vehicle_rc_back },
+    { label: "Government / ID Proof Front:", src: driver.idProofFront || driver.id_proof_front },
+    { label: "Government / ID Proof Back:", src: driver.idProofBack || driver.id_proof_back },
   ];
 
   return (
     <div className="crm-driverprofile-page-wrap">
       <div className="crm-driverprofile-card">
-        {/* Top Header & Actions */}
+        {/* Header and Actions */}
         <div className="crm-driverprofile-header-wrap">
-          <h2 className="crm-driverprofile-heading">Driver Details &amp; Documents</h2>
+          <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <button
+              className="crm-dp-btn btn-secondary"
+              onClick={() => navigate("/crm-user-driver")}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--bg-panel)" }}
+            >
+              <ArrowLeft size={16} /> Back to Drivers
+            </button>
+
+            <span
+              style={{
+                display: "inline-block",
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "13px",
+                fontWeight: 700,
+                background: isApproved ? "rgba(16, 185, 129, 0.15)" : isRejected ? "rgba(239, 68, 68, 0.15)" : "rgba(245, 158, 11, 0.15)",
+                color: isApproved ? "#10b981" : isRejected ? "#ef4444" : "#f59e0b",
+                border: isApproved ? "1px solid rgba(16, 185, 129, 0.3)" : isRejected ? "1px solid rgba(239, 68, 68, 0.3)" : "1px solid rgba(245, 158, 11, 0.3)",
+              }}
+            >
+              Status: {isApproved ? "Approved" : isRejected ? "Rejected" : "Pending Approval"}
+            </span>
+          </div>
+
+          <h2 className="crm-driverprofile-heading">Driver Profile &amp; Verification</h2>
 
           <div className="crm-driverprofile-actions">
             <button
-              type="button"
               className="crm-dp-btn btn-warning"
-              onClick={() => navigate(`/crm-driver-location/${id || profile.id}`)}
+              onClick={() => navigate(`/crm-driver-location/${id}`)}
             >
-              Driver Live Location
+              Live Location
             </button>
             <button
-              type="button"
-              className="crm-dp-btn btn-warning"
-              onClick={() => navigate("/crm-user-driver")}
+              className="crm-dp-btn btn-info"
+              onClick={() => navigate(`/crm-driver-profile-edit/${id}`)}
             >
-              Back to Drivers List
+              Edit Driver
             </button>
+            <button
+              className="crm-dp-btn btn-warning"
+              onClick={() => navigate(`/crm-driver-referral-list/${id}`)}
+            >
+              Referral List
+            </button>
+            <button
+              className="crm-dp-btn btn-warning"
+              onClick={() => navigate(`/crm-driver-referral-commission-list/${id}`)}
+            >
+              Referral Commission
+            </button>
+
+            {/* Approval / Rejection Controls */}
+            {(!isApproved || isRejected) && (
+              <button
+                className="crm-dp-btn btn-success"
+                onClick={handleApprove}
+                disabled={submittingStatus}
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+              >
+                <Check size={16} /> Approve Driver
+              </button>
+            )}
+
+            {(!isRejected || isApproved) && (
+              <button
+                className="crm-dp-btn btn-danger"
+                onClick={handleReject}
+                disabled={submittingStatus}
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+              >
+                <X size={16} /> Reject Driver
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Table Details */}
+        {/* Data Table */}
         <div className="crm-driverprofile-body">
           <table className="crm-driverprofile-table">
             <tbody>
-              <tr>
-                <th scope="row" className="crm-dp-label">Profile Image</th>
-                <td>
-                  <img
-                    src={profile.image}
-                    alt="Driver Profile"
-                    className="crm-dp-thumb"
-                    onClick={() => setZoomImage(profile.image)}
-                    onError={(e) => {
-                      e.target.src =
-                        "https://kalasalingam.ac.in/wp-content/uploads/2021/08/Achievements-dummy-profile.png";
-                    }}
-                  />
-                </td>
-              </tr>
-
-              {rows.map((r) => (
-                <tr key={r.label}>
-                  <th scope="row" className="crm-dp-label">{r.label}</th>
+              {rows.map((r, i) => (
+                <tr key={i}>
+                  <th className="crm-dp-label">{r.label}</th>
                   <td className="crm-dp-value">{r.value}</td>
                 </tr>
               ))}
 
-              {imageRows.map((img) => (
-                <tr key={img.label}>
-                  <th scope="row" className="crm-dp-label">{img.label}</th>
-                  <td>
-                    {img.src ? (
+              {/* Document Images */}
+              {imageRows.map((img, i) => {
+                if (!img.src) return null;
+                return (
+                  <tr key={"img-" + i}>
+                    <th className="crm-dp-label">{img.label}</th>
+                    <td className="crm-dp-value">
                       <img
                         src={img.src}
                         alt={img.label}
                         className="crm-dp-doc-thumb"
                         onClick={() => setZoomImage(img.src)}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
                       />
-                    ) : (
-                      <span className="crm-dp-na">N/A</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Lightbox Zoom Modal */}
+      {/* Zoom Modal */}
       {zoomImage && (
-        <div className="crm-dp-modal-overlay" onClick={() => setZoomImage(null)}>
-          <div className="crm-dp-modal-content" onClick={(e) => e.stopPropagation()}>
-            <img src={zoomImage} alt="Zoomed document preview" />
-            <button
-              type="button"
-              className="crm-dp-modal-close"
-              onClick={() => setZoomImage(null)}
-            >
-              &times;
-            </button>
-          </div>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            cursor: "pointer",
+          }}
+          onClick={() => setZoomImage(null)}
+        >
+          <img
+            src={zoomImage}
+            alt="Enlarged Document"
+            style={{ maxWidth: "90%", maxHeight: "90%", borderRadius: "8px", objectFit: "contain" }}
+          />
         </div>
       )}
     </div>

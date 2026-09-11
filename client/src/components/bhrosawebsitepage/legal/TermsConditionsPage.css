@@ -1,0 +1,406 @@
+/* =========================================================================
+   Bhrosa Cab Term & Conditions / Refund Policy Page Styles
+   Matches brand aesthetics: Dark Skyline Header + Amber Accents + Responsive Cards
+========================================================================= */
+
+.policy-page-wrapper {
+  min-height: 100vh;
+  background-color: #f7f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #222222;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Header with Dark Skyline Background */
+.policy-header {
+  position: relative;
+  background: #111111 url("../../../../assets/img/bg-1.jpg") center center / cover no-repeat;
+  color: #ffffff;
+  padding: 70px 20px 60px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.policy-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 14, 23, 0.85);
+  z-index: 1;
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header-content h1 {
+  font-size: 38px;
+  font-weight: 800;
+  color: #f6c000;
+  margin: 0 0 12px;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.header-content p {
+  font-size: 16px;
+  color: #e2e8f0;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Sticky Navigation Bar */
+.nav-container {
+  position: sticky;
+  top: 0;
+  background-color: #000000;
+  z-index: 999;
+  border-bottom: 2px solid #f6c000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.policy-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f6c000;
+  color: #111111;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 9px 20px;
+  border-radius: 9999px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(246, 192, 0, 0.3);
+}
+
+.home-btn:hover {
+  background-color: #e5b300;
+  transform: translateY(-1px);
+  color: #000000;
+}
+
+.back-to-top {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #444444;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-to-top:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #f6c000;
+  color: #f6c000;
+}
+
+/* Policy Content Container */
+.policy-content {
+  max-width: 1100px;
+  margin: 40px auto 70px;
+  padding: 0 20px;
+}
+
+.policy-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  border-left: 5px solid #f6c000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.policy-section:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.policy-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px;
+  position: relative;
+}
+
+.policy-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 20px 0 10px;
+}
+
+.policy-section p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #4b5563;
+  margin: 0 0 14px;
+}
+
+.policy-section ul {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+
+.policy-section li {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.policy-section strong {
+  color: #111827;
+}
+
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 24px 0 0;
+}
+
+/* Responsive Table */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.policy-page-wrapper .legal-price-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  min-width: 480px !important;
+  text-align: left !important;
+  background-color: #ffffff !important;
+}
+
+.policy-page-wrapper .legal-price-table thead tr {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+}
+
+.policy-page-wrapper .legal-price-table th {
+  padding: 14px 18px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  background-color: #111827 !important;
+  border: none !important;
+}
+
+.policy-page-wrapper .legal-price-table td {
+  padding: 14px 18px !important;
+  font-size: 15px !important;
+  color: #111827 !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: transparent !important;
+}
+
+.policy-page-wrapper .legal-price-table tbody tr:nth-child(even) {
+  background-color: #f8fafc !important;
+}
+
+.policy-page-wrapper .legal-price-table tbody tr:nth-child(odd) {
+  background-color: #ffffff !important;
+}
+
+.policy-page-wrapper .legal-price-table tbody tr:hover {
+  background-color: #fef9c3 !important;
+}
+
+/* Note Box */
+.note-box {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 20px 0 10px;
+}
+
+.note-box strong {
+  color: #92400e;
+  font-size: 15px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.note-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.note-box li {
+  color: #78350f;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+/* Contact Info Box */
+.contact-info {
+  background: #111827;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin-top: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f6c000;
+  margin: 0 0 16px;
+}
+
+.contact-info p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #d1d5db;
+  margin: 0 0 8px;
+}
+
+.contact-info a {
+  color: #f6c000;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+/* Return Home Bottom Button */
+.bottom-cta-wrap {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+/* Policy Footer */
+.policy-footer {
+  background-color: #0f172a;
+  color: #94a3b8;
+  padding: 24px 20px;
+  text-align: center;
+  font-size: 14px;
+  border-top: 1px solid #1e293b;
+}
+
+.policy-footer p {
+  margin: 0;
+}
+
+/* =========================================================================
+   Responsive Media Queries
+========================================================================= */
+
+@media (max-width: 768px) {
+  .policy-header {
+    padding: 50px 16px 40px;
+  }
+
+  .header-content h1 {
+    font-size: 26px;
+  }
+
+  .header-content p {
+    font-size: 14px;
+  }
+
+  .policy-nav {
+    padding: 10px 16px;
+  }
+
+  .home-btn {
+    padding: 7px 16px;
+    font-size: 13px;
+  }
+
+  .back-to-top {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .policy-content {
+    margin: 24px auto 40px;
+    padding: 0 12px;
+  }
+
+  .policy-section {
+    padding: 22px 20px;
+    border-radius: 10px;
+    border-left-width: 4px;
+  }
+
+  .policy-section h2 {
+    font-size: 20px;
+  }
+
+  .policy-section h3 {
+    font-size: 16px;
+  }
+
+  .policy-section p,
+  .policy-section li {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .contact-info {
+    padding: 24px 20px;
+  }
+
+  .contact-info h2 {
+    font-size: 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 22px;
+  }
+
+  .policy-section {
+    padding: 18px 16px;
+  }
+
+  .home-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .back-to-top {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}

@@ -1,4 +1,5 @@
 const AppIcon = require("../models/AppIcon");
+const Promo = require("../models/Promo");
 
 const formatImageUrl = (imgPath, req) => {
   if (!imgPath) return null;
@@ -127,3 +128,41 @@ exports.deleteIcon = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Mobile endpoint - Get Icons with Promo EndDate (PHP sixtynine / get-icons)
+// @route   GET/ALL /api/get-icons
+exports.getIconsMobile = async (req, res) => {
+  try {
+    const list = await AppIcon.find().sort({ createdAt: -1 }).lean();
+    if (!list || list.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No data found",
+      });
+    }
+
+    const lastPromo = await Promo.findOne().sort({ id: -1, _id: -1 }).lean();
+    const lastEndDate = lastPromo ? (lastPromo.endDate || lastPromo.end_date || null) : null;
+
+    const icons = list.map((item) => ({
+      name: item.name,
+      image: formatImageUrl(item.image, req),
+      created_at: item.createdAt || item.created_at,
+      updated_at: item.updatedAt || item.updated_at,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      message: "Icons retrieved successfully",
+      endDate: lastEndDate,
+      icons: icons,
+    });
+  } catch (ex) {
+    console.error("getIconsMobile Error:", ex);
+    return res.status(500).json({
+      message: "An error occurred",
+      details: ex.message,
+    });
+  }
+};
+

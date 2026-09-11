@@ -1,0 +1,1 @@
+{"watch":["src"],"ext":"js","ignore":["uploads/*","*.json","logs/*","node_modules/*"]}

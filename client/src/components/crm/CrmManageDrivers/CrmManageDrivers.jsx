@@ -1,188 +1,175 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, RefreshCw, Eye } from "lucide-react";
-import { swalWithBootstrapButtons } from "../../../utils/sweetAlert";
+import { Search, RefreshCw, Eye, Edit, MapPin } from "lucide-react";
+import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import Pagination from "../../admin/rides/Pagination/Pagination";
+import api from "../../../api/axios";
 import "./CrmManageDrivers.css";
-
-const mockDriversList = [
-  {
-    id: 13878,
-    srNo: 1,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/edfa16e5-b8ca-4cea-be6c-670fbd4ae2dd.jpg",
-    name: "Harvinder Singh",
-    email: "harnoorkaur0085@gmail.com",
-    phone: "+919855897719",
-    activeStatus: "Offline",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13852,
-    srNo: 2,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/b0483cb9-6daa-4d45-aa08-cde840b986dd.jpg",
-    name: "Rahul",
-    email: "rahulcandy155@gmail.com",
-    phone: "+918685896408",
-    activeStatus: "Offline",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13848,
-    srNo: 3,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/978f68ec-a3e3-4294-8851-123b210677ed.jpg",
-    name: "kuldeep",
-    email: "knehra202@gmail.com",
-    phone: "+917404046446",
-    activeStatus: "Online",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13828,
-    srNo: 4,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/645c1fb2-8ddd-4861-a4d5-8501ab4e11aa.jpg",
-    name: "rohit",
-    email: "rm6543171@gmail.com",
-    phone: "+918950038024",
-    activeStatus: "Online",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13824,
-    srNo: 5,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/118b255a-bb34-4412-988c-d569b29bca04.jpg",
-    name: "Gurpreet singh",
-    email: "gbrar5219@gmail.com",
-    phone: "+919772528300",
-    activeStatus: "Online",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13821,
-    srNo: 6,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/f378db5a-9ece-49d9-8d4a-db5d197e13c1.jpg",
-    name: "Mohinder Pal",
-    email: "rk2785109@gmail.com",
-    phone: "+918303027895",
-    activeStatus: "Online",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13816,
-    srNo: 7,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/94bfc15c-e442-43c3-80d5-d8a31a25bcc4.jpg",
-    name: "Jeet Singh",
-    email: "Jeetsingh0509@gmail.com",
-    phone: "+918219543510",
-    activeStatus: "Offline",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13815,
-    srNo: 8,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/93806b41-7450-4edf-b55d-0e95e4c6d892.jpg",
-    name: "Gurmail Singh",
-    email: "gurmailsingh2026@gmail.com",
-    phone: "+916239345514",
-    activeStatus: "Offline",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13813,
-    srNo: 9,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/7fec7e14-048b-405c-9152-687576b838ca.jpg",
-    name: "Arvind Kumar Dogra",
-    email: "dograa19@gmail.com",
-    phone: "+919736320205",
-    activeStatus: "Offline",
-    blocked: false,
-    status: "Approved",
-  },
-  {
-    id: 13811,
-    srNo: 10,
-    image: "https://bhrosacab-storage.s3.ap-south-1.amazonaws.com/driver_image/612b7863-9e96-4025-914b-2643c109b456.jpg",
-    name: "avdhesh Kumar Prajapati",
-    email: "kumaravdhesh49@gmail.com",
-    phone: "+916284398018",
-    activeStatus: "Offline",
-    blocked: false,
-    status: "Pending",
-  },
-];
 
 export default function CrmManageDrivers() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [drivers, setDrivers] = useState(mockDriversList);
+  const [searchInput, setSearchInput] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState(""); // "" | "2" (Approved) | "1" (Pending) | "3" (Rejected)
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 153;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
+  useEffect(() => {
+    fetchDrivers(1, activeSearch, activeFilter);
+  }, [activeFilter]);
+
+  async function fetchDrivers(page = 1, query = activeSearch, statusFilter = activeFilter) {
+    setLoading(true);
+    try {
+      let url = `/drivers?page=${page}&limit=20`;
+      if (query && query.trim()) url += `&search=${encodeURIComponent(query.trim())}`;
+      if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
+
+      const res = await api.get(url);
+      if (res.data && res.data.drivers) {
+        setDrivers(res.data.drivers);
+        setTotalPages(res.data.totalPages || 1);
+        setCurrentPage(res.data.currentPage || 1);
+        setTotalRecords(res.data.total || res.data.drivers.length);
+      }
+    } catch (err) {
+      console.error("Failed to load CRM drivers:", err);
+      showErrorAlert("Failed to load drivers from database");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function handleSearch(e) {
     e.preventDefault();
-    if (!search.trim()) {
-      setDrivers(mockDriversList);
-      return;
-    }
-    const q = search.toLowerCase();
-    const filtered = mockDriversList.filter(
-      (d) =>
-        d.name.toLowerCase().includes(q) ||
-        d.email.toLowerCase().includes(q) ||
-        d.phone.toLowerCase().includes(q) ||
-        d.activeStatus.toLowerCase().includes(q) ||
-        String(d.id).includes(q)
-    );
-    setDrivers(filtered);
+    setActiveSearch(searchInput);
+    fetchDrivers(1, searchInput, activeFilter);
   }
 
   function handleReload() {
-    setLoading(true);
-    setSearch("");
-    setDrivers([...mockDriversList]);
-    setTimeout(() => setLoading(false), 400);
+    setSearchInput("");
+    setActiveSearch("");
+    setActiveFilter("");
+    fetchDrivers(1, "", "");
   }
 
-  function handleBlockToggle(id) {
-    swalWithBootstrapButtons.fire({
-      title: "Change Block Status?",
-      text: "Are you sure you want to change the block status?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, change status",
-      cancelButtonText: "No, cancel",
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setDrivers((prev) =>
-          prev.map((d) => (d.id === id ? { ...d, blocked: !d.blocked } : d))
-        );
-        swalWithBootstrapButtons.fire({
-          title: "Status Updated!",
-          text: "Driver block status has been updated.",
-          icon: "success",
-        });
-      }
-    });
+  function handleBlockToggle(id, isBlocked) {
+    const actionText = isBlocked ? "unblock" : "block";
+
+    swalWithBootstrapButtons
+      .fire({
+        title: "Change Block Status?",
+        text: `Are you sure you want to ${actionText} this driver?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${actionText}!`,
+        cancelButtonText: "No, cancel",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await api.put(`/drivers/${id}/block`);
+            showSuccessAlert(`Driver ${isBlocked ? "unblocked" : "blocked"} successfully!`);
+            fetchDrivers(currentPage, activeSearch, activeFilter);
+          } catch (err) {
+            console.error("Failed to toggle block status:", err);
+            showErrorAlert("Failed to update block status");
+          }
+        }
+      });
   }
 
   function handleView(id) {
     navigate(`/crm-driver-profile/${id}`);
   }
 
+  function handleEdit(id) {
+    navigate(`/crm-driver-profile-edit/${id}`);
+  }
+
+  function handleLocation(id) {
+    navigate(`/crm-driver-location/${id}`);
+  }
+
   return (
     <div className="crm-managedrivers-page-wrap">
       <div className="crm-managedrivers-card">
-        <div className="crm-managedrivers-card-header">
-          <h4 className="crm-managedrivers-card-title">Manage Driver</h4>
+        <div className="crm-managedrivers-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+          <h4 className="crm-managedrivers-card-title">
+            Manage Driver {totalRecords > 0 && <span style={{ fontSize: "14px", fontWeight: "normal", color: "var(--text-muted)" }}>({totalRecords} Total Drivers)</span>}
+          </h4>
+
+          {/* Quick Filter Buttons */}
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("")}
+              style={{
+                background: activeFilter === "" ? "var(--accent, #fca103)" : "var(--bg-panel, #242935)",
+                color: activeFilter === "" ? "#fff" : "var(--text-primary)",
+                border: "1px solid var(--border-color)",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("2")}
+              style={{
+                background: activeFilter === "2" ? "#22c55e" : "var(--bg-panel, #242935)",
+                color: activeFilter === "2" ? "#fff" : "var(--text-primary)",
+                border: "1px solid var(--border-color)",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              Approved
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("1")}
+              style={{
+                background: activeFilter === "1" ? "#f59e0b" : "var(--bg-panel, #242935)",
+                color: activeFilter === "1" ? "#fff" : "var(--text-primary)",
+                border: "1px solid var(--border-color)",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              Pending
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveFilter("3")}
+              style={{
+                background: activeFilter === "3" ? "#ef4444" : "var(--bg-panel, #242935)",
+                color: activeFilter === "3" ? "#fff" : "var(--text-primary)",
+                border: "1px solid var(--border-color)",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              Rejected
+            </button>
+          </div>
         </div>
 
         <div className="crm-managedrivers-card-body">
@@ -192,9 +179,9 @@ export default function CrmManageDrivers() {
               <div className="crm-managedrivers-input-group">
                 <input
                   type="text"
-                  placeholder="Search drivers..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by name, phone, email, or vehicle..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                 />
                 <button type="submit" className="crm-managedrivers-search-btn">
                   <Search size={14} /> Search
@@ -222,70 +209,136 @@ export default function CrmManageDrivers() {
                   <th>Driver Image</th>
                   <th>Name</th>
                   <th>Email</th>
-                  {/* <th>Phone no.</th> */}
+                  <th>Phone no.</th>
+                  <th>Vehicle</th>
                   <th style={{ textAlign: "center" }}>Active Status</th>
                   <th style={{ textAlign: "center" }}>Block Status</th>
                   <th style={{ textAlign: "center" }}>Status</th>
-                  <th style={{ width: "100px", textAlign: "center" }}>Action</th>
+                  <th style={{ width: "130px", textAlign: "center" }}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {drivers.length === 0 ? (
+                {loading ? (
                   <tr>
-                    <td colSpan={8} className="crm-managedrivers-no-data">
-                      No drivers found
+                    <td colSpan={10} className="crm-managedrivers-no-data">
+                      Loading live drivers from database...
+                    </td>
+                  </tr>
+                ) : drivers.length === 0 ? (
+                  <tr>
+                    <td colSpan={10} className="crm-managedrivers-no-data">
+                      No drivers found in database
                     </td>
                   </tr>
                 ) : (
                   drivers.map((d, i) => {
-                    const isOnline = d.activeStatus === "Online";
+                    const driverId = d.id || d._id;
+                    const isOnline = d.active === "Online" || d.online_offline === "1" || d.online_offline === 1;
+                    const isBlocked = d.blocked || d.is_block === "1" || d.is_block === 1;
+                    const statusText = d.approved || (d.status === 2 || d.status === "2" ? "Approved" : d.status === 3 || d.status === "3" ? "Rejected" : "Pending");
+
                     return (
-                      <tr key={d.id}>
-                        <td style={{ textAlign: "center", fontWeight: 700 }}>{i + 1}</td>
-                        <td >
+                      <tr key={driverId}>
+                        <td style={{ textAlign: "center", fontWeight: 700 }}>
+                          {(currentPage - 1) * 20 + i + 1}
+                        </td>
+                        <td>
                           <div className="crm-driver-avatar-wrap">
                             <img
-                              src={d.image}
+                              src={d.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name || "Driver")}&background=random`}
                               alt={d.name}
                               className="crm-driver-avatar"
                               onError={(e) => {
-                                e.target.src =
-                                  "https://kalasalingam.ac.in/wp-content/uploads/2021/08/Achievements-dummy-profile.png";
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name || "Driver")}&background=random`;
                               }}
                             />
                           </div>
                         </td>
-                        <td className="crm-driver-name">{d.name}</td>
-                        <td className="crm-driver-email">{d.email}</td>
-                        {/* <td className="crm-driver-phone">{d.phone}</td> */}
+                        <td className="crm-driver-name">
+                          {d.name} {d.lastName || d.last_name || ""}
+                        </td>
+                        <td className="crm-driver-email">{d.email || "N/A"}</td>
+                        <td className="crm-driver-phone">{d.phone || d.number || "N/A"}</td>
+                        <td>{d.vehicleNumber || "N/A"}</td>
                         <td style={{ textAlign: "center" }}>
                           <span className={`crm-driver-active-badge ${isOnline ? "online" : "offline"}`}>
-                            {d.activeStatus}
+                            {isOnline ? "Online" : "Offline"}
                           </span>
                         </td>
                         <td style={{ textAlign: "center" }}>
                           <button
                             type="button"
-                            className={`crm-driver-block-btn ${d.blocked ? "unblock" : "block"}`}
-                            onClick={() => handleBlockToggle(d.id)}
+                            className={`crm-driver-block-btn ${isBlocked ? "unblock" : "block"}`}
+                            onClick={() => handleBlockToggle(driverId, isBlocked)}
                           >
-                            {d.blocked ? "Unblock" : "Block"}
+                            {isBlocked ? "Unblock" : "Block"}
                           </button>
                         </td>
                         <td style={{ textAlign: "center" }}>
-                          <span className="crm-driver-status-approved">
-                            {d.status}
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              fontSize: "13px",
+                              color:
+                                statusText === "Approved"
+                                  ? "#22c55e"
+                                  : statusText === "Rejected"
+                                  ? "#ef4444"
+                                  : "#f59e0b",
+                            }}
+                          >
+                            {statusText}
                           </span>
                         </td>
                         <td style={{ textAlign: "center" }}>
-                          <button
-                            type="button"
-                            className="crm-driver-action-eye-btn"
-                            title="View Driver Profile"
-                            onClick={() => handleView(d.id)}
-                          >
-                            <Eye size={15} strokeWidth={2.5} />
-                          </button>
+                          <div style={{ display: "inline-flex", gap: "6px", alignItems: "center" }}>
+                            <button
+                              type="button"
+                              className="crm-driver-action-eye-btn"
+                              title="View Driver Profile"
+                              onClick={() => handleView(driverId)}
+                            >
+                              <Eye size={15} strokeWidth={2.5} />
+                            </button>
+                            <button
+                              type="button"
+                              title="Edit Driver"
+                              onClick={() => handleEdit(driverId)}
+                              style={{
+                                background: "#3b82f6",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "6px",
+                                width: "32px",
+                                height: "32px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button
+                              type="button"
+                              title="View Live Location"
+                              onClick={() => handleLocation(driverId)}
+                              style={{
+                                background: "#10b981",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "6px",
+                                width: "32px",
+                                height: "32px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <MapPin size={14} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -295,11 +348,16 @@ export default function CrmManageDrivers() {
             </table>
           </div>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(p) => {
+                setCurrentPage(p);
+                fetchDrivers(p, activeSearch, activeFilter);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

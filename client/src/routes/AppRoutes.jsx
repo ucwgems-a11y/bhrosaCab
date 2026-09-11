@@ -45,6 +45,7 @@ import Event from "../components/bhrosawebsitepage/Event";
 import Franchise from "../components/bhrosawebsitepage/Franchise";
 import PrivacyPolicyPage from "../components/bhrosawebsitepage/legal/PrivacyPolicyPage";
 import RefundPolicyPage from "../components/bhrosawebsitepage/legal/RefundPolicyPage"; 
+import WebsiteTermsConditionsPage from "../components/bhrosawebsitepage/legal/TermsConditionsPage";
 
 /* =========================================================
    3. ADMIN AUTH & DASHBOARD CORE IMPORTS
@@ -212,7 +213,11 @@ function AppRoutes() {
 
               {/* Public Legal Policies */}
               <Route path="/policy" element={<PrivacyPolicyPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/refund-policy" element={<RefundPolicyPage />} />
+              <Route path="/term-and-conditions" element={<WebsiteTermsConditionsPage />} />
+              <Route path="/terms-and-conditions" element={<WebsiteTermsConditionsPage />} />
+              <Route path="/terms-conditions" element={<WebsiteTermsConditionsPage />} />
 
               {/* =========================================================
                  SECTION 2: ADMIN & CRM AUTHENTICATION
@@ -359,9 +364,9 @@ function AppRoutes() {
               <Route path="/crm-user-driver" element={<CrmManageDrivers />} />
               <Route path="/crm-driver-profile/:id" element={<CrmDriverProfile />} />
               <Route path="/crm-driver-location/:id" element={<CrmDriverLocation />} />
-              <Route path="/crm-driver-profile-edit/:id" element={<Navigate to="/crm-user-driver" replace />} />
-              <Route path="/crm-driver-referral-list/:id" element={<Navigate to="/crm-user-driver" replace />} />
-              <Route path="/crm-driver-referral-commission-list/:id" element={<Navigate to="/crm-user-driver" replace />} />
+              <Route path="/crm-driver-profile-edit/:id" element={<CrmEditDriver />} />
+              <Route path="/crm-driver-referral-list/:id" element={<CrmDriverReferralList />} />
+              <Route path="/crm-driver-referral-commission-list/:id" element={<CrmDriverReferralCommission />} />
               <Route path="/crm-rides-ongoing-manage" element={<CrmOngoingRides />} />
               <Route path="/crm-rides-completed-manage" element={<CrmCompletedRides />} />
               <Route path="/crm-rides-cancel-manage" element={<CrmCancelledRides />} />
