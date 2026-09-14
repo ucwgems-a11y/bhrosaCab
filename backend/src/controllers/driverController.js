@@ -1468,6 +1468,15 @@ exports.getDrivers = async (req, res) => {
       block_status: d.block_status,
       blocked: d.block_status === 1,
       document_verify_status: d.document_verify_status || "0",
+      documentVerifyStatus:
+        d.document_verify_status === "accepted" ||
+        d.document_verify_status === "approved" ||
+        d.document_verify_status === "2"
+          ? "Approved"
+          : d.document_verify_status === "rejected" ||
+            d.document_verify_status === "3"
+          ? "Rejected"
+          : "Pending",
       created_at: d.created_at || d.createdAt,
     }));
 
@@ -1629,50 +1638,53 @@ exports.updateDriverStatus = async (req, res) => {
         .json({ success: false, message: "Driver not found" });
     }
 
-    let numericStatus = driver.status;
-    if (
-      status === 2 ||
-      status === "2" ||
-      status === "Approved" ||
-      status === "approve" ||
-      status === "accepted"
-    ) {
-      numericStatus = 2;
-      driver.document_verify_status = "accepted";
-    } else if (
-      status === 3 ||
-      status === "3" ||
-      status === "Rejected" ||
-      status === "reject" ||
-      status === "rejected"
-    ) {
-      numericStatus = 3;
-      driver.document_verify_status = "rejected";
-    } else if (
-      status === 1 ||
-      status === "1" ||
-      status === "Pending" ||
-      status === "pending"
-    ) {
-      numericStatus = 1;
-      driver.document_verify_status = "pending";
+    if (status !== undefined) {
+      let numericStatus = driver.status;
+      if (
+        status === 2 ||
+        status === "2" ||
+        status === "Approved" ||
+        status === "approve"
+      ) {
+        numericStatus = 2;
+      } else if (
+        status === 3 ||
+        status === "3" ||
+        status === "Rejected" ||
+        status === "reject"
+      ) {
+        numericStatus = 3;
+      } else if (
+        status === 1 ||
+        status === "1" ||
+        status === "Pending" ||
+        status === "pending" ||
+        status === 0 ||
+        status === "0"
+      ) {
+        numericStatus = 1;
+      }
+      driver.status = numericStatus;
     }
 
-    driver.status = numericStatus;
-    if (document_verify_status)
+    if (document_verify_status !== undefined) {
       driver.document_verify_status = document_verify_status;
-    if (driving_licence_status !== undefined)
+    }
+    if (driving_licence_status !== undefined) {
       driver.driving_licence_status = driving_licence_status;
-    if (aadhaar_number_status !== undefined)
+    }
+    if (aadhaar_number_status !== undefined) {
       driver.aadhaar_number_status = aadhaar_number_status;
+    }
 
     await driver.save();
 
     return res.status(200).json({
       success: true,
-      message: `Driver status updated to '${getStatusLabel(numericStatus)}' successfully`,
-      status: getStatusLabel(numericStatus),
-      statusCode: numericStatus,
+      message: `Driver status updated successfully`,
+      status: getStatusLabel(driver.status),
+      statusCode: driver.status,
+      document_verify_status: driver.document_verify_status,
       driver,
     });
   } catch (err) {
