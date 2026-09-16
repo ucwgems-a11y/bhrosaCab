@@ -5,6 +5,7 @@ const navLinks = [
   { name: "Event", path: "/event" },
   { name: "Franchise", path: "/franchise" },
   { name: "Contact", path: "/contact" },
+  { name: "Media Coverage", path: "/media-coverage" },
 ];
 
 export default navLinks;

@@ -8,7 +8,7 @@ const router = express.Router();
 const verifyAdmin = require("../middleware/verifyAdmin");
 
 // 1. Unified CMS & Website Dynamic Content Router (Single Clean Import)
-const cmswebRoutes = require("./cmswebRoutes");
+const bhrosawebRoutes = require("./bhrosawebRoutes");
 const bharatVerifyRoutes = require("./bharatVerifyRoutes");
 
 // 2. Authentication, Administration, User, Driver & Ride Core Routers
@@ -29,7 +29,7 @@ const cancelReasonRoutes = require("./cancelReasonRoutes");
 const faqRoutes = require("./faqRoutes");
 
 // 3. Mount Unified Public Website & CMS Content Routes at Root (/api/)
-router.use("/", cmswebRoutes);
+router.use("/", bhrosawebRoutes);
 router.use("/", bharatVerifyRoutes);
 
 // 4. Admin Profile & Verification Check

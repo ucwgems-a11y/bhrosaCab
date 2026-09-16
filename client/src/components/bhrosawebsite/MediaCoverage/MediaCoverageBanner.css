@@ -1,0 +1,242 @@
+/* ===============================
+   Media Coverage Banner
+================================ */
+
+.media-page-header {
+    background: url("../../../assets/img/bg-1.jpg") no-repeat center center;
+    background-size: cover;
+    width: 100%;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Overlay */
+.media-page-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(34, 34, 34, 0.8);
+    z-index: -1;
+}
+
+/* Container */
+.media-banner-container {
+    width: 90%;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* ===============================
+   Content
+================================ */
+.media-page-info {
+    position: relative;
+    z-index: 5;
+}
+
+.media-page-info h4 {
+    display: inline-block;
+    padding: 0 16px;
+    height: 26px;
+    line-height: 26px;
+    background: #87CEEB;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    clip-path: polygon(93% 0%, 100% 30%, 100% 100%, 0 100%, 0 0);
+    margin-bottom: 18px;
+}
+
+.media-page-info h2 {
+    color: #fff;
+    font-size: 46px;
+    line-height: 56px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+.media-page-info h2 .highlight-text {
+    color: #87CEEB;
+}
+
+.media-page-info p {
+    color: #ddd;
+    font-size: 18px;
+    line-height: 28px;
+    margin: 0;
+}
+
+/* ===============================
+   Bottom Shape
+=============================== */
+.media-page-shape {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 50%;
+    height: 100px;
+    z-index: 2;
+}
+
+/* Blue Shape */
+.media-page-shape::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #87CEEB;
+    background-image: repeating-linear-gradient(
+        45deg,
+        #87CEEB 0,
+        #87CEEB 2px,
+        transparent 2px,
+        transparent 10px
+    );
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+}
+
+/* Black Shape */
+.media-page-shape::after {
+    content: "";
+    position: absolute;
+    left: -150px;
+    bottom: 0;
+    width: 100%;
+    height: 80px;
+    background: #222 url("../../../assets/img/texture.png") repeat;
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0 100%);
+    z-index: -1;
+}
+
+/* ===================================
+   TABLET (769px - 992px)
+=================================== */
+@media (max-width: 992px) {
+    .media-page-header {
+        height: 320px;
+    }
+
+    .media-banner-container {
+        width: 92%;
+    }
+
+    .media-page-info h4 {
+        font-size: 11px;
+        padding: 0 14px;
+        height: 24px;
+        line-height: 24px;
+        margin-bottom: 16px;
+    }
+
+    .media-page-info h2 {
+        font-size: 38px;
+        line-height: 48px;
+        margin-bottom: 12px;
+    }
+
+    .media-page-info p {
+        font-size: 17px;
+        line-height: 28px;
+    }
+
+    .media-page-shape {
+        width: 55%;
+        height: 80px;
+    }
+
+    .media-page-shape::after {
+        height: 65px;
+        left: -110px;
+    }
+}
+
+/* ===================================
+   MOBILE (481px - 768px)
+=================================== */
+@media (max-width: 768px) {
+    .media-page-header {
+        height: 300px;
+    }
+
+    .media-banner-container {
+        width: 92%;
+    }
+
+    .media-page-info h4 {
+        font-size: 11px;
+        padding: 0 12px;
+        height: 22px;
+        line-height: 22px;
+        margin-bottom: 14px;
+    }
+
+    .media-page-info h2 {
+        font-size: 32px;
+        line-height: 42px;
+        margin-bottom: 12px;
+    }
+
+    .media-page-info p {
+        font-size: 16px;
+        line-height: 26px;
+    }
+
+    .media-page-shape {
+        width: 60%;
+        height: 70px;
+    }
+
+    .media-page-shape::after {
+        height: 55px;
+        left: -90px;
+    }
+}
+
+/* ===================================
+   SMALL MOBILE (480px)
+=================================== */
+@media (max-width: 480px) {
+    .media-page-header {
+        height: 270px;
+    }
+
+    .media-banner-container {
+        width: 90%;
+    }
+
+    .media-page-info h4 {
+        font-size: 10px;
+        padding: 0 10px;
+        height: 20px;
+        line-height: 20px;
+        margin-bottom: 12px;
+    }
+
+    .media-page-info h2 {
+        font-size: 26px;
+        line-height: 36px;
+        margin-bottom: 10px;
+    }
+
+    .media-page-info p {
+        font-size: 15px;
+        line-height: 24px;
+    }
+
+    .media-page-shape {
+        width: 65%;
+        height: 60px;
+    }
+
+    .media-page-shape::after {
+        height: 45px;
+        left: -70px;
+    }
+}
+

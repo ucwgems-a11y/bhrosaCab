@@ -8,15 +8,17 @@ import contactEditors from "../contact/editors";
 import eventEditors from "../event/editors";
 import franchiseEditors from "../franchise/editors";
 import footerEditors from "../footer/editors";
+import mediaCoverageEditors from "../mediaCoverage/editors";
 
 const pageEditorsMap = {
   home: homeEditors,
   about: aboutEditors,
   services: servicesEditors,
   contact: contactEditors,
-    event: eventEditors,
-    franchise: franchiseEditors,
-      footer: footerEditors,
+  event: eventEditors,
+  franchise: franchiseEditors,
+  "media-coverage": mediaCoverageEditors,
+  footer: footerEditors,
 };
 
 export default function SectionEditor() {

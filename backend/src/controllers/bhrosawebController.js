@@ -38,6 +38,8 @@ const ContactMap = require("../models/ContactMap");
 const ContactInfo = require("../models/ContactInfo");
 const ContactMessage = require("../models/ContactMessage");
 
+const MediaCoverage = require("../models/MediaCoverage");
+
 /* =========================================================================
    SECTION 1: GLOBAL HEADER, FOOTER & COMPANY INFO
 ========================================================================= */
@@ -899,6 +901,97 @@ const deleteContactMessage = async (req, res) => {
   }
 };
 
+/* =========================================================================
+   SECTION 7: MEDIA COVERAGE
+========================================================================= */
+
+// --- 7.1 Media Coverage Articles ---
+// GET /api/media-coverages (Public)
+const getMediaCoverages = async (req, res) => {
+  try {
+    const coverages = await MediaCoverage.find({ isActive: { $ne: false } }).sort({
+      date: -1,
+      createdAt: -1,
+    });
+    res.json(coverages);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// POST /api/media-coverages (Admin Only)
+const createMediaCoverage = async (req, res) => {
+  try {
+    const data = { ...req.body };
+    if (req.files?.image) {
+      data.image = `/uploads/${req.files.image[0].filename}`;
+    } else if (req.file) {
+      data.image = `/uploads/${req.file.filename}`;
+    }
+    const coverage = await MediaCoverage.create(data);
+    res.status(201).json(coverage);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// PUT /api/media-coverages/:id (Admin Only)
+const updateMediaCoverage = async (req, res) => {
+  try {
+    const data = { ...req.body };
+    if (req.files?.image) {
+      data.image = `/uploads/${req.files.image[0].filename}`;
+    } else if (req.file) {
+      data.image = `/uploads/${req.file.filename}`;
+    }
+    const coverage = await MediaCoverage.findByIdAndUpdate(req.params.id, data, {
+      returnDocument: "after",
+    });
+    if (!coverage) return res.status(404).json({ message: "Media coverage not found" });
+    res.json(coverage);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// DELETE /api/media-coverages/:id (Admin Only)
+const deleteMediaCoverage = async (req, res) => {
+  try {
+    const coverage = await MediaCoverage.findByIdAndDelete(req.params.id);
+    if (!coverage) return res.status(404).json({ message: "Media coverage not found" });
+    res.json({ message: "Media coverage deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// POST /api/media-coverages/seed (Admin Only)
+const seedMediaCoverages = async (req, res) => {
+  try {
+    const { articles } = req.body;
+    if (!Array.isArray(articles) || articles.length === 0) {
+      return res.status(400).json({ message: "Articles array is required" });
+    }
+    const docs = articles.map((a) => ({
+      date: new Date(a.date),
+      displayDate: a.displayDate || "",
+      title: a.title || a.newspaper || "भरोसा कैब मीडिया कवरेज",
+      newspaper: a.newspaper || "",
+      city: a.city || "",
+      image: a.filename || a.image,
+      description: a.description || "",
+      link: a.link || "",
+      linkText: a.linkText || "ई-पेपर / खबर पढ़ें",
+      isActive: true,
+    }));
+    await MediaCoverage.insertMany(docs);
+    const all = await MediaCoverage.find().sort({ date: -1, createdAt: -1 });
+    res.status(201).json({ success: true, count: docs.length, data: all });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   // 1. Header, Footer & Company
   getSiteHeader,
@@ -981,4 +1074,11 @@ module.exports = {
   createContactMessage,
   getContactMessages,
   deleteContactMessage,
+
+  // 7. Media Coverage
+  getMediaCoverages,
+  createMediaCoverage,
+  updateMediaCoverage,
+  deleteMediaCoverage,
+  seedMediaCoverages,
 };

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Phone as PhoneIcon, Home, Info, Wrench, Phone, CalendarDays, Building2, LayoutTemplate } from "lucide-react"
+import { Phone as PhoneIcon, Home, Info, Wrench, Phone, CalendarDays, Building2, LayoutTemplate, Newspaper } from "lucide-react"
 import "./WebsitePages.css";
 
 // Header pehle rakha hai kyunki ye website ke har page pe common hota hai
@@ -12,6 +12,7 @@ const pages = [
   { key: "contact", label: "Contact", icon: <Phone size={20} /> },
   { key: "event", label: "Event", icon: <CalendarDays size={20} /> },
   { key: "franchise", label: "Franchise", icon: <Building2 size={20} /> },
+  { key: "media-coverage", label: "Media Coverage", icon: <Newspaper size={20} /> },
   { key: "footer", label: "Footer", icon: <LayoutTemplate size={20} /> },
 ];
 

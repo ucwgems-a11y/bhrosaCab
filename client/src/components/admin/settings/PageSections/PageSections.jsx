@@ -9,6 +9,7 @@ import {
   Star,
   FileText,
   ArrowLeft,
+  Newspaper,
 } from "lucide-react";
 import "./PageSections.css";
 
@@ -61,6 +62,12 @@ contact: {
     { key: "map", label: "Map", icon: FileText },
     { key: "info", label: "Contact Info", icon: Info },
     { key: "messages", label: "Messages", icon: CalendarCheck },
+  ],
+},
+"media-coverage": {
+  title: "Media Coverage Page",
+  sections: [
+    { key: "articles", label: "Newspaper & Media Clippings", icon: Newspaper },
   ],
 },
 footer: {

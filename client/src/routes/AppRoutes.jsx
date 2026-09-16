@@ -43,6 +43,7 @@ import Services from "../components/bhrosawebsitepage/Services";
 import Contact from "../components/bhrosawebsitepage/Contact";
 import Event from "../components/bhrosawebsitepage/Event";
 import Franchise from "../components/bhrosawebsitepage/Franchise";
+import MediaCoverage from "../components/bhrosawebsitepage/MediaCoverage";
 import PrivacyPolicyPage from "../components/bhrosawebsitepage/legal/PrivacyPolicyPage";
 import RefundPolicyPage from "../components/bhrosawebsitepage/legal/RefundPolicyPage"; 
 import WebsiteTermsConditionsPage from "../components/bhrosawebsitepage/legal/TermsConditionsPage";
@@ -138,6 +139,7 @@ import AdminSendNotification from "../components/adminpage/Notification/SendNoti
 import AdminCompanyInfo from "../components/adminpage/Settings/CompanyInfo";
 import AdminSiteHeader from "../components/admin/settings/SiteHeaderEditor/SiteHeaderEditor";
 import AdminSettingsWebsite from "../components/adminpage/Settings/Website";
+import AdminMediaCoverageEditor from "../components/admin/settings/mediaCoverage/MediaCoverageEditor/MediaCoverageEditor";
 import AdminSettingsWebsitePage from "../components/adminpage/Settings/WebsitePage";
 import AdminSectionEditor from "../components/admin/settings/SectionEditor/SectionEditor";
 import AdminContactUs from "../components/adminpage/Settings/ContactUs";  
@@ -209,6 +211,7 @@ function AppRoutes() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/event" element={<Event />} />
                 <Route path="/franchise" element={<Franchise />} />
+                <Route path="/media-coverage" element={<MediaCoverage />} />
               </Route>
 
               {/* Public Legal Policies */}
@@ -317,6 +320,7 @@ function AppRoutes() {
               <Route path="/admin/settings/website" element={<AdminSettingsWebsite />} />
               <Route path="/admin/settings/website/header" element={<AdminSiteHeader />} />
               <Route path="/admin/settings/website/company-info" element={<AdminCompanyInfo />} />
+              <Route path="/admin/settings/website/media-coverage" element={<AdminMediaCoverageEditor />} />
               <Route path="/admin/settings/website/:pageKey" element={<AdminSettingsWebsitePage />} />
               <Route path="/admin/settings/website/:pageKey/:sectionKey" element={<AdminSectionEditor />} />
 

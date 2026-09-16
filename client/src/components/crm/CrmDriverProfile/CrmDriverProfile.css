@@ -171,3 +171,35 @@ transition: transform 1.2s ease;
   font-size: 32px;
   cursor: pointer;
 }
+
+/* PDF Document Badge Button for CRM Driver Profile */
+.crm-dp-pdf-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 84px;
+  background: #f95738;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(249, 87, 56, 0.25);
+}
+
+.crm-dp-pdf-btn:hover {
+  background: #e04b2e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(249, 87, 56, 0.35);
+}
+
+.crm-dp-pdf-btn span {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}

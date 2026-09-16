@@ -272,6 +272,43 @@
   display: block;
 }
 
+/* PDF Document Badge Button (Matching UI in Driver Verification) */
+.driver-pdf-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 48px;
+  background: #f95738;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(249, 87, 56, 0.25);
+}
+
+.driver-pdf-badge:hover {
+  background: #e04b2e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(249, 87, 56, 0.35);
+}
+
+.driver-pdf-badge svg {
+  margin-bottom: 2px;
+}
+
+.driver-pdf-badge span {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
 /* Status text badges */
 .driver-status-text {
   font-weight: 700;

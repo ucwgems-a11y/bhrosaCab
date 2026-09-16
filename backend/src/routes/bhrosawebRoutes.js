@@ -291,4 +291,36 @@ router.post("/contact-messages", bhrosawebController.createContactMessage);
 router.get("/contact-messages", verifyAdmin, bhrosawebController.getContactMessages);
 router.delete("/contact-messages/:id", verifyAdmin, bhrosawebController.deleteContactMessage);
 
+// =========================================================================
+// 7. MEDIA COVERAGE CMS ROUTES
+// =========================================================================
+
+// Public List (Plural and Singular)
+router.get("/media-coverages", bhrosawebController.getMediaCoverages);
+router.get("/media-coverage", bhrosawebController.getMediaCoverages);
+
+// Admin Management (Create, Update, Delete)
+router.post(
+  "/media-coverages/seed",
+  verifyAdmin,
+  bhrosawebController.seedMediaCoverages
+);
+router.post(
+  "/media-coverages",
+  verifyAdmin,
+  upload.fields([{ name: "image", maxCount: 1 }]),
+  bhrosawebController.createMediaCoverage
+);
+router.put(
+  "/media-coverages/:id",
+  verifyAdmin,
+  upload.fields([{ name: "image", maxCount: 1 }]),
+  bhrosawebController.updateMediaCoverage
+);
+router.delete(
+  "/media-coverages/:id",
+  verifyAdmin,
+  bhrosawebController.deleteMediaCoverage
+);
+
 module.exports = router;

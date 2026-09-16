@@ -140,7 +140,12 @@ export default function ReuploadDocumentsPage() {
             <div className="reupload-grid">
               {docFields.map((doc) => {
                 const currentPreview = previews[doc.key];
-                const hasUploaded = Boolean(files[doc.key]);
+                const selectedFile = files[doc.key];
+                const hasUploaded = Boolean(selectedFile);
+
+                const isPdf = selectedFile
+                  ? selectedFile.type === "application/pdf" || (selectedFile.name && selectedFile.name.toLowerCase().endsWith(".pdf"))
+                  : typeof currentPreview === "string" && (currentPreview.toLowerCase().endsWith(".pdf") || currentPreview.toLowerCase().includes(".pdf"));
 
                 return (
                   <div className="reupload-doc-card" key={doc.key}>
@@ -152,20 +157,32 @@ export default function ReuploadDocumentsPage() {
                     </div>
 
                     <div className="reupload-preview-container">
-                      <img
-                        src={currentPreview || "/no-document.png"}
-                        alt={doc.label}
-                        className="reupload-preview-img"
-                        style={{
-                          objectFit: "contain",
-                          background: currentPreview ? "transparent" : "#ffffff",
-                          padding: currentPreview ? "0" : "8px",
-                        }}
-                        onError={(e) => {
-                          e.target.src = "/no-document.png";
-                          e.target.style.background = "#ffffff";
-                        }}
-                      />
+                      {isPdf ? (
+                        <button
+                          type="button"
+                          className="reupload-pdf-btn"
+                          onClick={() => window.open(currentPreview, "_blank", "noopener,noreferrer")}
+                          title="Click to view PDF"
+                        >
+                          <FileText size={26} />
+                          <span>View PDF</span>
+                        </button>
+                      ) : (
+                        <img
+                          src={currentPreview || "/no-document.png"}
+                          alt={doc.label}
+                          className="reupload-preview-img"
+                          style={{
+                            objectFit: "contain",
+                            background: currentPreview ? "transparent" : "#ffffff",
+                            padding: currentPreview ? "0" : "8px",
+                          }}
+                          onError={(e) => {
+                            e.target.src = "/no-document.png";
+                            e.target.style.background = "#ffffff";
+                          }}
+                        />
+                      )}
                     </div>
 
                     <div className="reupload-upload-btn-wrap">

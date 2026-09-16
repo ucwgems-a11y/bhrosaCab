@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Check, X, ArrowLeft, Eye } from "lucide-react";
+import { Check, X, ArrowLeft, Eye, FileText } from "lucide-react";
 import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import api from "../../../api/axios";
 import "./CrmDriverProfile.css";
@@ -49,9 +49,6 @@ export default function CrmDriverProfile() {
           try {
             await api.put(`/drivers/${id}/status`, {
               status: 2,
-              document_verify_status: "accepted",
-              driving_licence_status: "approved",
-              aadhaar_number_status: "approved",
             });
             showSuccessAlert("Driver has been approved successfully!");
             fetchDriverProfile();
@@ -82,9 +79,6 @@ export default function CrmDriverProfile() {
           try {
             await api.put(`/drivers/${id}/status`, {
               status: 3,
-              document_verify_status: "rejected",
-              driving_licence_status: "rejected",
-              aadhaar_number_status: "rejected",
             });
             showSuccessAlert("Driver application has been rejected.");
             fetchDriverProfile();
@@ -252,19 +246,33 @@ export default function CrmDriverProfile() {
               {/* Document Images */}
               {imageRows.map((img, i) => {
                 if (!img.src) return null;
+                const isPdf = typeof img.src === "string" && (img.src.toLowerCase().endsWith(".pdf") || img.src.toLowerCase().includes(".pdf"));
+
                 return (
                   <tr key={"img-" + i}>
                     <th className="crm-dp-label">{img.label}</th>
                     <td className="crm-dp-value">
-                      <img
-                        src={img.src}
-                        alt={img.label}
-                        className="crm-dp-doc-thumb"
-                        onClick={() => setZoomImage(img.src)}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
+                      {isPdf ? (
+                        <button
+                          type="button"
+                          className="crm-dp-pdf-btn"
+                          onClick={() => window.open(img.src, "_blank", "noopener,noreferrer")}
+                          title={`Click to view ${img.label} (PDF)`}
+                        >
+                          <FileText size={24} />
+                          <span>View PDF</span>
+                        </button>
+                      ) : (
+                        <img
+                          src={img.src}
+                          alt={img.label}
+                          className="crm-dp-doc-thumb"
+                          onClick={() => setZoomImage(img.src)}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      )}
                     </td>
                   </tr>
                 );

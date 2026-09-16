@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Check, X } from "lucide-react";
+import { Check, X, FileText } from "lucide-react";
 import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../../utils/sweetAlert";
 import api from "../../../../api/axios";
 import "./DriverProfilePage.css";
@@ -49,9 +49,6 @@ export default function DriverProfilePage() {
           try {
             await api.put(`/drivers/${id}/status`, {
               status: 2,
-              document_verify_status: "accepted",
-              driving_licence_status: "approved",
-              aadhaar_number_status: "approved",
             });
             showSuccessAlert("Driver has been approved successfully!");
             fetchDriverProfile();
@@ -83,9 +80,6 @@ export default function DriverProfilePage() {
           try {
             await api.put(`/drivers/${id}/status`, {
               status: 3,
-              document_verify_status: "rejected",
-              driving_licence_status: "rejected",
-              aadhaar_number_status: "rejected",
             });
             showSuccessAlert("Driver application has been rejected.");
             fetchDriverProfile();
@@ -235,29 +229,45 @@ export default function DriverProfilePage() {
                   <td>{r.value}</td>
                 </tr>
               ))}
-              {imageRows.map((r) => (
-                <tr key={r.label}>
-                  <th>{r.label}</th>
-                  <td>
-                    <img
-                      src={r.src || "/no-document.png"}
-                      alt={r.label}
-                      className="driverprofile-doc-thumb"
-                      onClick={() => setZoomImage(r.src || "/no-document.png")}
-                      style={{
-                        cursor: "pointer",
-                        objectFit: "contain",
-                        background: r.src ? "transparent" : "#ffffff",
-                        padding: r.src ? "0" : "4px",
-                      }}
-                      onError={(e) => {
-                        e.target.src = "/no-document.png";
-                        e.target.style.background = "#ffffff";
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {imageRows.map((r) => {
+                const isPdf = typeof r.src === "string" && (r.src.toLowerCase().endsWith(".pdf") || r.src.toLowerCase().includes(".pdf"));
+
+                return (
+                  <tr key={r.label}>
+                    <th>{r.label}</th>
+                    <td>
+                      {isPdf ? (
+                        <button
+                          type="button"
+                          className="driverprofile-pdf-btn"
+                          onClick={() => window.open(r.src, "_blank", "noopener,noreferrer")}
+                          title={`Click to view ${r.label} (PDF)`}
+                        >
+                          <FileText size={26} />
+                          <span>View PDF</span>
+                        </button>
+                      ) : (
+                        <img
+                          src={r.src || "/no-document.png"}
+                          alt={r.label}
+                          className="driverprofile-doc-thumb"
+                          onClick={() => setZoomImage(r.src || "/no-document.png")}
+                          style={{
+                            cursor: "pointer",
+                            objectFit: "contain",
+                            background: r.src ? "transparent" : "#ffffff",
+                            padding: r.src ? "0" : "4px",
+                          }}
+                          onError={(e) => {
+                            e.target.src = "/no-document.png";
+                            e.target.style.background = "#ffffff";
+                          }}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 

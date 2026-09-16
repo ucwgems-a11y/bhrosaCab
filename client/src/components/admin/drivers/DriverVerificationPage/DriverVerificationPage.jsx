@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Check, X, Upload } from "lucide-react";
+import { Search, Check, X, Upload, FileText } from "lucide-react";
 import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../../utils/sweetAlert";
 import Pagination from "../../rides/Pagination/Pagination";
 import api from "../../../../api/axios";
@@ -68,7 +68,6 @@ export default function DriverVerificationPage() {
         if (result.isConfirmed) {
           try {
             await api.put(`/drivers/${id}/status`, {
-              status: 2,
               document_verify_status: "accepted",
               driving_licence_status: "approved",
               aadhaar_number_status: "approved",
@@ -76,8 +75,8 @@ export default function DriverVerificationPage() {
             showSuccessAlert("Driver documents approved successfully!");
             fetchVerifications(currentPage, activeSearch);
           } catch (err) {
-            console.error("Failed to approve driver:", err);
-            showErrorAlert("Failed to approve driver");
+            console.error("Failed to approve driver documents:", err);
+            showErrorAlert("Failed to approve driver documents");
           }
         }
       });
@@ -98,7 +97,6 @@ export default function DriverVerificationPage() {
         if (result.isConfirmed) {
           try {
             await api.put(`/drivers/${id}/status`, {
-              status: 3,
               document_verify_status: "rejected",
               driving_licence_status: "rejected",
               aadhaar_number_status: "rejected",
@@ -106,8 +104,8 @@ export default function DriverVerificationPage() {
             showSuccessAlert("Driver documents have been rejected.");
             fetchVerifications(currentPage, activeSearch);
           } catch (err) {
-            console.error("Failed to reject driver:", err);
-            showErrorAlert("Failed to reject driver");
+            console.error("Failed to reject driver documents:", err);
+            showErrorAlert("Failed to reject driver documents");
           }
         }
       });
@@ -118,19 +116,49 @@ export default function DriverVerificationPage() {
   }
 
   function renderDocThumbnail(src, alt = "Doc") {
-    const finalSrc = src || "/no-document.png";
+    if (!src) {
+      return (
+        <img
+          src="/no-document.png"
+          alt={alt}
+          className="driver-doc-thumbnail"
+          style={{
+            objectFit: "contain",
+            background: "#ffffff",
+            padding: "2px",
+          }}
+        />
+      );
+    }
+
+    const isPdf = typeof src === "string" && (src.toLowerCase().endsWith(".pdf") || src.toLowerCase().includes(".pdf"));
+
+    if (isPdf) {
+      return (
+        <button
+          type="button"
+          className="driver-pdf-badge"
+          onClick={() => window.open(src, "_blank", "noopener,noreferrer")}
+          title={`Click to view ${alt} (PDF)`}
+        >
+          <FileText size={18} />
+          <span>View<br />PDF</span>
+        </button>
+      );
+    }
+
     return (
       <img
-        src={finalSrc}
+        src={src}
         alt={alt}
         className="driver-doc-thumbnail"
         style={{
           objectFit: "contain",
-          background: src ? "transparent" : "#ffffff",
-          padding: src ? "0" : "2px",
+          background: "transparent",
+          padding: "0",
           cursor: "pointer",
         }}
-        onClick={() => setZoomedImage({ src: finalSrc, title: alt })}
+        onClick={() => setZoomedImage({ src, title: alt })}
         title="Click to zoom document"
         onError={(e) => {
           e.target.src = "/no-document.png";
@@ -210,8 +238,15 @@ export default function DriverVerificationPage() {
                 </tr>
               ) : (
                 drivers.map((d, index) => {
-                  const isApproved = d.status === "Approved" || d.statusCode === 2;
-                  const isRejected = d.status === "Rejected" || d.statusCode === 3;
+                  const docStatus = d.documentVerifyStatus || (
+                    d.document_verify_status === "accepted" || d.document_verify_status === "approved" || d.document_verify_status === "2"
+                      ? "Approved"
+                      : d.document_verify_status === "rejected" || d.document_verify_status === "3"
+                      ? "Rejected"
+                      : "Pending"
+                  );
+                  const isDocApproved = docStatus === "Approved";
+                  const isDocRejected = docStatus === "Rejected";
 
                   return (
                     <tr key={d.id || d._id}>
@@ -265,20 +300,20 @@ export default function DriverVerificationPage() {
                       <td>
                         <span
                           className={
-                            isApproved
+                            isDocApproved
                               ? "driver-status-text approved"
-                              : isRejected
+                              : isDocRejected
                               ? "driver-status-text rejected"
                               : "driver-status-text pending"
                           }
                         >
-                          {d.status}
+                          {docStatus}
                         </span>
                       </td>
                       <td>
                         <div className="driver-action-icons-wrap" style={{ gap: "6px" }}>
                           {/* Reject Icon - Hide if already Rejected */}
-                          {!isRejected && (
+                          {!isDocRejected && (
                             <button
                               type="button"
                               className="driver-circle-btn reject"
@@ -299,8 +334,8 @@ export default function DriverVerificationPage() {
                             <Upload size={14} />
                           </button>
 
-                          {/* Approve Icon - Show on Pending or when documents are freshly re-uploaded */}
-                          {!isApproved && !isRejected && (
+                          {/* Approve Icon - Show if not already approved */}
+                          {!isDocApproved && (
                             <button
                               type="button"
                               className="driver-circle-btn approve"
