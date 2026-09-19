@@ -226,7 +226,7 @@ exports.driverRegister = async (req, res) => {
       success: true,
       message: "OTP has been sent successfully",
       account_exit: accountExit,
-      otp: otp,
+      otp: process.env.NODE_ENV === "development" ? otp : undefined,
       gateway_response: gatewayResponse,
     });
   } catch (error) {
@@ -5201,6 +5201,12 @@ exports.getDriverTopupAlert = exports.driverTopupAlert;
  * Route: ALL /api/test-login
  */
 exports.driverTestLogin = async (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({
+      message: "Test login is disabled in production",
+    });
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({
       message: "Invalid Method",

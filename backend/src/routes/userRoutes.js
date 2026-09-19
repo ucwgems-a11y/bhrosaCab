@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userUpload = require("../middleware/userUpload");
 const verifyUserToken = require("../middleware/verifyUserToken");
+const verifyAdmin = require("../middleware/verifyAdmin");
 const {
   userSendMessage,
   userGetMessageList,
@@ -123,13 +124,13 @@ router.all("/user-delete-account", userAccountDeleted);
 /* =========================================================================
    2. ADMIN & CRM PANEL USER MANAGEMENT ENDPOINTS (Mounted at /users)
    ========================================================================= */
-router.get("/stats", getUserStats);
-router.get("/campaigns", getCampaigns);
-router.get("/campaigns/media-source/:source", getMediaSourceUsers);
-router.get("/", getAllUsers);
-router.get("/:id", getUserById);
-router.patch("/:id/toggle-block", toggleBlockUser);
-router.post("/:id/logout", logoutUser);
-router.patch("/:id/logout", logoutUser);
+router.get("/stats", verifyAdmin, getUserStats);
+router.get("/campaigns", verifyAdmin, getCampaigns);
+router.get("/campaigns/media-source/:source", verifyAdmin, getMediaSourceUsers);
+router.get("/", verifyAdmin, getAllUsers);
+router.get("/:id", verifyAdmin, getUserById);
+router.patch("/:id/toggle-block", verifyAdmin, toggleBlockUser);
+router.post("/:id/logout", verifyAdmin, logoutUser);
+router.patch("/:id/logout", verifyAdmin, logoutUser);
 
 module.exports = router;

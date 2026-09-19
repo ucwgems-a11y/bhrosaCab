@@ -139,7 +139,6 @@ exports.userRegister = async (req, res) => {
       message: "OTP has been sent successfully",
       account_exit: accountExit,
       otp: process.env.NODE_ENV === "development" ? otp : undefined,
-      otp: otp,
       gateway_response: gatewayResponse,
     });
   } catch (error) {
@@ -2365,8 +2364,8 @@ exports.driverGetFullDetails = async (req, res) => {
     ];
 
     const driverCheckBooking = await DriverCheckBooking.findOne({
+      user_id: { $in: userCriteria },
       $or: [
-        { user_id: { $in: userCriteria } },
         { accept_status: 1 },
         { accept_status: "1" },
       ],
@@ -3719,6 +3718,12 @@ exports.getState = exports.getStates;
  * Route: ALL /api/test-login-user
  */
 exports.userTestLogin = async (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({
+      message: "Test login is disabled in production",
+    });
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({
       message: "Invalid Method",

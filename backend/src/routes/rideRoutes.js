@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verifyUserToken = require("../middleware/verifyUserToken");
 const verifyDriverToken = require("../middleware/verifyDriverToken");
+const verifyAdmin = require("../middleware/verifyAdmin");
 const {
   getVehicleTypes,
   getVehicleTypeFare,
@@ -69,8 +70,8 @@ router.all("/driver-outstation-history", verifyDriverToken, driverOutstationHist
    2. ADMIN & CRM PANEL MANAGEMENT ENDPOINTS
    ========================================================================= */
 
-router.get("/rides/stats", getRideStats);
-router.get("/rides", getRides);
-router.get("/rides/:status", getRides);
+router.get("/rides/stats", verifyAdmin, getRideStats);
+router.get("/rides", verifyAdmin, getRides);
+router.get("/rides/:status", verifyAdmin, getRides);
 
 module.exports = router;

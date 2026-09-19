@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const carUpload = require("../middleware/carUpload");
+const verifyAdmin = require("../middleware/verifyAdmin");
 const {
   getCarTypes,
   getCarTypeById,
@@ -27,16 +28,16 @@ const {
 // 1. Car Types
 router.get("/types", getCarTypes);
 router.get("/types/:id", getCarTypeById);
-router.post("/types", createCarType);
-router.put("/types/:id", updateCarType);
-router.delete("/types/:id", deleteCarType);
+router.post("/types", verifyAdmin, createCarType);
+router.put("/types/:id", verifyAdmin, updateCarType);
+router.delete("/types/:id", verifyAdmin, deleteCarType);
 
 // 2. Price Fares
 router.get("/fares", getPriceFares);
 router.get("/fares/:id", getPriceFareById);
-router.post("/fares", carUpload.any(), createPriceFare);
-router.put("/fares/:id", carUpload.any(), updatePriceFare);
-router.delete("/fares/:id", deletePriceFare);
+router.post("/fares", verifyAdmin, carUpload.any(), createPriceFare);
+router.put("/fares/:id", verifyAdmin, carUpload.any(), updatePriceFare);
+router.delete("/fares/:id", verifyAdmin, deletePriceFare);
 router.all("/vehice-details", getVehicleFaresDetails);
 router.all("/vehicle-details", getVehicleFaresDetails);
 router.all("/get-kilometer-price", getKilometerPrices);
@@ -44,15 +45,15 @@ router.all("/get-kilometer-price", getKilometerPrices);
 // 3. Auto Prices
 router.get("/auto-prices", getAutoPrices);
 router.get("/auto-price", getAutoPrices);
-router.post("/auto-prices", createAutoPrice);
-router.delete("/auto-prices/:id", deleteAutoPrice);
+router.post("/auto-prices", verifyAdmin, createAutoPrice);
+router.delete("/auto-prices/:id", verifyAdmin, deleteAutoPrice);
 
 // 4. Driver Topup
 router.get("/topups", getDriverTopups);
 router.get("/driver-topup", getDriverTopups);
 router.get("/topups/:id", getDriverTopupById);
-router.post("/topups", createDriverTopup);
-router.put("/topups/:id", updateDriverTopup);
-router.delete("/topups/:id", deleteDriverTopup);
+router.post("/topups", verifyAdmin, createDriverTopup);
+router.put("/topups/:id", verifyAdmin, updateDriverTopup);
+router.delete("/topups/:id", verifyAdmin, deleteDriverTopup);
 
 module.exports = router;

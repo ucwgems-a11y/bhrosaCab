@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const driverUpload = require("../middleware/driverUpload");
 const verifyDriverToken = require("../middleware/verifyDriverToken");
+const verifyAdmin = require("../middleware/verifyAdmin");
 const {
   driverSendMessage,
   driverGetMessageList,
@@ -134,34 +135,34 @@ router.all("/logout", logoutDriver);
 /* =========================================================================
    2. ADMIN & CRM PANEL DRIVER MANAGEMENT ENDPOINTS (Mounted at /drivers)
    ========================================================================= */
-router.get("/stats", getDriverStats);
-router.get("/active/state-count", getActiveDriversStateCount);
-router.get("/active/by-state", getActiveDriversStateCount);
-router.get("/wallet/recharge-history", getAllRechargeHistory);
-router.get("/recharge-history", getAllRechargeHistory);
+router.get("/stats", verifyAdmin, getDriverStats);
+router.get("/active/state-count", verifyAdmin, getActiveDriversStateCount);
+router.get("/active/by-state", verifyAdmin, getActiveDriversStateCount);
+router.get("/wallet/recharge-history", verifyAdmin, getAllRechargeHistory);
+router.get("/recharge-history", verifyAdmin, getAllRechargeHistory);
 
 // Referral Commission Monthly Payout Engine
-router.post("/referral-commission/process-payout", processMonthlyReferralPayout);
-router.get("/referral-commission/process-payout", processMonthlyReferralPayout);
+router.post("/referral-commission/process-payout", verifyAdmin, processMonthlyReferralPayout);
+router.get("/referral-commission/process-payout", verifyAdmin, processMonthlyReferralPayout);
 
-router.get("/", getDrivers);
+router.get("/", verifyAdmin, getDrivers);
 
 // Single Driver Operations (by MongoDB _id)
-router.get("/:id/referrals", getDriverReferrals);
-router.get("/:id/referral-list", getDriverReferrals);
-router.get("/:id/referral-commission", getDriverReferralCommissions);
-router.get("/:id", getDriverById);
-router.get("/:id/profile", getDriverById);
-router.get("/:id/wallet-history", getDriverWalletHistoryById);
-router.post("/:id/recharge", rechargeDriverWallet);
-router.post("/:id/wallet/recharge", rechargeDriverWallet);
-router.get("/:id/rides", getDriverRidesById);
-router.post("/:id/logout", logoutDriver);
-router.patch("/:id/logout", logoutDriver);
-router.put("/:id/status", updateDriverStatus);
-router.patch("/:id/status", updateDriverStatus);
-router.put("/:id/block", toggleBlockStatus);
-router.put("/:id", driverUpload.any(), updateDriver);
-router.delete("/:id", deleteDriver);
+router.get("/:id/referrals", verifyAdmin, getDriverReferrals);
+router.get("/:id/referral-list", verifyAdmin, getDriverReferrals);
+router.get("/:id/referral-commission", verifyAdmin, getDriverReferralCommissions);
+router.get("/:id", verifyAdmin, getDriverById);
+router.get("/:id/profile", verifyAdmin, getDriverById);
+router.get("/:id/wallet-history", verifyAdmin, getDriverWalletHistoryById);
+router.post("/:id/recharge", verifyAdmin, rechargeDriverWallet);
+router.post("/:id/wallet/recharge", verifyAdmin, rechargeDriverWallet);
+router.get("/:id/rides", verifyAdmin, getDriverRidesById);
+router.post("/:id/logout", verifyAdmin, logoutDriver);
+router.patch("/:id/logout", verifyAdmin, logoutDriver);
+router.put("/:id/status", verifyAdmin, updateDriverStatus);
+router.patch("/:id/status", verifyAdmin, updateDriverStatus);
+router.put("/:id/block", verifyAdmin, toggleBlockStatus);
+router.put("/:id", verifyAdmin, driverUpload.any(), updateDriver);
+router.delete("/:id", verifyAdmin, deleteDriver);
 
 module.exports = router;
