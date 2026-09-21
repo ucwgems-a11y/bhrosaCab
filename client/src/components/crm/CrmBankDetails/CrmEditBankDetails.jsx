@@ -1,28 +1,16 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Landmark, CreditCard, User, MapPin, Code, Save, ArrowLeft } from "lucide-react";
-import { swalWithBootstrapButtons } from "../../../utils/sweetAlert";
+import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
+import api from "../../../api/axios";
 import "./CrmBankDetails.css";
 
 export default function CrmEditBankDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [bankAccounts, setBankAccounts] = useState(() => {
-    const saved = localStorage.getItem("crm_bank_accounts");
-    return saved
-      ? JSON.parse(saved)
-      : [
-          {
-            id: 1,
-            accountNumber: "123456789",
-            accountHolder: "aaaaa",
-            bankName: "PNB BANK",
-            branch: "dfasdf",
-            ifscCode: "DFSD435435",
-          },
-        ];
-  });
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     account_number: "",
@@ -33,17 +21,36 @@ export default function CrmEditBankDetails() {
   });
 
   useEffect(() => {
-    const current = bankAccounts.find((a) => String(a.id) === String(id));
-    if (current) {
-      setFormData({
-        account_number: current.accountNumber || "",
-        account_holder_name: current.accountHolder || "",
-        bank_name: current.bankName || "",
-        branch_name: current.branch || "",
-        ifsc_code: current.ifscCode || "",
-      });
+    async function loadAccount() {
+      setLoading(true);
+      try {
+        const res = await api.get("/subadmin-auth/bank-accounts");
+        if (res.data && res.data.success && Array.isArray(res.data.bankAccounts)) {
+          const current = res.data.bankAccounts.find(
+            (a) => String(a._id) === String(id) || String(a.id) === String(id)
+          );
+          if (current) {
+            setFormData({
+              account_number: current.accountNumber || "",
+              account_holder_name: current.accountHolder || "",
+              bank_name: current.bankName || "",
+              branch_name: current.branch || "",
+              ifsc_code: current.ifscCode || "",
+            });
+          } else {
+            showErrorAlert("Bank account not found");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load bank account:", err);
+        showErrorAlert("Failed to load bank account details");
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [id, bankAccounts]);
+
+    if (id) loadAccount();
+  }, [id]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -53,34 +60,49 @@ export default function CrmEditBankDetails() {
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    const updatedList = bankAccounts.map((acc) => {
-      if (String(acc.id) === String(id)) {
-        return {
-          ...acc,
-          accountNumber: formData.account_number,
-          accountHolder: formData.account_holder_name,
-          bankName: formData.bank_name,
-          branch: formData.branch_name,
-          ifscCode: formData.ifsc_code,
-        };
-      }
-      return acc;
-    });
-
-    localStorage.setItem("crm_bank_accounts", JSON.stringify(updatedList));
-
-    swalWithBootstrapButtons
-      .fire({
-        title: "Updated Successfully!",
-        text: "Bank account details have been updated.",
-        icon: "success",
-      })
-      .then(() => {
-        navigate("/crm-bank-details");
+    if (!formData.account_number || !formData.account_holder_name || !formData.bank_name || !formData.ifsc_code) {
+      swalWithBootstrapButtons.fire({
+        title: "Required Fields",
+        text: "Please fill all mandatory fields marked with *",
+        icon: "warning",
       });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        accountNumber: formData.account_number.trim(),
+        accountHolder: formData.account_holder_name.trim(),
+        bankName: formData.bank_name.trim(),
+        branch: formData.branch_name ? formData.branch_name.trim() : "Main Branch",
+        ifscCode: formData.ifsc_code.trim().toUpperCase(),
+      };
+
+      const res = await api.put(`/subadmin-auth/bank-accounts/${id}`, payload);
+      if (res.data && res.data.success) {
+        showSuccessAlert("Bank account updated successfully!");
+        setTimeout(() => {
+          navigate("/crm-bank-details");
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Failed to update bank account:", err);
+      showErrorAlert(err.response?.data?.message || "Failed to update bank account");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="crm-bank-page-wrap" style={{ textAlign: "center", padding: "60px", color: "var(--text-muted)" }}>
+        Loading bank account details...
+      </div>
+    );
   }
 
   return (
@@ -100,20 +122,19 @@ export default function CrmEditBankDetails() {
           className="crm-bank-back-btn"
           onClick={() => navigate("/crm-bank-details")}
         >
-          <ArrowLeft size={16} />
-          <span>Back to Bank Details</span>
+          <ArrowLeft size={16} /> Back to Bank Details
         </button>
       </div>
 
-      {/* Edit Card */}
+      {/* Edit Card Form */}
       <div className="crm-bank-card">
         <div className="crm-bank-card-header">
           <div className="crm-bank-card-icon">
-            <Landmark size={22} />
+            <CreditCard size={22} />
           </div>
           <div>
-            <h4 className="crm-bank-card-title">Update Bank Account</h4>
-            <p className="crm-bank-card-subtitle">Edit the fields below and click save</p>
+            <h4 className="crm-bank-card-title">Bank Account Information</h4>
+            <p className="crm-bank-card-subtitle">Modify account details below</p>
           </div>
         </div>
 
@@ -214,17 +235,10 @@ export default function CrmEditBankDetails() {
               </div>
             </div>
 
-            <div className="crm-bank-submit-area d-flex gap-3">
-              <button type="submit" className="crm-bank-submit-btn">
+            <div className="crm-bank-submit-area">
+              <button type="submit" className="crm-bank-submit-btn" disabled={submitting}>
                 <Save size={16} />
-                <span>Save Changes</span>
-              </button>
-              <button
-                type="button"
-                className="crm-bank-cancel-btn"
-                onClick={() => navigate("/crm-bank-details")}
-              >
-                Cancel
+                <span>{submitting ? "Updating..." : "Update Bank Details"}</span>
               </button>
             </div>
           </form>

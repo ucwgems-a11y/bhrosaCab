@@ -16,7 +16,17 @@ const {
   requestWithdrawal,
   getWithdrawalRequests,
   updateWithdrawalStatus,
+  getBankAccounts,
+  addBankAccount,
+  updateBankAccount,
+  deleteBankAccount,
 } = require("../controllers/subAdminAuthController");
+
+// Sub-Admin Bank Account Endpoints
+router.get("/bank-accounts", verifyAdmin, getBankAccounts);
+router.post("/bank-accounts", verifyAdmin, addBankAccount);
+router.put("/bank-accounts/:bankId", verifyAdmin, updateBankAccount);
+router.delete("/bank-accounts/:bankId", verifyAdmin, deleteBankAccount);
 
 // Sub-Admin Withdrawal Endpoints
 router.post("/withdrawal-request", verifyAdmin, requestWithdrawal);

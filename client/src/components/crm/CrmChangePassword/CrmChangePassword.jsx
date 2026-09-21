@@ -1,9 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 import { Lock, Key, CheckCircle, Shield, Info, Eye, EyeOff } from "lucide-react";
 import { useCrmAuth } from "../../../context/CrmAuthContext";
 import { swalWithBootstrapButtons } from "../../../utils/sweetAlert";
-import { API_BASE_URL } from "../../../config";
+import api from "../../../api/axios";
 import "./CrmChangePassword.css";
 
 export default function CrmChangePassword() {
@@ -44,7 +43,7 @@ export default function CrmChangePassword() {
     }
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/subadmin-auth/change-password`, {
+      const res = await api.post("/subadmin-auth/change-password", {
         old_password: formData.old_password,
         new_password: formData.new_password,
         email: subAdmin?.email,

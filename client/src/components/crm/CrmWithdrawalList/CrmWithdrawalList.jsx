@@ -4,92 +4,57 @@ import {
   Landmark,
   List,
   Plus,
-  Inbox,
   Banknote,
   Calendar,
   Building,
+  RefreshCw,
 } from "lucide-react";
-import axios from "axios";
+import api from "../../../api/axios";
 import { useCrmAuth } from "../../../context/CrmAuthContext";
-import { API_BASE_URL } from "../../../config";
 import "./CrmWithdrawalList.css";
 
 export default function CrmWithdrawalList() {
   const { subAdmin } = useCrmAuth();
-  const [requests, setRequests] = useState(() => {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  async function loadRequests() {
+    setLoading(true);
+    const subAdminId = subAdmin?._id || subAdmin?.id;
     try {
-      const saved = localStorage.getItem("crm_withdrawal_requests");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+      const url = subAdminId
+        ? `/subadmin-auth/withdrawal-requests?subAdminId=${subAdminId}`
+        : "/subadmin-auth/withdrawal-requests";
+      const res = await api.get(url);
+      if (res.data && res.data.success && Array.isArray(res.data.requests)) {
+        const mapped = res.data.requests.map((r) => ({
+          id: r._id || r.id,
+          subAdminId: r.subAdminId,
+          subAdminName: r.subAdminName,
+          bankName: r.bankName,
+          accountNumber: r.accountNumber,
+          accountHolder: r.accountHolder || r.subAdminName,
+          ifscCode: r.ifscCode,
+          branchName: r.branchName,
+          amount:
+            typeof r.amount === "number"
+              ? `₹${r.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
+              : r.amount,
+          status: r.status,
+          requestedDate: r.requestedDate,
+          rejectReason: r.rejectReason,
+        }));
+        setRequests(mapped);
       }
-    } catch (e) {}
-    return [];
-  });
+    } catch (err) {
+      console.error("Could not fetch withdrawal requests from server:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    let isMounted = true;
-    async function loadRequests() {
-      const subAdminId = subAdmin?._id || subAdmin?.id;
-      try {
-        const url = subAdminId
-          ? `${API_BASE_URL}/subadmin-auth/withdrawal-requests?subAdminId=${subAdminId}`
-          : `${API_BASE_URL}/subadmin-auth/withdrawal-requests`;
-        const res = await axios.get(url);
-        if (res.data && res.data.success && Array.isArray(res.data.requests) && isMounted) {
-          const mapped = res.data.requests.map((r) => ({
-            id: r._id || r.id,
-            subAdminId: r.subAdminId,
-            subAdminName: r.subAdminName,
-            bankName: r.bankName,
-            accountNumber: r.accountNumber,
-            accountHolder: r.accountHolder || r.subAdminName,
-            holderName: r.accountHolder || r.subAdminName,
-            ifscCode: r.ifscCode,
-            branchName: r.branchName,
-            amount:
-              typeof r.amount === "number"
-                ? `₹${r.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
-                : r.amount,
-            status: r.status,
-            requestedDate: r.requestedDate,
-            rejectReason: r.rejectReason,
-          }));
-          setRequests(mapped);
-          localStorage.setItem("crm_withdrawal_requests", JSON.stringify(mapped));
-          return;
-        }
-      } catch (err) {
-        console.warn("Could not fetch withdrawal requests from server:", err);
-      }
-
-      // fallback to localStorage
-      try {
-        const saved = localStorage.getItem("crm_withdrawal_requests");
-        if (saved && isMounted) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            const cleaned = parsed.map((item) => ({
-              ...item,
-              accountHolder:
-                !item.accountHolder || item.accountHolder === "aaaaa" || item.accountHolder === "Harvinder Singh"
-                  ? (subAdmin?.name || item.subAdminName || "Sub Admin")
-                  : item.accountHolder,
-              holderName:
-                !item.holderName || item.holderName === "aaaaa" || item.holderName === "Harvinder Singh"
-                  ? (subAdmin?.name || item.subAdminName || "Sub Admin")
-                  : item.holderName,
-            }));
-            setRequests(cleaned);
-          }
-        }
-      } catch (e) {}
-    }
-
     loadRequests();
-    return () => {
-      isMounted = false;
-    };
   }, [subAdmin]);
 
   return (
@@ -106,7 +71,16 @@ export default function CrmWithdrawalList() {
           </p>
         </div>
 
-        <div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <button
+            type="button"
+            className="crm-withdraw-list-request-btn"
+            onClick={loadRequests}
+            style={{ background: "var(--bg-panel)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+          >
+            <RefreshCw size={15} className={loading ? "spin" : ""} />
+            <span>Reload</span>
+          </button>
           <Link
             to="/crm-withdrawal"
             className="crm-withdraw-list-request-btn"
@@ -127,7 +101,7 @@ export default function CrmWithdrawalList() {
           <div>
             <h4 className="crm-withdraw-list-card-title">Withdrawal List</h4>
             <p className="crm-withdraw-list-card-subtitle">
-              All your withdrawal requests
+              All your withdrawal requests from database
             </p>
           </div>
         </div>
@@ -148,7 +122,13 @@ export default function CrmWithdrawalList() {
                 </tr>
               </thead>
               <tbody>
-                {requests.length === 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                      Loading withdrawal requests from database...
+                    </td>
+                  </tr>
+                ) : requests.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="crm-withdraw-list-empty">
                       <div className="crm-withdraw-list-empty-icon">
@@ -156,13 +136,6 @@ export default function CrmWithdrawalList() {
                       </div>
                       <h5>No Withdrawal Requests</h5>
                       <p>You have not submitted any withdrawal request yet.</p>
-                      {/* <Link
-                        to="/crm-withdrawal"
-                        className="crm-withdraw-empty-action-btn"
-                      >
-                        <Plus size={14} />
-                        <span>Submit First Request</span>
-                      </Link> */}
                     </td>
                   </tr>
                 ) : (
@@ -190,7 +163,7 @@ export default function CrmWithdrawalList() {
                       {/* Account Holder */}
                       <td>
                         <strong className="crm-withdraw-holder-name">
-                          {req.accountHolder || req.holderName || req.subAdminName || subAdmin?.name || "N/A"}
+                          {req.accountHolder || req.subAdminName || subAdmin?.name || "N/A"}
                         </strong>
                       </td>
 
@@ -212,7 +185,7 @@ export default function CrmWithdrawalList() {
                       <td style={{ textAlign: "center" }}>
                         <span
                           className={`crm-withdraw-status-badge ${
-                            req.status === "Approved"
+                            req.status === "Approved" || req.status === "Completed"
                               ? "status-approved"
                               : req.status === "Rejected"
                               ? "status-rejected"

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Landmark, CreditCard, User, MapPin, Code, Save, Info, ListFilter, Edit2, Trash2 } from "lucide-react";
-import { swalWithBootstrapButtons } from "../../../utils/sweetAlert";
+import { swalWithBootstrapButtons, showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import { useCrmAuth } from "../../../context/CrmAuthContext";
+import api from "../../../api/axios";
 import "./CrmBankDetails.css";
 
 export default function CrmBankDetails() {
@@ -21,35 +22,9 @@ export default function CrmBankDetails() {
     })() ||
     "Sub Admin";
 
-  const defaultBankAccounts = [
-    {
-      id: 1,
-      accountNumber: "123456789",
-      accountHolder: realName,
-      bankName: "PNB BANK",
-      branch: "Main Branch",
-      ifscCode: "PUNB0123456",
-    },
-  ];
-
-  const [bankAccounts, setBankAccounts] = useState(() => {
-    const saved = localStorage.getItem("crm_bank_accounts");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((acc) => ({
-            ...acc,
-            accountHolder:
-              !acc.accountHolder || acc.accountHolder === "aaaaa" || acc.accountHolder === "Harvinder Singh"
-                ? realName
-                : acc.accountHolder,
-          }));
-        }
-      } catch (e) {}
-    }
-    return defaultBankAccounts;
-  });
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     account_number: "",
@@ -60,14 +35,37 @@ export default function CrmBankDetails() {
   });
 
   useEffect(() => {
-    if (subAdmin?.name && formData.account_holder_name === "Sub Admin") {
+    fetchBankAccounts();
+  }, [subAdmin]);
+
+  async function fetchBankAccounts() {
+    setLoading(true);
+    try {
+      const res = await api.get("/subadmin-auth/bank-accounts");
+      if (res.data && res.data.success && Array.isArray(res.data.bankAccounts)) {
+        const mapped = res.data.bankAccounts.map((b) => ({
+          id: b._id || b.id,
+          _id: b._id || b.id,
+          accountNumber: b.accountNumber,
+          accountHolder: b.accountHolder || realName,
+          bankName: b.bankName,
+          branch: b.branch || "Main Branch",
+          ifscCode: b.ifscCode,
+        }));
+        setBankAccounts(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to load bank accounts from API:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (subAdmin?.name && (!formData.account_holder_name || formData.account_holder_name === "Sub Admin")) {
       setFormData((prev) => ({ ...prev, account_holder_name: subAdmin.name }));
     }
   }, [subAdmin]);
-
-  useEffect(() => {
-    localStorage.setItem("crm_bank_accounts", JSON.stringify(bankAccounts));
-  }, [bankAccounts]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -77,7 +75,7 @@ export default function CrmBankDetails() {
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!formData.account_number || !formData.account_holder_name || !formData.bank_name || !formData.ifsc_code) {
@@ -89,30 +87,34 @@ export default function CrmBankDetails() {
       return;
     }
 
-    const newAccount = {
-      id: Date.now(),
-      accountNumber: formData.account_number,
-      accountHolder: formData.account_holder_name,
-      bankName: formData.bank_name,
-      branch: formData.branch_name || "N/A",
-      ifscCode: formData.ifsc_code,
-    };
+    setSubmitting(true);
+    try {
+      const payload = {
+        accountNumber: formData.account_number.trim(),
+        accountHolder: formData.account_holder_name.trim(),
+        bankName: formData.bank_name.trim(),
+        branch: (formData.branch_name || "Main Branch").trim(),
+        ifscCode: formData.ifsc_code.trim().toUpperCase(),
+      };
 
-    setBankAccounts((prev) => [...prev, newAccount]);
-
-    swalWithBootstrapButtons.fire({
-      title: "Bank Details Saved!",
-      text: "New bank account has been added successfully.",
-      icon: "success",
-    });
-
-    setFormData({
-      account_number: "",
-      account_holder_name: "",
-      bank_name: "",
-      branch_name: "",
-      ifsc_code: "",
-    });
+      const res = await api.post("/subadmin-auth/bank-accounts", payload);
+      if (res.data && res.data.success) {
+        showSuccessAlert("Bank account added successfully!");
+        fetchBankAccounts();
+        setFormData({
+          account_number: "",
+          account_holder_name: subAdmin?.name || realName,
+          bank_name: "",
+          branch_name: "",
+          ifsc_code: "",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to save bank account:", err);
+      showErrorAlert(err.response?.data?.message || "Failed to save bank account");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function handleDelete(id) {
@@ -126,14 +128,16 @@ export default function CrmBankDetails() {
         cancelButtonText: "Cancel",
         reverseButtons: true,
       })
-      .then((result) => {
+      .then(async (result) => {
         if (result.isConfirmed) {
-          setBankAccounts((prev) => prev.filter((acc) => acc.id !== id));
-          swalWithBootstrapButtons.fire({
-            title: "Deleted!",
-            text: "Bank account has been removed.",
-            icon: "success",
-          });
+          try {
+            await api.delete(`/subadmin-auth/bank-accounts/${id}`);
+            showSuccessAlert("Bank account has been removed.");
+            fetchBankAccounts();
+          } catch (err) {
+            console.error("Failed to delete bank account:", err);
+            showErrorAlert(err.response?.data?.message || "Failed to delete bank account");
+          }
         }
       });
   }
@@ -267,9 +271,9 @@ export default function CrmBankDetails() {
             </div>
 
             <div className="crm-bank-submit-area">
-              <button type="submit" className="crm-bank-submit-btn">
+              <button type="submit" className="crm-bank-submit-btn" disabled={submitting}>
                 <Save size={16} />
-                <span>Save Bank Details</span>
+                <span>{submitting ? "Saving..." : "Save Bank Details"}</span>
               </button>
             </div>
           </form>
@@ -303,15 +307,21 @@ export default function CrmBankDetails() {
                 </tr>
               </thead>
               <tbody>
-                {bankAccounts.length === 0 ? (
+                {loading ? (
                   <tr>
                     <td colSpan={7} className="crm-bank-no-data">
-                      No saved bank accounts found.
+                      Loading bank accounts from database...
+                    </td>
+                  </tr>
+                ) : bankAccounts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="crm-bank-no-data">
+                      No saved bank accounts found. Use the form above to add your bank details.
                     </td>
                   </tr>
                 ) : (
                   bankAccounts.map((acc, i) => (
-                    <tr key={acc.id}>
+                    <tr key={acc.id || acc._id}>
                       <td style={{ textAlign: "center", fontWeight: 700 }}>{i + 1}</td>
                       <td>
                         <span className="crm-bank-acc-num">{acc.accountNumber}</span>
@@ -333,7 +343,7 @@ export default function CrmBankDetails() {
                             type="button"
                             className="crm-bank-action-btn edit"
                             title="Edit"
-                            onClick={() => navigate(`/crm-bank-details-edit/${acc.id}`)}
+                            onClick={() => navigate(`/crm-bank-details-edit/${acc.id || acc._id}`)}
                           >
                             <Edit2 size={15} />
                           </button>
@@ -341,7 +351,7 @@ export default function CrmBankDetails() {
                             type="button"
                             className="crm-bank-action-btn delete"
                             title="Delete"
-                            onClick={() => handleDelete(acc.id)}
+                            onClick={() => handleDelete(acc.id || acc._id)}
                           >
                             <Trash2 size={15} />
                           </button>

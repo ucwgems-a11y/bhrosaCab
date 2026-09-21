@@ -123,19 +123,19 @@ export default function DriverProfilePage() {
   const rows = [
     { label: "Driver Name:", value: driver.name + (driver.lastName ? " " + driver.lastName : "") },
     { label: "Phone Number:", value: driver.number || driver.phone || "N/A" },
-    { label: "Email Address:", value: driver.email || "N/A" },
-    { label: "State / Location:", value: driver.state || "N/A" },
-    { label: "Wallet Balance:", value: "₹ " + (driver.wallet || 0).toFixed(2) },
+    // { label: "Email Address:", value: driver.email || "N/A" },
+    // { label: "State / Location:", value: driver.state || "N/A" },
+    // { label: "Wallet Balance:", value: "₹ " + (driver.wallet || 0).toFixed(2) },
     { label: "License Number:", value: driver.license_number || driver.licenseNumber || "N/A" },
     { label: "Aadhaar Number:", value: driver.aadhaar_number || driver.aadhaarNumber || "N/A" },
     { label: "Aadhaar Status:", value: driver.aadhaar_number_status || driver.aadhaarStatus || "pending" },
-    { label: "Licence Status:", value: driver.driving_licence_status || driver.licenceStatus || "pending" },
+    // { label: "Licence Status:", value: driver.driving_licence_status || driver.licenceStatus || "pending" },
     { label: "Vehicle Brand:", value: driver.brand || driver.vehicleBrand || "N/A" },
-    { label: "Vehicle Model:", value: driver.model || driver.vehicleModel || "N/A" },
+    // { label: "Vehicle Model:", value: driver.model || driver.vehicleModel || "N/A" },
     { label: "Vehicle Number:", value: driver.vehicle_number || driver.vehicleNumber || "N/A" },
     { label: "Vehicle Category:", value: driver.cateogory || driver.vehicleCategory || "Hatchback" },
-    { label: "Manufacturing Year:", value: driver.manufacturing_year || "N/A" },
-    { label: "Application Status:", value: isApproved ? "Approved" : isRejected ? "Rejected" : "Pending" },
+    // { label: "Manufacturing Year:", value: driver.manufacturing_year || "N/A" },
+    // { label: "Application Status:", value: isApproved ? "Approved" : isRejected ? "Rejected" : "Pending" },
   ];
 
   const imageRows = [
@@ -143,9 +143,9 @@ export default function DriverProfilePage() {
     { label: "Vehicle Back Image:", src: driver.vehicleBack || driver.vehicle_back_image },
     { label: "Vehicle Interior Image:", src: driver.vehicleInterior || driver.vehicle_interior_image },
     { label: "Licence Front:", src: driver.licenceFront || driver.driving_licence_front },
-    { label: "Licence Back:", src: driver.licenceBack || driver.driving_licence_back },
+    // { label: "Licence Back:", src: driver.licenceBack || driver.driving_licence_back },
     { label: "Vehicle RC Front:", src: driver.rcFront || driver.vehicle_rc_front },
-    { label: "Vehicle RC Back:", src: driver.rcBack || driver.vehicle_rc_back },
+    // { label: "Vehicle RC Back:", src: driver.rcBack || driver.vehicle_rc_back },
     { label: "Government / ID Proof Front:", src: driver.idProofFront || driver.id_proof_front },
     { label: "Government / ID Proof Back:", src: driver.idProofBack || driver.id_proof_back },
   ];

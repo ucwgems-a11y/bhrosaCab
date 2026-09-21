@@ -627,6 +627,165 @@ const updateWithdrawalStatus = async (req, res) => {
   }
 };
 
+// 14. Get Bank Accounts (Sub-Admin)
+const getBankAccounts = async (req, res) => {
+  try {
+    let subAdminId = req.admin?.id || req.query?.subAdminId;
+    if (!subAdminId && req.admin?.role === "subadmin") {
+      subAdminId = req.admin.id;
+    }
+    if (!subAdminId) {
+      const firstSubAdmin = await SubAdmin.findOne();
+      if (firstSubAdmin) subAdminId = firstSubAdmin._id;
+    }
+
+    const subAdmin = await SubAdmin.findById(subAdminId);
+    if (!subAdmin) {
+      return res.status(404).json({ success: false, message: "Sub-Admin not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      bankAccounts: subAdmin.bankAccounts || [],
+    });
+  } catch (err) {
+    console.error("Error in getBankAccounts:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// 15. Add Bank Account (Sub-Admin)
+const addBankAccount = async (req, res) => {
+  try {
+    let subAdminId = req.admin?.id || req.body?.subAdminId;
+    if (!subAdminId && req.admin?.role === "subadmin") {
+      subAdminId = req.admin.id;
+    }
+    if (!subAdminId) {
+      const firstSubAdmin = await SubAdmin.findOne();
+      if (firstSubAdmin) subAdminId = firstSubAdmin._id;
+    }
+
+    const { accountNumber, accountHolder, bankName, branch, ifscCode } = req.body;
+    if (!accountNumber || !accountHolder || !bankName || !ifscCode) {
+      return res.status(400).json({ success: false, message: "Please fill all mandatory fields" });
+    }
+
+    const subAdmin = await SubAdmin.findById(subAdminId);
+    if (!subAdmin) {
+      return res.status(404).json({ success: false, message: "Sub-Admin not found" });
+    }
+
+    if (!subAdmin.bankAccounts) subAdmin.bankAccounts = [];
+
+    const newAccount = {
+      accountNumber: String(accountNumber).trim(),
+      accountHolder: String(accountHolder).trim(),
+      bankName: String(bankName).trim(),
+      branch: branch ? String(branch).trim() : "Main Branch",
+      ifscCode: String(ifscCode).trim().toUpperCase(),
+    };
+
+    subAdmin.bankAccounts.push(newAccount);
+    await subAdmin.save();
+
+    const created = subAdmin.bankAccounts[subAdmin.bankAccounts.length - 1];
+
+    return res.status(201).json({
+      success: true,
+      message: "Bank account added successfully",
+      bankAccount: created,
+      bankAccounts: subAdmin.bankAccounts,
+    });
+  } catch (err) {
+    console.error("Error in addBankAccount:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// 16. Update Bank Account (Sub-Admin)
+const updateBankAccount = async (req, res) => {
+  try {
+    let subAdminId = req.admin?.id || req.body?.subAdminId;
+    if (!subAdminId && req.admin?.role === "subadmin") {
+      subAdminId = req.admin.id;
+    }
+    if (!subAdminId) {
+      const firstSubAdmin = await SubAdmin.findOne();
+      if (firstSubAdmin) subAdminId = firstSubAdmin._id;
+    }
+
+    const { bankId } = req.params;
+    const { accountNumber, accountHolder, bankName, branch, ifscCode } = req.body;
+
+    const subAdmin = await SubAdmin.findById(subAdminId);
+    if (!subAdmin) {
+      return res.status(404).json({ success: false, message: "Sub-Admin not found" });
+    }
+
+    const acc = (subAdmin.bankAccounts || []).find(
+      (b) => String(b._id) === String(bankId) || String(b.id) === String(bankId)
+    );
+
+    if (!acc) {
+      return res.status(404).json({ success: false, message: "Bank account not found" });
+    }
+
+    if (accountNumber) acc.accountNumber = String(accountNumber).trim();
+    if (accountHolder) acc.accountHolder = String(accountHolder).trim();
+    if (bankName) acc.bankName = String(bankName).trim();
+    if (branch) acc.branch = String(branch).trim();
+    if (ifscCode) acc.ifscCode = String(ifscCode).trim().toUpperCase();
+
+    await subAdmin.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Bank account updated successfully",
+      bankAccounts: subAdmin.bankAccounts,
+    });
+  } catch (err) {
+    console.error("Error in updateBankAccount:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// 17. Delete Bank Account (Sub-Admin)
+const deleteBankAccount = async (req, res) => {
+  try {
+    let subAdminId = req.admin?.id || req.body?.subAdminId;
+    if (!subAdminId && req.admin?.role === "subadmin") {
+      subAdminId = req.admin.id;
+    }
+    if (!subAdminId) {
+      const firstSubAdmin = await SubAdmin.findOne();
+      if (firstSubAdmin) subAdminId = firstSubAdmin._id;
+    }
+
+    const { bankId } = req.params;
+
+    const subAdmin = await SubAdmin.findById(subAdminId);
+    if (!subAdmin) {
+      return res.status(404).json({ success: false, message: "Sub-Admin not found" });
+    }
+
+    subAdmin.bankAccounts = (subAdmin.bankAccounts || []).filter(
+      (b) => String(b._id) !== String(bankId) && String(b.id) !== String(bankId)
+    );
+
+    await subAdmin.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Bank account deleted successfully",
+      bankAccounts: subAdmin.bankAccounts,
+    });
+  } catch (err) {
+    console.error("Error in deleteBankAccount:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   getSubAdmins,
   getSubAdminById,
@@ -641,4 +800,8 @@ module.exports = {
   requestWithdrawal,
   getWithdrawalRequests,
   updateWithdrawalStatus,
+  getBankAccounts,
+  addBankAccount,
+  updateBankAccount,
+  deleteBankAccount,
 };

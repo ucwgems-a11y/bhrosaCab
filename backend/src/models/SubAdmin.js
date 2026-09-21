@@ -70,6 +70,16 @@ const subAdminSchema = new mongoose.Schema(
       type: String,
       default: "subadmin",
     },
+    bankAccounts: [
+      {
+        accountNumber: { type: String, required: true },
+        accountHolder: { type: String, required: true },
+        bankName: { type: String, required: true },
+        branch: { type: String, default: "Main Branch" },
+        ifscCode: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
